@@ -1,20 +1,60 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+    colors: {
+      // Please refer https://colorffy.com/dark-theme-generator
+      // Primary Color: #01aaff
+      // Dark Color: #262626
+      primary: {
+        100: "#1e425e",
+        200: "#216391",
+        300: "#1c85c6",
+        400: "#01aaff",
+        500: "#4bb3ff",
+        600: "#6cbcff",
+        700: "#86c6ff",
+        800: "#9dcfff",
+        900: "#b2d8ff",
+      },
+      surface: {
+        100: "#262626",
+        200: "#3a3a3a",
+        300: "#505050",
+        400: "#676767",
+        500: "#7e7e7e",
+        600: "#979797",
+        700: "#dcdcdc",
+      },
+      white: "#ffffff",
+      black: {
+        100: "#080808",
+        200: "#0f0f0f",
+        300: "#141414",
+        400: "#191919",
+        500: "#1d1d1d",
+        600: "#222222",
+        700: "#262626",
+      },
+      alert: {
+        100: "#fee2e2",
+        200: "#fecaca",
+        300: "#fca5a5",
+        400: "#f87171",
+        500: "#ef4444",
+        600: "#dc2626",
+        700: "#b91c1c",
+        800: "#991b1b",
+        900: "#7f1d1d",
+        950: "#450a0a",
       },
     },
   },
   plugins: [],
-}
-export default config
+};
+export default config;
