@@ -8,9 +8,8 @@ const config: Config = {
   ],
   theme: {
     colors: {
-      // Please refer https://colorffy.com/dark-theme-generator
       // Primary Color: #01aaff
-      // Dark Color: #262626
+      // Refer: https://www.ibm.com/design/language/color
       primary: {
         100: "#1e425e",
         200: "#216391",
@@ -23,13 +22,16 @@ const config: Config = {
         900: "#b2d8ff",
       },
       surface: {
-        100: "#262626",
-        200: "#3a3a3a",
-        300: "#505050",
-        400: "#676767",
-        500: "#7e7e7e",
-        600: "#979797",
-        700: "#dcdcdc",
+        100: "#161616",
+        200: "#262626",
+        300: "#393939",
+        400: "#525252",
+        500: "#6f6f6f",
+        600: "#8d8d8d",
+        700: "#a8a8a8",
+        800: "#c6c6c6",
+        900: "#e0e0e0",
+        950: "#f4f4f4",
       },
       white: "#ffffff",
       black: {
