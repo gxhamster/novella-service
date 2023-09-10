@@ -23,6 +23,16 @@ function NovellaInput<NovellaInputField extends string>({
       return "border-surface-500 hover:bg-surface-400 hover:placeholder:text-surface-600 ring-surface-700";
   };
 
+  const autoCompleteTag = () => {
+    if (type === "email") return "username email";
+    else if (type === "password") return "current-password";
+  };
+
+  const inputId = () => {
+    if (type === "email") return "email";
+    else if (type === "password") return "current-password";
+  };
+
   return (
     <section className="flex flex-col justify-start">
       <label
@@ -35,7 +45,8 @@ function NovellaInput<NovellaInputField extends string>({
         className={`px-4 py-2 mt-2 border-[1px] transition  appearance-none outline-none bg-surface-300  focus:ring-[1px] placeholder:text-surface-500 rounded-md ${inputBorderStyles()}`}
         placeholder={placeholder}
         type={type}
-        id={reactHookRegister.name}
+        autoComplete={autoCompleteTag()}
+        id={inputId()}
         {...reactHookRegister}
       ></input>
       <span className="mt-2 text-sm text-alert-400">
