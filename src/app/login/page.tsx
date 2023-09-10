@@ -1,5 +1,7 @@
 "use client";
+import { useRouter } from "next/navigation";
 import NovellaInput from "@/components/NovellaInput";
+import { signInWithEmail } from "@/supabase/auth";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 type LoginPageInputs = {
@@ -14,8 +16,19 @@ const Login = () => {
     formState: { errors },
   } = useForm<LoginPageInputs>();
 
-  const signInSupabase: SubmitHandler<LoginPageInputs> = (data) => {
-    console.log(data);
+  const router = useRouter();
+
+  const signInSupabase: SubmitHandler<LoginPageInputs> = async (formData) => {
+    const { data, error } = await signInWithEmail(
+      formData.email,
+      formData.password
+    );
+    if (error) {
+      console.error("Cannot sign into Novella :(", error);
+    } else {
+      console.log("Succesfully signed into Novella :)", data.user);
+      router.push("/dashboard");
+    }
   };
 
   return (
@@ -29,9 +42,9 @@ const Login = () => {
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           >
             <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
             <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
