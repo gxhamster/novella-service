@@ -3,23 +3,9 @@ import IssueBookIcon from "@/components/icons/IssueBookIcon";
 import UnreturnedBookIcon from "@/components/icons/UnreturnedBookIcon";
 import UserIcon from "@/components/icons/UserIcon";
 import StatCard from "./StatCard";
-import NovellaDataTable from "@/components/NovellaDataTable";
-import { getIssuedBooks } from "@/supabase/db";
+import DashboardBooksTable from "./DashboardBooksTable";
 
 export default async function Dashboard() {
-  const { issued, error } = await getIssuedBooks();
-  const issuedBooks = issued?.map((books) => {
-    const newObj = {
-      id: books.id,
-      student_name: books.students.name,
-      title: books.books.title,
-      issue_date: books.created_at,
-      due_date: books.due_date,
-    };
-
-    return newObj;
-  });
-
   return (
     <div className="pt-16 px-16 w-full flex flex-col text-surface-900 gap-y-3">
       <span className="text-3xl">Dashboard</span>
@@ -57,19 +43,10 @@ export default async function Dashboard() {
         </StatCard>
       </div>
       <div className="mt-10">
-        <span className="text-1xl text-surface-800">Recently Issued Books</span>
+        <span className="text-1xl text-surface-800">Books Catalogue</span>
         <div className="mt-10">
           <div className="bg-surface-200 w-full m-0">
-            <NovellaDataTable<typeof issuedBooks>
-              data={issuedBooks}
-              headers={[
-                "ID",
-                "Student Name",
-                "Title",
-                "Issued Date",
-                "Due Date",
-              ]}
-            />
+            <DashboardBooksTable />
           </div>
         </div>
       </div>
