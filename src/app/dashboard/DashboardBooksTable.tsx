@@ -3,6 +3,7 @@ import NovellaDataTable from "@/components/NovellaDataTable";
 import { createColumnHelper } from "@tanstack/react-table";
 import { BooksResult } from "@/supabase/db";
 import { PaginationState } from "@tanstack/react-table";
+import Link from "next/link";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 export default function DashboardBooksTable() {
@@ -10,13 +11,28 @@ export default function DashboardBooksTable() {
 
   const getBooksByPage = async ({ pageIndex, pageSize }: PaginationState) => {
     const supabase = createClientComponentClient();
-    const { data: books, error } = await supabase
+    let { data: books, error } = await supabase
       .from("books")
       .select("id, title, author, isbn")
       .range(pageIndex * pageSize, pageSize * (pageIndex + 1));
     const { data, count } = await supabase
       .from("books")
       .select("*", { head: true, count: "exact" });
+
+    books = books
+      ? books.map((v) => {
+          const n_id = (
+            <Link
+              href={`/dashboard/books/${v.id}`}
+              className="hover:underline hover:text-primary-500"
+            >
+              {v.id}
+            </Link>
+          );
+          v.id = n_id;
+          return v;
+        })
+      : null;
 
     return { data: books, count };
   };

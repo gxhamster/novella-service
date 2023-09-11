@@ -18,8 +18,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${ibmPlex.className} overflow-auto bg-surface-100`}>
+    // Always set the the theme to dark mode
+    <html lang="en" style={{ colorScheme: "dark" }}>
+      <body className={`${ibmPlex.className} min-h-screen bg-surface-100`}>
         {children}
       </body>
     </html>

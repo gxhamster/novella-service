@@ -53,7 +53,8 @@ export default function NovellaDataTable<T>({
       const { data, count } = await fetchData({ pageIndex, pageSize });
       // Fixme: Put the proper typing
       setData(() => [...data]);
-      setTotalPageCount(Math.floor(count / pageSize));
+      const pageCount = Math.floor(count / pageSize);
+      setTotalPageCount(pageCount < 1 ? 1 : pageCount);
       setIsLoading(false);
     };
     getData();
@@ -111,7 +112,7 @@ export default function NovellaDataTable<T>({
           {isLoading ? (
             <div className="flex gap-2 text-xs items-center">
               {" "}
-              <LoadingIcon size={20} /> <span>Loading data...</span>
+              <LoadingIcon size={18} /> <span>Loading data...</span>
             </div>
           ) : null}
         </div>

@@ -19,7 +19,7 @@ export default function StatCard({
             {title}
           </span>
         </div>
-        <span className="text-surface-500 text-sm">{subtitle}</span>
+        <span className="text-surface-700 text-sm">{subtitle}</span>
       </div>
       <span className="text-5xl text-surface-950 font-bold mt-6">{stat}</span>
     </div>

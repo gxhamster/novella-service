@@ -4,6 +4,7 @@ import UnreturnedBookIcon from "@/components/icons/UnreturnedBookIcon";
 import UserIcon from "@/components/icons/UserIcon";
 import StatCard from "./StatCard";
 import DashboardBooksTable from "./DashboardBooksTable";
+import DashboardIssuedTable from "./DashboardIssuedTable";
 
 export default async function Dashboard() {
   return (
@@ -41,6 +42,14 @@ export default async function Dashboard() {
         >
           <BookIcon />
         </StatCard>
+      </div>
+      <div className="mt-10">
+        <span className="text-1xl text-surface-800">Recently Issued Books</span>
+        <div className="mt-10">
+          <div className="bg-surface-200 w-full m-0">
+            <DashboardIssuedTable />
+          </div>
+        </div>
       </div>
       <div className="mt-10">
         <span className="text-1xl text-surface-800">Books Catalogue</span>

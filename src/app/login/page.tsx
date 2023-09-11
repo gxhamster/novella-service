@@ -52,7 +52,7 @@ const Login = () => {
           <h2 className="text-4xl font-semibold">Novella</h2>
         </div>
       </section>
-      <section className="bg-surface-200 p-12 flex flex-col gap-10 w-1/3 min-w-[450px] rounded-md min-h-[500px]">
+      <section className="bg-surface-200 p-12 flex flex-col gap-10 w-1/3 min-w-[450px] min-h-[500px]">
         <section className="flex flex-col gap-2">
           <h3 className="text-surface-700 text-2xl font-bold">Welcome back</h3>
           <span className="text-surface-600">Sign in to your account</span>

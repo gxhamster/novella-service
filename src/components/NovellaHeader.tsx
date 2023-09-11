@@ -1,10 +1,13 @@
 "use client";
 import { Menu } from "@headlessui/react";
 import UserIcon from "./icons/UserIcon";
+import Link from "next/link";
 
 const NovellaHeader = () => (
-  <nav className="fixed top-0 left-0 w-screen bg-surface-100 px-6 items-center border-b-2 border-surface-200 flex justify-between m-0 h-[58px] text-surface-700">
-    <span className="text-2xl text-surface-950">novella</span>
+  <nav className="fixed top-0 left-0 w-screen bg-surface-100 px-6 items-center border-b-2 border-surface-200 flex justify-between m-0 h-[58px] text-surface-700 z-20">
+    <Link href="/dashboard">
+      <span className="text-2xl text-surface-950">novella</span>
+    </Link>
     <Menu as="div" className="relative">
       <Menu.Button className="p-2 inline-flex justify-center items-center bg-surface-100 border-[1px] border-surface-500 hover:bg-surface-200 transition-all focus:ring-1 focus:ring-surface-900">
         <UserIcon size={20} />
