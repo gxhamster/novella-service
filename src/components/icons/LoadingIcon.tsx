@@ -1,11 +1,15 @@
 type LoadingIconProps = {
   size?: number;
+  className?: string;
 };
 
-export default function LoadingIcon({ size = 24 }: LoadingIconProps) {
+export default function LoadingIcon({
+  size = 24,
+  className,
+}: LoadingIconProps) {
   return (
     <svg
-      className="animate-spin-slow text-surface-700"
+      className={`animate-spin-slow text-surface-700 ${className}`}
       xmlns="http://www.w3.org/2000/svg"
       width={size}
       height={size}
