@@ -2,12 +2,14 @@ import { MouseEventHandler } from "react";
 type ButtonPrimaryProps = {
   title: string;
   disabled?: boolean;
+  icon?: React.ReactNode;
   onClick?: MouseEventHandler<HTMLButtonElement>;
 };
 
 export default function ButtonPrimary({
   title,
   disabled = false,
+  icon,
   onClick,
 }: ButtonPrimaryProps) {
   return (
@@ -15,9 +17,10 @@ export default function ButtonPrimary({
       disabled={disabled}
       onClick={onClick}
       type="submit"
-      className="text-sm px-4 py-2 outline-none bg-primary-500 hover:bg-primary-400 focus:ring-1 focus:ring-surface-900 transition-colors disabled:bg-primary-400 disabled:opacity-80"
+      className="text-sm px-4  py-2 flex items-center gap-3 outline-none bg-primary-500 hover:bg-primary-400 border-[1px] border-primary-500 focus:border-primary-900 transition-colors disabled:bg-primary-400 disabled:opacity-80"
     >
-      {title}
+      {icon}
+      <span>{title}</span>
     </button>
   );
 }

@@ -24,7 +24,7 @@ export default function DashboardBooksTable() {
           const n_id = (
             <Link
               href={`/dashboard/books/${v.id}`}
-              className="hover:underline hover:text-primary-500"
+              className="hover:underline hover:text-primary-600"
             >
               {v.id}
             </Link>
@@ -34,7 +34,7 @@ export default function DashboardBooksTable() {
         })
       : null;
 
-    return { data: books, count };
+    return { data: books, count: count ? count : 0 };
   };
   const columns = [
     columnHelper.accessor("id", {

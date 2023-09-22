@@ -12,7 +12,10 @@ import LeftArrowIcon from "./icons/LeftArrowIcon";
 import LoadingIcon from "./icons/LoadingIcon";
 
 type NovellaDataTableProps<T> = {
-  fetchData: ({ pageIndex, pageSize }: PaginationState) => Promise<any>;
+  fetchData: ({
+    pageIndex,
+    pageSize,
+  }: PaginationState) => Promise<{ data: any; count: number }>;
   columns: ColumnDef<T, any>[];
 };
 export default function NovellaDataTable<T>({
@@ -61,13 +64,13 @@ export default function NovellaDataTable<T>({
   }, [pageIndex, pageSize, fetchData]);
 
   return (
-    <div>
+    <div className="">
       <table className="w-full">
         <thead className="text-surface-900 bg-surface-300">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <th key={header.id} className="text-start p-2 px-4">
+                <th key={header.id} className="text-start p-2 px-4 text-base">
                   {header.isPlaceholder
                     ? null
                     : flexRender(
