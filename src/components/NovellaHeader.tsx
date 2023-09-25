@@ -4,7 +4,7 @@ import UserIcon from "./icons/UserIcon";
 import Link from "next/link";
 
 const NovellaHeader = () => (
-  <nav className="fixed top-0 left-0 w-screen bg-surface-100 px-6 items-center border-b-[1px] border-surface-200 flex justify-between m-0 h-[58px] text-surface-700 z-20">
+  <nav className="fixed top-0 left-[64px] w-screen bg-surface-100 px-6 items-center border-b-[1px] border-surface-300 flex justify-between m-0 h-[58px] text-surface-700 z-10">
     <Link href="/dashboard">
       <span className="text-2xl text-surface-950">novella</span>
     </Link>

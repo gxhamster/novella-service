@@ -40,3 +40,12 @@ export async function DELETE(request: Request) {
 
   return NextResponse.json({ error });
 }
+
+export async function POST(request: Request) {
+  const reqBody = await request.json();
+
+  const { data, error } = await supabase.from("books").insert(reqBody).select();
+  console.log("=== Succesfully added to books", data, error);
+
+  return NextResponse.json({ error, data });
+}

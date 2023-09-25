@@ -62,6 +62,8 @@ export default function BookSummary({ data }: { data: IBook }) {
     if (error) {
       throw new Error(error.message);
     }
+
+    router.back();
   };
 
   type BookField = {

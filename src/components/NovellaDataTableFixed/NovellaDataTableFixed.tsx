@@ -13,30 +13,37 @@ import LoadingIcon from "../icons/LoadingIcon";
 import ButtonPrimary from "../ButtonPrimary";
 import ButtonGhost from "../ButtonGhost";
 import AddIcon from "../icons/AddIcon";
-import SortIcon from "../icons/SortIcon";
 import RefreshIcon from "../icons/RefreshIcon";
 import NovellaDataTableFixedFilterMenu, {
   Filter,
 } from "./NovellaDataTableFixedFilterMenu";
-import { TableFetchFunction } from "@/app/dashboard/books/BooksTable";
+import { TableFetchFunction } from "@/app/books/BooksTable";
+import NovellaDataTableFixedSortMenu from "./NovellaDataTableFixedSortMenu";
+import { Sort } from "./NovellaDataTableFixedSortMenu";
+import BooksCreateDrawer from "@/app/books/BooksCreateDrawer";
 
-type NovellaDataTableProps<T> = {
+type NovellaDataTableProps<TableType> = {
   fetchData: ({
     pageIndex,
     pageSize,
     filters,
-  }: TableFetchFunction) => Promise<{ data: any; count: number }>;
-  tanStackColumns: ColumnDef<T, any>[];
-  columns: Array<{ id: keyof T; header: string }>;
+    sorts,
+  }: TableFetchFunction<TableType>) => Promise<{ data: any; count: number }>;
+  tanStackColumns: ColumnDef<TableType, any>[];
+  columns: Array<{ id: keyof TableType; header: string }>;
+  onCreateRowButtonPressed: () => void;
 };
-export default function NovellaDataTableFixed<T>({
+
+export default function NovellaDataTableFixed<TableType>({
   fetchData,
   tanStackColumns,
   columns,
-}: NovellaDataTableProps<T>) {
+  onCreateRowButtonPressed,
+}: NovellaDataTableProps<TableType>) {
   // Fixme: Remove the any type and put proper typing :(
   const [data, setData] = useState<any>([]);
   const [filters, setFilters] = useState<Filter[]>([]);
+  const [sorts, setSorts] = useState<Sort<TableType> | null>(null);
   const [totalPageCount, setTotalPageCount] = useState(data.length);
   const [totalRecords, setTotalRecords] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,7 +77,12 @@ export default function NovellaDataTableFixed<T>({
   const getData = async () => {
     setIsLoading(true);
     setRefreshBtnIcon(<LoadingIcon size={18} />);
-    const { data, count } = await fetchData({ pageIndex, pageSize, filters });
+    const { data, count } = await fetchData({
+      pageIndex,
+      pageSize,
+      filters,
+      sorts,
+    });
     // Fixme: Put the proper typing
     setData([...data]);
     const pageCount = Math.ceil(count / pageSize);
@@ -82,12 +94,12 @@ export default function NovellaDataTableFixed<T>({
 
   useEffect(() => {
     getData();
-  }, [pageIndex, pageSize, fetchData, filters]);
+  }, [pageIndex, pageSize, fetchData, filters, sorts]);
 
   return (
-    <div>
+    <div className="m-0">
       {/* Table Functions */}
-      <div className="flex justify-between bg-surface-200">
+      <div className="flex justify-between bg-surface-200 border-b-[1px] border-surface-300">
         <div className="flex">
           <ButtonGhost
             icon={refreshBtnIcon}
@@ -98,7 +110,18 @@ export default function NovellaDataTableFixed<T>({
           />
         </div>
         <div className="flex">
-          <ButtonGhost icon={<SortIcon size={18} />} title="Sort" />
+          {/* Sort Control */}
+          <NovellaDataTableFixedSortMenu<TableType>
+            fields={columns}
+            sortRulesChange={(_sorts) => {
+              if (_sorts)
+                setSorts({
+                  field: _sorts.field,
+                  ascending: _sorts.ascending,
+                });
+              else setSorts(null);
+            }}
+          />
           {/* Filter Controls */}
           <NovellaDataTableFixedFilterMenu
             filterRulesChanged={(filter) => {
@@ -106,12 +129,16 @@ export default function NovellaDataTableFixed<T>({
             }}
             tableProps={columns.map((col) => col.id)}
           />
-          <ButtonPrimary title="Create" icon={<AddIcon size={18} />} />
+          <ButtonPrimary
+            title="Create"
+            icon={<AddIcon size={18} />}
+            onClick={() => onCreateRowButtonPressed()}
+          />
         </div>
       </div>
-      <div className="h-[calc(100vh-(58px+45px))] overflow-scroll bg-surface-200 m-0">
+      <div className="h-[calc(100vh-(58px+45px))] overflow-scroll bg-surface-100 m-0">
         <table className="w-full">
-          <thead className="text-surface-900 bg-surface-300 sticky top-0">
+          <thead className="text-surface-900 bg-surface-200 sticky top-0 m-0">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -134,7 +161,7 @@ export default function NovellaDataTableFixed<T>({
             {table.getRowModel().rows.map((row) => (
               <tr
                 key={row.id}
-                className="text-surface-700 bg-surface-200 border-b-[0.7px] border-surface-400"
+                className="text-surface-700 bg-surface-100 border-b-[0.7px] border-surface-400"
               >
                 {row.getVisibleCells().map((cell) => (
                   <td
@@ -149,11 +176,11 @@ export default function NovellaDataTableFixed<T>({
           </tbody>
         </table>
         {/* Table Controls */}
-        <div className="flex justify-between items-center px-4 py-1 text-surface-800 bg-surface-200 gap-2 text-sm fixed w-[calc(100%-128px)] bottom-0 border-t-[0.7px] border-surface-400/60">
+        <div className="flex justify-between items-center px-4 py-1 text-surface-800 bg-surface-100 gap-2 text-sm fixed w-[calc(100%-64px)] bottom-0 border-t-[0.7px] border-surface-400/60">
           <div className="flex gap-6 items-center">
             <p>Items per page</p>
             <select
-              className="apperance-none bg-surface-200 outline-none p-2 focus:ring-1 focus:ring-surface-900 hover:bg-surface-300"
+              className="apperance-none bg-surface-100 outline-none p-2 focus:ring-1 focus:ring-surface-900 hover:bg-surface-200"
               value={table.getState().pagination.pageSize}
               onChange={(e) => table.setPageSize(Number(e.target.value))}
             >
@@ -173,21 +200,21 @@ export default function NovellaDataTableFixed<T>({
           </div>
           <div className="flex gap-4 items-center">
             <button
-              className="p-2 inline-flex justify-center items-center bg-surface-200 hover:bg-surface-300 transition-all focus:ring-1 focus:ring-surface-900 disabled:opacity-60 disabled:bg-surface-200"
+              className="p-2 inline-flex justify-center items-center bg-surface-100 hover:bg-surface-200 transition-all focus:ring-1 focus:ring-surface-900 disabled:opacity-60 disabled:bg-surface-100"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
               <RightArrowIcon size={18} />
             </button>
             <button
-              className="p-2 inline-flex justify-center items-center bg-surface-200 hover:bg-surface-300 transition-all focus:ring-1 focus:ring-surface-900 disabled:bg-surface-200 disabled:opacity-60"
+              className="p-2 inline-flex justify-center items-center bg-surface-100 hover:bg-surface-200 transition-all focus:ring-1 focus:ring-surface-900 disabled:bg-surface-100 disabled:opacity-60"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
               <LeftArrowIcon size={18} />
             </button>
             <select
-              className="apperance-none bg-surface-200 outline-none p-2 focus:ring-1 focus:ring-surface-900 hover:bg-surface-300"
+              className="apperance-none bg-surface-100 outline-none p-2 focus:ring-1 focus:ring-surface-900 hover:bg-surface-200"
               defaultValue={table.getState().pagination.pageIndex + 1}
               onChange={(e) => {
                 const page = e.target.value ? Number(e.target.value) - 1 : 0;

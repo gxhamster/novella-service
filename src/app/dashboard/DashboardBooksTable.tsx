@@ -23,7 +23,7 @@ export default function DashboardBooksTable() {
       ? books.map((v) => {
           const n_id = (
             <Link
-              href={`/dashboard/books/${v.id}`}
+              href={`/books/${v.id}`}
               className="hover:underline hover:text-primary-600"
             >
               {v.id}

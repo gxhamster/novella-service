@@ -1,10 +1,11 @@
-import { ChangeEventHandler, useState } from "react";
+import { useState } from "react";
 import { Popover } from "@headlessui/react";
 import ButtonGhost from "../ButtonGhost";
 import FilterIcon from "../icons/FilterIcon";
 import AddIcon from "../icons/AddIcon";
 import CloseIcon from "../icons/CloseIcon";
 import ButtonSecondary from "../ButtonSecondary";
+import Select from "../Select";
 
 export type Filter = {
   id: number;
@@ -17,26 +18,6 @@ type NovellaDataTableFixedFilterMenuProps = {
   tableProps: any;
   filterRulesChanged: (filter: Filter[]) => void;
 };
-
-const FilterSelect = ({
-  children,
-  value,
-  onChange,
-  className,
-}: {
-  value: string | number;
-  onChange: ChangeEventHandler<HTMLSelectElement>;
-  children: React.ReactNode;
-  className?: string;
-}) => (
-  <select
-    onChange={onChange}
-    value={value}
-    className={`${className} apperance-none bg-surface-200 outline-none p-1 text-xs border-[1px] border-surface-200 focus:border-surface-900 hover:bg-surface-300`}
-  >
-    {children}
-  </select>
-);
 
 export default function NovellaDataTableFixedFilterMenu({
   tableProps,
@@ -73,10 +54,10 @@ export default function NovellaDataTableFixedFilterMenu({
                     </span>
                   </>
                 ) : (
-                  <div className="flex flex-col gap-2 items-center w-full text-surface-600">
+                  <div className="flex gap-3 items-center w-full text-surface-600">
                     {filters.map((filter, idx) => (
                       <div key={filter.id} className="w-full flex-grow flex">
-                        <FilterSelect
+                        <Select
                           onChange={(e) => {
                             const n = filters.map((v, i) => {
                               if (i === idx)
@@ -96,8 +77,8 @@ export default function NovellaDataTableFixedFilterMenu({
                           {tableProps.map((prop: any) => (
                             <option key={prop}>{prop}</option>
                           ))}
-                        </FilterSelect>
-                        <FilterSelect
+                        </Select>
+                        <Select
                           onChange={(e) => {
                             const n = filters.map((v, i) => {
                               if (i === idx)
@@ -116,7 +97,7 @@ export default function NovellaDataTableFixedFilterMenu({
                           {["eq", "gt", "lt"].map((v) => (
                             <option key={v}>{v}</option>
                           ))}
-                        </FilterSelect>
+                        </Select>
                         <input
                           value={filter.value}
                           onChange={(e) => {

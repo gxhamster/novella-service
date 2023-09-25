@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import BookSummary from "./BookSummary";
 import { Database } from "@/types/supabase";
 import ButtonPrimary from "@/components/ButtonPrimary";
+import BooksCreateDrawer from "../BooksCreateDrawer";
+import BookCreate from "./BookCreate";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +21,7 @@ export default async function Book({ params }: { params: { book: string } }) {
 
   const resultBook = data ? data[0] : null;
   return (
-    <div className="pt-16 px-16 w-full flex flex-col text-surface-900 gap-y-3 min-h-full">
+    <div className="pt-16 px-16 w-full flex flex-col text-surface-900 gap-y-3 h-full overflow-y-auto">
       {resultBook ? (
         <BookSummary data={resultBook} />
       ) : (
@@ -29,7 +31,7 @@ export default async function Book({ params }: { params: { book: string } }) {
             <span className="text-surface-700 text-sm">
               Please select a valid book on the database or create a new one
             </span>
-            <ButtonPrimary title="Create a new book" />
+            <BookCreate />
           </div>
         </div>
       )}

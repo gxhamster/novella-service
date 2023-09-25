@@ -8,7 +8,7 @@ import DashboardIssuedTable from "./DashboardIssuedTable";
 
 export default async function Dashboard() {
   return (
-    <div className="pt-16 px-16 w-full flex flex-col text-surface-900 gap-y-3">
+    <div className="pt-16 px-16 w-full flex flex-col text-surface-900 gap-y-3 overflow-y-auto">
       <span className="text-3xl">Dashboard</span>
       <span className="text-md text-surface-600 font-light">
         View manage your library
