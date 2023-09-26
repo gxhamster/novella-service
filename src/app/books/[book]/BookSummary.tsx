@@ -8,7 +8,8 @@ import { SubmitHandler, useForm, useWatch } from "react-hook-form";
 import BookCategoryCard from "./BookCatergoryCard";
 import { useRouter } from "next/navigation";
 import BookDeleteCard from "./BookDeleteCard";
-import BookDeleteModal from "./BookDeleteModal";
+import ButtonDanger from "@/components/ButtonDanger";
+import NModal from "@/components/NModal";
 
 export default function BookSummary({ data }: { data: IBook }) {
   let defaultInputValues = {};
@@ -248,12 +249,28 @@ export default function BookSummary({ data }: { data: IBook }) {
           ))}
         </form>
         <BookDeleteCard onClick={() => setIsDeleteModalOpen(true)} />
-        <BookDeleteModal
+        <NModal
           title={`Confirm deletion of book Ref: ${data.id}`}
-          description="This will permanently delete the book from the database and cannot be recovered"
           isOpen={isDeleteModalOpen}
-          closeModal={deleteModalCloseHandler}
-        />
+          onModalClose={() => setIsDeleteModalOpen(false)}
+        >
+          <div className="mt-2">
+            <p className="text-sm text-surface-500">
+              This will permanently delete the book from the database and cannot
+              be recovered
+            </p>
+          </div>
+          <div className="mt-6 flex gap-2">
+            <ButtonDanger
+              title="Delete book"
+              onClick={deleteModalCloseHandler}
+            />
+            <ButtonSecondary
+              title="Cancel"
+              onClick={() => setIsDeleteModalOpen(false)}
+            />
+          </div>
+        </NModal>
       </div>
     </div>
   );

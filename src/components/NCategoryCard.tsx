@@ -1,14 +1,14 @@
-type BookCategoryCardProps = {
+type NCategoryCardProps = {
   title?: string;
   subtitle?: string;
   children?: React.ReactNode;
 };
 
-export default function BookCategoryCard({
+export default function NCategoryCard({
   title,
   subtitle,
   children,
-}: BookCategoryCardProps) {
+}: NCategoryCardProps) {
   return (
     <div
       className="bg-surface-200 flex flex-col border-[0.7px] border-surface-400 scroll-m-6"

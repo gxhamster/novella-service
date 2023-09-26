@@ -6,8 +6,8 @@ import NovellaDataTableFixed from "@/components/NovellaDataTableFixed";
 import { Database, IStudent } from "@/types/supabase";
 import { Filter } from "@/components/NovellaDataTableFixed/NovellaDataTableFixedFilterMenu";
 import { Sort } from "@/components/NovellaDataTableFixed/NovellaDataTableFixedSortMenu";
-// import BooksCreateDrawer from "./BooksCreateDrawer";
 import { useState } from "react";
+import NDrawerCreateStudent from "./NDrawerCreateStudent";
 
 export type TableFetchFunction<TableType> = {
   pageIndex: number;
@@ -62,7 +62,6 @@ export default function StudentsTable() {
         })
       : null;
 
-    // console.log("=== Sorts ===", data, count);
     return { data: students, count: count ? count : 0 };
   };
 
@@ -86,31 +85,37 @@ export default function StudentsTable() {
     })
   );
 
-  const addBookToSupabase = async (formData: IStudent) => {
-    console.log("=== Adding book to supabase", formData);
-
+  const addStudentToSupabase = async (formData: IStudent) => {
     setSaveButtonLoading(true);
-    const { _, error } = await fetch("/api/books", {
+    const { _, error } = await fetch("/api/students", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
     }).then((res) => res.json());
 
     if (error) {
+      setSaveButtonLoading(false);
       throw new Error(error.message);
     }
     setSaveButtonLoading(false);
   };
 
+  type IStudentV2 = {
+    [Property in keyof IStudent]: Property extends "id"
+      ? JSX.Element
+      : IStudent[Property];
+  };
+
   return (
     <>
-      {/* <BooksCreateDrawer
-        title="Add new book to library"
+      <NDrawerCreateStudent
+        title="Add new student to library"
         saveButtonLoadingState={saveButtonLoading}
         isOpen={isAddBookDrawerOpen}
-        onBookFormSubmit={addBookToSupabase}
-        closeModal={() => setIsAddBookDrawerOpen(false)}
-      /> */}
+        onStudentFormSubmit={addStudentToSupabase}
+        closeDrawer={() => setIsAddBookDrawerOpen(false)}
+      />
+
       <NovellaDataTableFixed<IStudent>
         columns={columnsObj}
         tanStackColumns={tanstackColumns}

@@ -20,7 +20,6 @@ import NovellaDataTableFixedFilterMenu, {
 import { TableFetchFunction } from "@/app/books/BooksTable";
 import NovellaDataTableFixedSortMenu from "./NovellaDataTableFixedSortMenu";
 import { Sort } from "./NovellaDataTableFixedSortMenu";
-import BooksCreateDrawer from "@/app/books/BooksCreateDrawer";
 
 type NovellaDataTableProps<TableType> = {
   fetchData: ({
