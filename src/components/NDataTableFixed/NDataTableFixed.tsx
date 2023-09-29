@@ -191,7 +191,8 @@ export default function NDataTableFixed<TableType>({
           />
         </div>
       </div>
-      <div className="h-[calc(100vh-(58px+45px))] overflow-scroll bg-surface-100 m-0 relative">
+      {/* FIXME: WTH need to cleaner solution */}
+      <div className="h-[calc(100vh-(58px+45px+39px))] overflow-scroll bg-surface-100 m-0 relative">
         <table className="w-full">
           <thead className="text-surface-900 bg-surface-200 sticky top-0 m-0">
             {table.getHeaderGroups().map((headerGroup) => (
