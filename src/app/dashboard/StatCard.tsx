@@ -15,9 +15,7 @@ export default function StatCard({
       <div className="flex flex-col h-16 gap-1 text-xl">
         <div className="flex items-center gap-4">
           {children}
-          <span className="text-surface-800 text-xl font-semibold">
-            {title}
-          </span>
+          <span className="text-surface-800 text-xl">{title}</span>
         </div>
         <span className="text-surface-700 text-sm">{subtitle}</span>
       </div>

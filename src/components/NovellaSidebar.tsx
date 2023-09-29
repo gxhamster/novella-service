@@ -50,7 +50,7 @@ const links = [
       { title: "Add book", href: "/books", icon: <BookIcon size={20} /> },
       {
         title: "Issue book",
-        href: "/books",
+        href: "/issued",
         icon: <IssueBookIcon size={20} />,
       },
       {
@@ -75,7 +75,7 @@ export default function NovellaSidebar() {
         <Image src={NovellaLogo} width={48} height={48} alt="Novella logo" />
       </div>
       {links.map((linkGroup, groupIdx) => (
-        <>
+        <div key={linkGroup.groupTitle} className="flex flex-col gap-2">
           <div className="flex flex-col gap-2">
             {linkGroup.links.map((link, idx) => (
               <NovellaSidebarLink key={idx} title={link.title} href={link.href}>
@@ -87,7 +87,7 @@ export default function NovellaSidebar() {
           {groupIdx !== links.length - 1 ? (
             <span className="border-[0.7px] border-surface-300 w-full"></span>
           ) : null}
-        </>
+        </div>
       ))}
     </div>
   );

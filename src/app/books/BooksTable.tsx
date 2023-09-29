@@ -1,41 +1,29 @@
 "use client";
-import { createColumnHelper } from "@tanstack/react-table";
-import Link from "next/link";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import NovellaDataTableFixed from "@/components/NovellaDataTableFixed";
-import { Database, IBook } from "@/types/supabase";
-import { Filter } from "@/components/NovellaDataTableFixed/NovellaDataTableFixedFilterMenu";
-import { Sort } from "@/components/NovellaDataTableFixed/NovellaDataTableFixedSortMenu";
-import BooksCreateDrawer from "./BooksCreateDrawer";
 import { useState } from "react";
-
-export type TableFetchFunction<TableType> = {
-  pageIndex: number;
-  pageSize: number;
-  filters: Filter[];
-  sorts: Sort<TableType> | null;
-};
-
-// Take a filter array and return POSTGRES syntax filter
-function createSupabaseFilters(filters: Filter[]): string {
-  const filterStrArr = filters.map((filter, idx) => {
-    return `${filter.prop}.${filter.operator}.${filter.value}`;
-  });
-
-  return `and(${filterStrArr.join(",")})`;
-}
+import Link from "next/link";
+import { createColumnHelper } from "@tanstack/react-table";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { Database, IBook } from "@/types/supabase";
+import NDataTableFixed, {
+  NDataTableFixedConvertToSupabaseFilters,
+  NDataTableFixedFetchFunction,
+} from "@/components/NDataTableFixed";
+import {
+  NDrawerCreateForm,
+  NDrawerCreateFormFieldsType,
+} from "@/components/NDrawer";
 
 export default function BooksTable() {
   const columnHelper = createColumnHelper<IBook>();
   const [isAddBookDrawerOpen, setIsAddBookDrawerOpen] = useState(false);
   const [saveButtonLoading, setSaveButtonLoading] = useState(false);
-  const getBooksByPage = async ({
+  const getBooksByPage: NDataTableFixedFetchFunction<IBook> = async ({
     pageIndex,
     pageSize,
     filters,
     sorts,
-  }: TableFetchFunction<IBook>) => {
-    const supabaseFilters = createSupabaseFilters(filters);
+  }) => {
+    const supabaseFilters = NDataTableFixedConvertToSupabaseFilters(filters);
     const supabase = createClientComponentClient<Database>();
 
     let query = supabase.from("books").select("*", { count: "estimated" });
@@ -62,7 +50,6 @@ export default function BooksTable() {
         })
       : null;
 
-    // console.log("=== Sorts ===", data, count);
     return { data: books, count: count ? count : 0 };
   };
 
@@ -106,19 +93,111 @@ export default function BooksTable() {
     setSaveButtonLoading(false);
   };
 
+  const bookFieldCategories: NDrawerCreateFormFieldsType<IBook>[] = [
+    {
+      title: "",
+      fields: [
+        {
+          field: "id",
+          title: "ID",
+          help: "ID will be automatically set by the system",
+          fieldType: "number",
+          disabled: true,
+        },
+        {
+          field: "created_at",
+          title: "Created At",
+          fieldType: "string",
+          help: `Default value will be the time as of now ${new Date().toDateString()}`,
+        },
+        {
+          field: "title",
+          fieldType: "string",
+          title: "Title",
+        },
+      ],
+    },
+    {
+      title: "Publisher Fields",
+      description:
+        "These are fields that are related to the publisher of the book",
+      fields: [
+        {
+          fieldType: "string",
+          field: "publisher",
+          title: "Publisher",
+        },
+        {
+          fieldType: "string",
+          field: "edition",
+          title: "Edition",
+        },
+        {
+          fieldType: "number",
+          field: "year",
+          title: "Year",
+        },
+      ],
+    },
+    {
+      title: "Identification Fields",
+      description: "These fields are used to identify the book",
+      fields: [
+        {
+          fieldType: "string",
+          field: "ddc",
+          title: "DDC",
+        },
+        {
+          fieldType: "number",
+          field: "isbn",
+          title: "ISBN",
+        },
+      ],
+    },
+    {
+      title: "Misc Fields",
+      fields: [
+        {
+          fieldType: "string",
+          field: "author",
+          title: "Author",
+        },
+        {
+          fieldType: "string",
+          field: "genre",
+          title: "Genre",
+        },
+        {
+          fieldType: "number",
+          field: "pages",
+          title: "Pages",
+        },
+      ],
+    },
+  ];
+
   return (
     <>
-      <BooksCreateDrawer
+      <NDrawerCreateForm<IBook>
         title="Add new book to library"
         saveButtonLoadingState={saveButtonLoading}
         isOpen={isAddBookDrawerOpen}
-        onBookFormSubmit={addBookToSupabase}
-        closeModal={() => setIsAddBookDrawerOpen(false)}
+        onFormSubmit={addBookToSupabase}
+        closeDrawer={() => setIsAddBookDrawerOpen(false)}
+        formFieldsCategories={bookFieldCategories}
+        defaultValues={{
+          year: new Date().getFullYear(),
+          isbn: 0,
+          pages: 0,
+          created_at: String(new Date().toISOString()),
+        }}
       />
-      <NovellaDataTableFixed<IBook>
+      <NDataTableFixed<IBook>
         columns={columnsObj}
         tanStackColumns={tanstackColumns}
         onCreateRowButtonPressed={() => setIsAddBookDrawerOpen(true)}
+        onRowSelectionChanged={(state) => console.log(state)}
         fetchData={getBooksByPage}
       />
     </>

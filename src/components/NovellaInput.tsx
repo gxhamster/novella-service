@@ -21,7 +21,6 @@ function NovellaInput<NovellaInputField extends string>({
   helpText,
   ...props
 }: NovellaInputProps<NovellaInputField>) {
-  const inputRef = useRef(null);
   const inputBorderStyles = () => {
     if (reactHookErrorMessage?.message)
       return "border-alert-600 ring-alert-500";

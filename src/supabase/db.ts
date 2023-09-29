@@ -1,7 +1,3 @@
-// import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-// import { Database } from "@/types/supabase";
-// import { cookies } from "next/headers";
-
 export type IssuedBooksResult = {
   id: number;
   student_name: string;
@@ -16,10 +12,3 @@ export type BooksResult = {
   author: string;
   isbn: number;
 };
-// export const getAllBooks = async () => {
-//   const supabaseServer = createServerComponentClient({ cookies });
-//   let { data: books, error } = await supabaseServer
-//     .from("books")
-//     .select("id, title, author, isbn");
-//   return { books, booksError: error };
-// };

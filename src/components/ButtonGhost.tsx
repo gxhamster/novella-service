@@ -12,7 +12,9 @@ export default function ButtonGhost({
   title,
   disabled,
   fontSize = "sm",
-  onClick,
+  onClick = (e) => {
+    e.target;
+  },
   icon,
 }: ButtonGhostProps) {
   return (

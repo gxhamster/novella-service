@@ -4,13 +4,13 @@ import { Database, ITables } from "@/types/supabase";
 import { NextResponse } from "next/server";
 
 const supabase = createRouteHandlerClient<Database>({ cookies });
-const table: ITables = "books";
+const table: ITables = "issued";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const { data, error } = await supabase
     .from(table)
-    .select("*")
+    .select("*, book_id, books (id, title), student_id, students (id, name)")
     .eq("id", Number(searchParams.get("id")));
 
   const resultBook = data ? data[0] : null;
@@ -46,7 +46,6 @@ export async function POST(request: Request) {
   const reqBody = await request.json();
 
   const { data, error } = await supabase.from(table).insert(reqBody).select();
-  console.log("=== Succesfully added to books", data, error);
 
   return NextResponse.json({ error, data });
 }

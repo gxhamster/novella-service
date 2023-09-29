@@ -45,6 +45,8 @@ export default function NovellaDataTable<T>({
       pagination,
     },
     pageCount: totalPageCount,
+    enableMultiRowSelection: false,
+    enableRowSelection: true,
     manualPagination: true,
     onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
@@ -86,7 +88,10 @@ export default function NovellaDataTable<T>({
           {table.getRowModel().rows.map((row) => (
             <tr
               key={row.id}
-              className="text-surface-800 font-light bg-surface-200 text-sm border-b-[0.7px] border-surface-400"
+              className={`${
+                row.getIsSelected() ? "bg-surface-300/40" : "bg-surface-200"
+              } text-surface-800 font-light text-sm border-b-[0.7px] border-surface-400 cursor-pointer hover:bg-surface-300/40 transition-colors`}
+              onClick={() => row.toggleSelected()}
             >
               {row.getVisibleCells().map((cell) => (
                 <td key={cell.id} className="p-2 px-4">

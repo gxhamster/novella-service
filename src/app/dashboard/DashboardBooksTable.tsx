@@ -5,15 +5,16 @@ import { BooksResult } from "@/supabase/db";
 import { PaginationState } from "@tanstack/react-table";
 import Link from "next/link";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { IBook } from "@/types/supabase";
 
 export default function DashboardBooksTable() {
-  const columnHelper = createColumnHelper<BooksResult>();
+  const columnHelper = createColumnHelper<IBook>();
 
   const getBooksByPage = async ({ pageIndex, pageSize }: PaginationState) => {
     const supabase = createClientComponentClient();
     let { data: books, error } = await supabase
       .from("books")
-      .select("id, title, author, isbn")
+      .select("*")
       .range(pageIndex * pageSize, pageSize * (pageIndex + 1));
     const { data, count } = await supabase
       .from("books")
@@ -36,28 +37,33 @@ export default function DashboardBooksTable() {
 
     return { data: books, count: count ? count : 0 };
   };
-  const columns = [
-    columnHelper.accessor("id", {
-      cell: (info) => info.getValue(),
-      header: "ID",
-    }),
-    columnHelper.accessor("title", {
-      cell: (info) => info.getValue(),
-      header: "Title",
-    }),
-    columnHelper.accessor("author", {
-      cell: (info) => info.getValue(),
-      header: "Author",
-    }),
-    columnHelper.accessor("isbn", {
-      cell: (info) => info.getValue(),
-      header: "ISBN",
-    }),
+
+  const columnsObj: Array<{
+    id: keyof IBook;
+    header: string;
+  }> = [
+    { id: "id", header: "ID" },
+    { id: "title", header: "Tilte" },
+    { id: "author", header: "Author" },
+    { id: "isbn", header: "ISBN" },
+    { id: "genre", header: "Genre" },
+    { id: "publisher", header: "Publisher" },
+    { id: "edition", header: "Edition" },
+    { id: "ddc", header: "DDC" },
+    { id: "language", header: "Language" },
+    { id: "year", header: "Year" },
+    { id: "pages", header: "Pages" },
   ];
 
+  const tanstackColumns = columnsObj.map((column) =>
+    columnHelper.accessor(column.id, {
+      cell: (info) => info.getValue(),
+      header: column.header,
+    })
+  );
   return (
-    <NovellaDataTable<BooksResult>
-      columns={columns}
+    <NovellaDataTable<IBook>
+      columns={tanstackColumns}
       fetchData={getBooksByPage}
     />
   );

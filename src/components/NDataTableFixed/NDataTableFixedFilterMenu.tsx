@@ -6,42 +6,33 @@ import AddIcon from "../icons/AddIcon";
 import CloseIcon from "../icons/CloseIcon";
 import ButtonSecondary from "../ButtonSecondary";
 import Select from "../Select";
-
-export type Filter = {
-  id: number;
-  prop: string;
-  operator: string;
-  value: string | number;
-};
+import { NDataTableFixedFilter } from ".";
 
 type NovellaDataTableFixedFilterMenuProps = {
   tableProps: any;
-  filterRulesChanged: (filter: Filter[]) => void;
+  filterRulesChanged: (filter: NDataTableFixedFilter[]) => void;
+  position?: "right" | "left";
 };
 
-export default function NovellaDataTableFixedFilterMenu({
+export default function NDataTableFixedFilterMenu({
   tableProps,
   filterRulesChanged,
+  position = "right",
 }: NovellaDataTableFixedFilterMenuProps) {
-  const [filters, setFilters] = useState<Filter[]>([]);
+  const [filters, setFilters] = useState<NDataTableFixedFilter[]>([]);
 
   return (
     <Popover as="div" className="relative">
       {({ open }) => (
         <>
-          <Popover.Button>
-            <ButtonGhost
-              icon={<FilterIcon size={18} />}
-              title={
-                filters.length ? `Filtered by ${filters.length} rule` : "Filter"
-              }
-              onClick={close}
-            />
+          <Popover.Button className="py-2 px-3 inline-flex text-sm gap-2 justify-center items-center text-surface-700 bg-surface-200 hover:bg-surface-300 transition-all border-[1px] border-surface-200 focus:border-surface-900 disabled:bg-surface-200 disabled:opacity-60 outline-none">
+            <FilterIcon size={18} />
+            {filters.length ? `Filtered by ${filters.length} rule` : "Filter"}
           </Popover.Button>
           {open && (
             <Popover.Panel
               static
-              className="absolute right-0 origin-top-right mt-1 bg-surface-200 border-[1px] border-surface-300  min-w-[320px] p-3 flex gap-2 flex-col text-sm z-10"
+              className={`absolute ${position}-0 origin-top-${position} mt-1 bg-surface-200 border-[1px] border-surface-300  min-w-[320px] p-3 flex gap-2 flex-col text-sm z-10`}
             >
               <div className="flex flex-col gap-2">
                 {!filters.length ? (

@@ -158,3 +158,5 @@ export interface Database {
 export type IBook = Database["public"]["Tables"]["books"]["Row"];
 export type IStudent = Database["public"]["Tables"]["students"]["Row"];
 export type IIssuedBook = Database["public"]["Tables"]["issued"]["Row"];
+
+export type ITables = keyof Database["public"]["Tables"];

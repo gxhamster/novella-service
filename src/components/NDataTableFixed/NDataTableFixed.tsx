@@ -6,7 +6,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, HTMLProps, useRef, use } from "react";
 import RightArrowIcon from "../icons/RightArrowIcon";
 import LeftArrowIcon from "../icons/LeftArrowIcon";
 import LoadingIcon from "../icons/LoadingIcon";
@@ -14,35 +14,49 @@ import ButtonPrimary from "../ButtonPrimary";
 import ButtonGhost from "../ButtonGhost";
 import AddIcon from "../icons/AddIcon";
 import RefreshIcon from "../icons/RefreshIcon";
-import NovellaDataTableFixedFilterMenu, {
-  Filter,
-} from "./NovellaDataTableFixedFilterMenu";
-import { TableFetchFunction } from "@/app/books/BooksTable";
-import NovellaDataTableFixedSortMenu from "./NovellaDataTableFixedSortMenu";
-import { Sort } from "./NovellaDataTableFixedSortMenu";
+import NDataTableFixedFilterMenu from "./NDataTableFixedFilterMenu";
+import NDataTableFixedSortMenu from "./NDataTableFixedSortMenu";
+import {
+  NDataTableFixedFetchFunction,
+  NDataTableFixedSort,
+  NDataTableFixedFilter,
+} from ".";
+
+type TableCheckboxProps = {
+  indeterminate?: boolean;
+} & HTMLProps<HTMLInputElement>;
+
+function TableCheckbox({ indeterminate, ...rest }: TableCheckboxProps) {
+  const ref = useRef<HTMLInputElement>(null!);
+  useEffect(() => {
+    if (typeof indeterminate === "boolean")
+      ref.current.indeterminate = !rest.checked && indeterminate;
+  }, [ref, indeterminate]);
+  return <input ref={ref} type="checkbox" {...rest} />;
+}
 
 type NovellaDataTableProps<TableType> = {
-  fetchData: ({
-    pageIndex,
-    pageSize,
-    filters,
-    sorts,
-  }: TableFetchFunction<TableType>) => Promise<{ data: any; count: number }>;
+  fetchData: NDataTableFixedFetchFunction<TableType>;
   tanStackColumns: ColumnDef<TableType, any>[];
   columns: Array<{ id: keyof TableType; header: string }>;
-  onCreateRowButtonPressed: () => void;
+  onCreateRowButtonPressed?: () => void;
+  onRowSelectionChanged?: (state: Array<any>) => void;
 };
 
-export default function NovellaDataTableFixed<TableType>({
+export default function NDataTableFixed<TableType>({
   fetchData,
   tanStackColumns,
   columns,
   onCreateRowButtonPressed,
+  onRowSelectionChanged = () => null,
 }: NovellaDataTableProps<TableType>) {
   // Fixme: Remove the any type and put proper typing :(
-  const [data, setData] = useState<any>([]);
-  const [filters, setFilters] = useState<Filter[]>([]);
-  const [sorts, setSorts] = useState<Sort<TableType> | null>(null);
+  const [data, setData] = useState<Array<any>>([]);
+  const [filters, setFilters] = useState<NDataTableFixedFilter[]>([]);
+  const [rowSelection, setRowSelection] = useState({});
+  const [sorts, setSorts] = useState<NDataTableFixedSort<TableType> | null>(
+    null
+  );
   const [totalPageCount, setTotalPageCount] = useState(data.length);
   const [totalRecords, setTotalRecords] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,16 +75,49 @@ export default function NovellaDataTableFixed<TableType>({
     [pageIndex, pageSize]
   );
 
+  const selectColAdded = useMemo<ColumnDef<TableType>[]>(
+    () => [
+      {
+        id: "select",
+        header: ({ table }) => (
+          <TableCheckbox
+            {...{
+              checked: table.getIsAllRowsSelected(),
+              indeterminate: table.getIsSomeRowsSelected(),
+              onChange: table.getToggleAllRowsSelectedHandler(),
+            }}
+          />
+        ),
+        cell: ({ row }) => (
+          <TableCheckbox
+            {...{
+              checked: row.getIsSelected(),
+              disabled: !row.getCanSelect(),
+              indeterminate: row.getIsSomeSelected(),
+              onChange: row.getToggleSelectedHandler(),
+            }}
+          />
+        ),
+      },
+      ...tanStackColumns,
+    ],
+    []
+  );
+
   const table = useReactTable({
     data,
-    columns: tanStackColumns,
+    columns: selectColAdded,
     state: {
       pagination,
+      rowSelection,
     },
     pageCount: totalPageCount,
     manualPagination: true,
+    enableRowSelection: true,
+    onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
+    debugTable: true,
   });
 
   const getData = async () => {
@@ -95,6 +142,13 @@ export default function NovellaDataTableFixed<TableType>({
     getData();
   }, [pageIndex, pageSize, fetchData, filters, sorts]);
 
+  useEffect(() => {
+    const selectedData = Object.keys(rowSelection).map((key) => {
+      return data[Number(key)];
+    });
+    onRowSelectionChanged(selectedData);
+  }, [rowSelection]);
+
   return (
     <div className="m-0">
       {/* Table Functions */}
@@ -110,7 +164,7 @@ export default function NovellaDataTableFixed<TableType>({
         </div>
         <div className="flex">
           {/* Sort Control */}
-          <NovellaDataTableFixedSortMenu<TableType>
+          <NDataTableFixedSortMenu<TableType>
             fields={columns}
             sortRulesChange={(_sorts) => {
               if (_sorts)
@@ -122,7 +176,7 @@ export default function NovellaDataTableFixed<TableType>({
             }}
           />
           {/* Filter Controls */}
-          <NovellaDataTableFixedFilterMenu
+          <NDataTableFixedFilterMenu
             filterRulesChanged={(filter) => {
               setFilters([...filter]);
             }}
@@ -131,19 +185,21 @@ export default function NovellaDataTableFixed<TableType>({
           <ButtonPrimary
             title="Create"
             icon={<AddIcon size={18} />}
-            onClick={() => onCreateRowButtonPressed()}
+            onClick={() =>
+              onCreateRowButtonPressed && onCreateRowButtonPressed()
+            }
           />
         </div>
       </div>
-      <div className="h-[calc(100vh-(58px+45px))] overflow-scroll bg-surface-100 m-0">
+      <div className="h-[calc(100vh-(58px+45px))] overflow-scroll bg-surface-100 m-0 relative">
         <table className="w-full">
           <thead className="text-surface-900 bg-surface-200 sticky top-0 m-0">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
+                {headerGroup.headers.map((header, idx) => (
                   <th
                     key={header.id}
-                    className="text-start p-2 px-4 font-normal text-sm border-x-[0.7px] border-surface-300"
+                    className={`text-start p-2 px-4 font-normal text-sm border-x-[0.7px] border-surface-300`}
                   >
                     {header.isPlaceholder
                       ? null
@@ -162,10 +218,10 @@ export default function NovellaDataTableFixed<TableType>({
                 key={row.id}
                 className="text-surface-700 bg-surface-100 border-b-[0.7px] border-surface-400"
               >
-                {row.getVisibleCells().map((cell) => (
+                {row.getVisibleCells().map((cell, idx) => (
                   <td
                     key={cell.id}
-                    className="p-2 px-4 truncate border-[0.7px] border-surface-400/70 text-sm font-normal"
+                    className={`p-2 px-4 truncate border-[0.7px] border-surface-400/70 text-sm font-normal`}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
