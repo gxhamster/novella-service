@@ -29,10 +29,10 @@ export default function NDrawer({
             leaveFrom="translate-x-0"
             leaveTo="translate-x-full"
           >
-            <Dialog.Panel className="fixed right-0 w-full h-screen  flex-grow max-w-2xl transform bg-surface-200 text-left shadow-xl transition-all">
+            <Dialog.Panel className="fixed right-0 w-full h-screen flex flex-col flex-grow max-w-2xl transform bg-surface-200 text-left shadow-xl transition-all">
               <Dialog.Title
                 as="div"
-                className="text-base leading-6 text-surface-900 border-b-[1px] bg-surface-200 border-surface-300 p-4 sticky top-0"
+                className="text-base leading-6 text-surface-900 border-b-[1px] bg-surface-200 border-surface-300 p-4"
               >
                 {title}
               </Dialog.Title>

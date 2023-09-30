@@ -25,7 +25,7 @@ type NovellaDataTableProps<TableType> = {
   fetchData: NDataTableFixedFetchFunction<TableType>;
   tanStackColumns: ColumnDef<TableType, any>[];
   columns: Array<{ id: keyof TableType; header: string }>;
-  onRowSelectionChanged?: (state: IBook) => void;
+  onRowSelectionChanged?: (state: TableType) => void;
 };
 
 /*
@@ -109,7 +109,7 @@ export default function NDataTableFixedSmall<TableType>({
   }, [rowSelection]);
 
   return (
-    <div className="h-full">
+    <div className="h-full flex flex-col justify-between w-[42rem]">
       {/* Table Functions */}
       <div className="flex justify-between bg-surface-200 border-b-[1px] border-surface-300">
         <div className="flex items-center">
@@ -159,9 +159,9 @@ export default function NDataTableFixedSmall<TableType>({
           </button>
         </div>
       </div>
-      <div className="h-[100%] w-[42rem] overflow-scroll bg-surface-100 m-0 relative">
-        <table className="w-full">
-          <thead className="text-surface-900 bg-surface-200 sticky top-0 m-0">
+      <div className="h-[calc(100vh-43px-57px)] overflow-y-auto bg-surface-100 relative">
+        <table>
+          <thead className="text-surface-900 bg-surface-200 sticky top-0">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header, idx) => (
