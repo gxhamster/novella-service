@@ -1,14 +1,16 @@
 import { cookies } from "next/headers";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { Database } from "@/types/supabase";
+import { Database } from "@/supabase/types/supabase";
 import { NextResponse } from "next/server";
+import { ITables } from "@/supabase/types/supabase";
 
 const supabase = createRouteHandlerClient<Database>({ cookies });
+const table: ITables = "students";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const { data, error } = await supabase
-    .from("students")
+    .from(table)
     .select("*")
     .eq("id", Number(searchParams.get("id")));
 
@@ -22,7 +24,7 @@ export async function PUT(request: Request) {
   const jsonData = await request.json();
 
   const { data: updatedStudent, error } = await supabase
-    .from("students")
+    .from(table)
     .update(jsonData)
     .eq("id", Number(searchParams.get("id")))
     .select();
@@ -32,9 +34,15 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
+  const { ids } = await request.json();
+
+  if (ids) {
+    const { error } = await supabase.from(table).delete().in("id", ids);
+    return NextResponse.json({ error });
+  }
 
   const { error } = await supabase
-    .from("students")
+    .from(table)
     .delete()
     .eq("id", Number(searchParams.get("id")));
 
@@ -44,10 +52,7 @@ export async function DELETE(request: Request) {
 export async function POST(request: Request) {
   const reqBody = await request.json();
 
-  const { data, error } = await supabase
-    .from("students")
-    .insert(reqBody)
-    .select();
+  const { data, error } = await supabase.from(table).insert(reqBody).select();
 
   return NextResponse.json({ error, data });
 }

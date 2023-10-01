@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { Database, ITables } from "@/types/supabase";
+import { Database, ITables } from "@/supabase/types/supabase";
 import { NextResponse } from "next/server";
 
 const supabase = createRouteHandlerClient<Database>({ cookies });
@@ -33,6 +33,12 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
+  const { ids } = await request.json();
+
+  if (ids) {
+    const { error } = await supabase.from(table).delete().in("id", ids);
+    return NextResponse.json({ error });
+  }
 
   const { error } = await supabase
     .from(table)
@@ -46,7 +52,6 @@ export async function POST(request: Request) {
   const reqBody = await request.json();
 
   const { data, error } = await supabase.from(table).insert(reqBody).select();
-  console.log("=== Succesfully added to books", data, error);
 
   return NextResponse.json({ error, data });
 }
