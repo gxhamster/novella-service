@@ -11,7 +11,7 @@ export default function TrashIcon({ size = 24 }: TrashIconProps) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="3"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >

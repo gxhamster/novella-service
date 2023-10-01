@@ -1,7 +1,7 @@
 "use client";
 import { useForm, useWatch } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { IStudent } from "@/types/supabase";
+import { IStudent } from "@/supabase/types/supabase";
 import ButtonPrimary from "@/components/ButtonPrimary";
 import ButtonSecondary from "@/components/ButtonSecondary";
 import NCategoryCard from "@/components/NCategoryCard";

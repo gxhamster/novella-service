@@ -1,7 +1,7 @@
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import BookSummary from "./BookSummary";
-import { Database } from "@/types/supabase";
+import { Database } from "@/supabase/types/supabase";
 import BookCreate from "./BookCreate";
 
 export const dynamic = "force-dynamic";

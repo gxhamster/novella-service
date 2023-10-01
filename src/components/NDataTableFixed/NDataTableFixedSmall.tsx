@@ -19,7 +19,6 @@ import {
   NDataTableFixedSort,
   NDataTableFixedFilter,
 } from ".";
-import { IBook } from "@/types/supabase";
 
 type NovellaDataTableProps<TableType> = {
   fetchData: NDataTableFixedFetchFunction<TableType>;

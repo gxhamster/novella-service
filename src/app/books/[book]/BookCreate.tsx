@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import ButtonPrimary from "@/components/ButtonPrimary";
-import { IBook } from "@/types/supabase";
+import { IBook } from "@/supabase/types/supabase";
 import { addBookToSupabase } from "@/app/api/books/client";
 import {
   NDrawerCreateForm,

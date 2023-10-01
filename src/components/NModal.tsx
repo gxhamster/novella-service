@@ -45,11 +45,11 @@ export default function NModal({
               <Dialog.Panel className="w-full max-w-md transform overflow-hidden bg-surface-200 text-left align-middle shadow-xl transition-all">
                 <Dialog.Title
                   as="h3"
-                  className="text-lg font-medium leading-6 text-surface-800 border-b-[1px] border-surface-300 p-4"
+                  className="text-lg font-normal leading-6 bg-surface-300/20 text-surface-800 border-b-[1px] border-surface-300 p-4"
                 >
                   {title}
                 </Dialog.Title>
-                <section className="px-6 py-4">{children}</section>
+                <section>{children}</section>
               </Dialog.Panel>
             </Transition.Child>
           </div>

@@ -21,6 +21,9 @@ import {
   NDataTableFixedSort,
   NDataTableFixedFilter,
 } from ".";
+import NButton from "../NButton";
+import TrashIcon from "../icons/TrashIcon";
+import CloseIcon from "../icons/CloseIcon";
 
 type TableCheckboxProps = {
   indeterminate?: boolean;
@@ -41,6 +44,7 @@ type NovellaDataTableProps<TableType> = {
   columns: Array<{ id: keyof TableType; header: string }>;
   onCreateRowButtonPressed?: () => void;
   onRowSelectionChanged?: (state: Array<any>) => void;
+  onRowDeleted?: (deletedRows: Array<TableType>) => void;
 };
 
 export default function NDataTableFixed<TableType>({
@@ -49,11 +53,19 @@ export default function NDataTableFixed<TableType>({
   columns,
   onCreateRowButtonPressed,
   onRowSelectionChanged = () => null,
+  onRowDeleted,
 }: NovellaDataTableProps<TableType>) {
   // Fixme: Remove the any type and put proper typing :(
   const [data, setData] = useState<Array<any>>([]);
   const [filters, setFilters] = useState<NDataTableFixedFilter[]>([]);
   const [rowSelection, setRowSelection] = useState({});
+  const selectedData = useMemo(() => {
+    const selectedData = Object.keys(rowSelection).map((key) => {
+      return data[Number(key)];
+    });
+    return selectedData;
+  }, [rowSelection]);
+
   const [sorts, setSorts] = useState<NDataTableFixedSort<TableType> | null>(
     null
   );
@@ -143,11 +155,8 @@ export default function NDataTableFixed<TableType>({
   }, [pageIndex, pageSize, fetchData, filters, sorts]);
 
   useEffect(() => {
-    const selectedData = Object.keys(rowSelection).map((key) => {
-      return data[Number(key)];
-    });
     onRowSelectionChanged(selectedData);
-  }, [rowSelection]);
+  }, [selectedData]);
 
   return (
     <div className="m-0">
@@ -162,34 +171,55 @@ export default function NDataTableFixed<TableType>({
             }}
           />
         </div>
-        <div className="flex">
-          {/* Sort Control */}
-          <NDataTableFixedSortMenu<TableType>
-            fields={columns}
-            sortRulesChange={(_sorts) => {
-              if (_sorts)
-                setSorts({
-                  field: _sorts.field,
-                  ascending: _sorts.ascending,
-                });
-              else setSorts(null);
-            }}
-          />
-          {/* Filter Controls */}
-          <NDataTableFixedFilterMenu
-            filterRulesChanged={(filter) => {
-              setFilters([...filter]);
-            }}
-            tableProps={columns.map((col) => col.id)}
-          />
-          <ButtonPrimary
-            title="Create"
-            icon={<AddIcon size={18} />}
-            onClick={() =>
-              onCreateRowButtonPressed && onCreateRowButtonPressed()
-            }
-          />
-        </div>
+        {selectedData.length ? (
+          <div className="flex items-center gap-2">
+            <NButton
+              kind="ghost"
+              icon={<CloseIcon size={18} />}
+              onClick={() => table.resetRowSelection()}
+            />
+
+            <span className="text-sm text-surface-700">{`${selectedData.length} rows selected`}</span>
+            <NButton
+              title="Delete"
+              kind="alert"
+              icon={<TrashIcon size={18} />}
+              onClick={() => {
+                onRowDeleted && onRowDeleted(selectedData);
+                table.resetRowSelection();
+              }}
+            />
+          </div>
+        ) : (
+          <div className="flex">
+            {/* Sort Control */}
+            <NDataTableFixedSortMenu<TableType>
+              fields={columns}
+              sortRulesChange={(_sorts) => {
+                if (_sorts)
+                  setSorts({
+                    field: _sorts.field,
+                    ascending: _sorts.ascending,
+                  });
+                else setSorts(null);
+              }}
+            />
+            {/* Filter Controls */}
+            <NDataTableFixedFilterMenu
+              filterRulesChanged={(filter) => {
+                setFilters([...filter]);
+              }}
+              tableProps={columns.map((col) => col.id)}
+            />
+            <ButtonPrimary
+              title="Create"
+              icon={<AddIcon size={18} />}
+              onClick={() =>
+                onCreateRowButtonPressed && onCreateRowButtonPressed()
+              }
+            />
+          </div>
+        )}
       </div>
       {/* FIXME: WTH need to cleaner solution */}
       <div className="h-[calc(100vh-(58px+45px+39px))] overflow-scroll bg-surface-100 m-0 relative">

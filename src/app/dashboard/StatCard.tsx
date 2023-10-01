@@ -1,7 +1,7 @@
 type StatCardProps = {
   title: string;
   subtitle: string;
-  stat: string;
+  stat: number;
   children: React.ReactNode;
 };
 export default function StatCard({

@@ -1,9 +1,9 @@
+import { useState } from "react";
 import { Popover } from "@headlessui/react";
 import ButtonGhost from "../ButtonGhost";
 import ButtonSecondary from "../ButtonSecondary";
 import CloseIcon from "../icons/CloseIcon";
 import SortIcon from "../icons/SortIcon";
-import { useState } from "react";
 import Select from "../Select";
 import NovellaSwitch from "../NovellaSwitch";
 import { NDataTableFixedSort } from ".";

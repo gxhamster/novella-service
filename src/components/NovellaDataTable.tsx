@@ -66,13 +66,13 @@ export default function NovellaDataTable<T>({
   }, [pageIndex, pageSize, fetchData]);
 
   return (
-    <div className="">
+    <div>
       <table className="w-full">
         <thead className="text-surface-900 bg-surface-300">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <th key={header.id} className="text-start p-2 px-4 text-base">
+                <th key={header.id} className="text-start p-2 px-4 text-sm">
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -94,7 +94,7 @@ export default function NovellaDataTable<T>({
               onClick={() => row.toggleSelected()}
             >
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="p-2 px-4">
+                <td key={cell.id} className="p-2 px-4 text-ellipsis">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}

@@ -2,7 +2,7 @@
 import ButtonPrimary from "@/components/ButtonPrimary";
 import ButtonSecondary from "@/components/ButtonSecondary";
 import NovellaInput from "@/components/NovellaInput";
-import { IBook } from "@/types/supabase";
+import { IBook } from "@/supabase/types/supabase";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm, useWatch } from "react-hook-form";
 import BookCategoryCard from "./BookCatergoryCard";

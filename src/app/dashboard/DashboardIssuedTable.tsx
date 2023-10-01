@@ -1,10 +1,9 @@
 "use client";
 import NovellaDataTable from "@/components/NovellaDataTable";
 import { createColumnHelper } from "@tanstack/react-table";
-import { IssuedBooksResult } from "@/supabase/db";
+import { IssuedBooksResult } from "@/supabase/client";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { Database } from "@/types/supabase";
-import { useState } from "react";
+import { Database } from "@/supabase/types/supabase";
 
 export default function DashboardIssuedTable({ issuedBooks }: any) {
   const getIssuedBooks = async () => {
@@ -46,13 +45,18 @@ export default function DashboardIssuedTable({ issuedBooks }: any) {
       header: "Title",
     }),
     columnHelper.accessor("issue_date", {
-      cell: (info) => info.getValue(),
+      cell: (info) => new Date(info.getValue()).toDateString(),
       header: "Issued Date",
     }),
     columnHelper.accessor("due_date", {
-      cell: (info) => info.getValue(),
+      cell: (info) => new Date(info.getValue()).toDateString(),
       header: "Due Date",
     }),
   ];
-  return <NovellaDataTable columns={columns} fetchData={getIssuedBooks} />;
+  return (
+    <NovellaDataTable<IssuedBooksResult>
+      columns={columns}
+      fetchData={getIssuedBooks}
+    />
+  );
 }

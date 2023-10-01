@@ -13,18 +13,23 @@ export function NDataTableFixedConvertToSupabaseFilters(
   return `and(${filterStrArr.join(",")})`;
 }
 
+export type NDataTableFixedFetchFunctionProps<TableType> = {
+  pageIndex: number;
+  pageSize: number;
+  filters: NDataTableFixedFilter[];
+  sorts: NDataTableFixedSort<TableType> | null;
+};
+
 export type NDataTableFixedFetchFunction<TableType> = ({
   pageIndex,
   pageSize,
   filters,
   sorts,
-}: {
-  pageIndex: number;
-  pageSize: number;
-  filters: NDataTableFixedFilter[];
-  sorts: NDataTableFixedSort<TableType> | null;
-}) => Promise<{ data: any; count: number }>;
-
+}: // FIXME: :( Return type of the data from the promise should be the type passed to the table
+NDataTableFixedFetchFunctionProps<TableType>) => Promise<{
+  data: any;
+  count: number;
+}>;
 export type NDataTableFixedSort<T> = {
   field: keyof T;
   ascending: boolean;

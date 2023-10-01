@@ -1,22 +1,32 @@
 "use client";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
 import Link from "next/link";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { Database, IStudent } from "@/types/supabase";
-import NDataTableFixed, {
-  NDataTableFixedFetchFunction,
-  NDataTableFixedConvertToSupabaseFilters,
-} from "@/components/NDataTableFixed";
+import { Database, IStudent } from "@/supabase/types/supabase";
 import {
   NDrawerCreateForm,
   NDrawerCreateFormFieldsType,
 } from "@/components/NDrawer";
+import NDataTableFixed, {
+  NDataTableFixedFetchFunction,
+  NDataTableFixedConvertToSupabaseFilters,
+} from "@/components/NDataTableFixed";
+import NModal from "@/components/NModal";
+import NButton from "@/components/NButton";
+import { NAlertContext, NAlertContextType } from "@/components/NAlert";
 
 export default function StudentsTable() {
   const columnHelper = createColumnHelper<IStudent>();
   const [isAddBookDrawerOpen, setIsAddBookDrawerOpen] = useState(false);
+  const [isDeleteStudentModalOpen, setIsDeleteStudentModalOpen] =
+    useState(false);
+  const [deletedStudentsRows, setDeletedStudentRows] = useState<IStudent[]>();
   const [saveButtonLoading, setSaveButtonLoading] = useState(false);
+  const { openAlert, setContent, isOpen } = useContext(
+    NAlertContext
+  ) as NAlertContextType;
+
   const getBooksByPage: NDataTableFixedFetchFunction<IStudent> = async ({
     pageIndex,
     pageSize,
@@ -34,30 +44,15 @@ export default function StudentsTable() {
 
     if (error) throw new Error(error.message);
 
-    let students = data
-      ? data.map((v) => {
-          return {
-            ...v,
-            id: (
-              <Link
-                href={`/students/${v.id}`}
-                className="hover:underline hover:text-primary-700"
-              >
-                {v.id}
-              </Link>
-            ),
-          };
-        })
-      : null;
-
-    return { data: students, count: count ? count : 0 };
+    return { data, count: count ? count : 0 };
   };
 
   const columnsObj: Array<{
     id: keyof IStudent;
     header: string;
+    isLink?: boolean;
   }> = [
-    { id: "id", header: "ID" },
+    { id: "id", header: "ID", isLink: true },
     { id: "name", header: "Name" },
     { id: "island", header: "Island" },
     { id: "address", header: "Address" },
@@ -68,7 +63,17 @@ export default function StudentsTable() {
 
   const tanstackColumns = columnsObj.map((column) =>
     columnHelper.accessor(column.id, {
-      cell: (info) => info.getValue(),
+      cell: (info) =>
+        column.isLink ? (
+          <Link
+            href={`/students/${info.getValue()}`}
+            className="hover:underline hover:text-primary-700"
+          >
+            {info.getValue()}
+          </Link>
+        ) : (
+          info.getValue()
+        ),
       header: column.header,
     })
   );
@@ -171,8 +176,53 @@ export default function StudentsTable() {
         columns={columnsObj}
         tanStackColumns={tanstackColumns}
         onCreateRowButtonPressed={() => setIsAddBookDrawerOpen(true)}
+        onRowDeleted={(deletedRows) => {
+          setDeletedStudentRows([...deletedRows]);
+          setIsDeleteStudentModalOpen(true);
+        }}
         fetchData={getBooksByPage}
       />
+      <NModal
+        isOpen={isDeleteStudentModalOpen}
+        title="Confirm to delete"
+        onModalClose={() => setIsDeleteStudentModalOpen(false)}
+      >
+        <section className="p-4">
+          <p className="text-sm text-surface-700">
+            Are you sure you want to delete the selected rows?
+          </p>
+          <p className="text-sm text-surface-700">
+            This action cannot be undone
+          </p>
+        </section>
+        <section className="flex gap-2 justify-end py-3 border-t-[1px] border-surface-300 px-3">
+          <NButton
+            kind="secondary"
+            title="Cancel"
+            onClick={() => setIsDeleteStudentModalOpen(false)}
+          />
+          <NButton
+            kind="alert"
+            title="Delete"
+            onClick={async () => {
+              const ids = deletedStudentsRows?.map((rows) => rows.id);
+              const { error } = await fetch("/api/students", {
+                method: "DELETE",
+                body: JSON.stringify({ ids }),
+              }).then((response) => response.json());
+              if (error) {
+                setContent({
+                  title: "Could not delete the student",
+                  description: error.message,
+                });
+                openAlert();
+                // throw new Error(error.message);
+              }
+              setIsDeleteStudentModalOpen(false);
+            }}
+          />
+        </section>
+      </NModal>
     </>
   );
 }
