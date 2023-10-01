@@ -3,7 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { createColumnHelper } from "@tanstack/react-table";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { Database, IBook } from "@/types/supabase";
+import { Database, IBook } from "@/supabase/types/supabase";
 import NDataTableFixed, {
   NDataTableFixedConvertToSupabaseFilters,
   NDataTableFixedFetchFunction,
@@ -12,10 +12,14 @@ import {
   NDrawerCreateForm,
   NDrawerCreateFormFieldsType,
 } from "@/components/NDrawer";
+import NButton from "@/components/NButton";
+import NModal from "@/components/NModal";
 
 export default function BooksTable() {
   const columnHelper = createColumnHelper<IBook>();
   const [isAddBookDrawerOpen, setIsAddBookDrawerOpen] = useState(false);
+  const [isDeleteBookModalOpen, setIsDeleteBookModalOpen] = useState(false);
+  const [deletedBooks, setDeletedBooks] = useState<IBook[]>();
   const [saveButtonLoading, setSaveButtonLoading] = useState(false);
   const getBooksByPage: NDataTableFixedFetchFunction<IBook> = async ({
     pageIndex,
@@ -34,30 +38,15 @@ export default function BooksTable() {
 
     if (error) throw new Error(error.message);
 
-    let books = data
-      ? data.map((v) => {
-          return {
-            ...v,
-            id: (
-              <Link
-                href={`/books/${v.id}`}
-                className="hover:underline hover:text-primary-700"
-              >
-                {v.id}
-              </Link>
-            ),
-          };
-        })
-      : null;
-
-    return { data: books, count: count ? count : 0 };
+    return { data, count: count ? count : 0 };
   };
 
   const columnsObj: Array<{
     id: keyof IBook;
     header: string;
+    isLink?: boolean;
   }> = [
-    { id: "id", header: "ID" },
+    { id: "id", header: "ID", isLink: true },
     { id: "title", header: "Tilte" },
     { id: "author", header: "Author" },
     { id: "isbn", header: "ISBN" },
@@ -72,14 +61,22 @@ export default function BooksTable() {
 
   const tanstackColumns = columnsObj.map((column) =>
     columnHelper.accessor(column.id, {
-      cell: (info) => info.getValue(),
+      cell: (info) =>
+        column.isLink ? (
+          <Link
+            href={`/books/${info.getValue()}`}
+            className="hover:underline hover:text-primary-700"
+          >
+            {info.getValue()}
+          </Link>
+        ) : (
+          info.getValue()
+        ),
       header: column.header,
     })
   );
 
   const addBookToSupabase = async (formData: IBook) => {
-    console.log("=== Adding book to supabase", formData);
-
     setSaveButtonLoading(true);
     const { _, error } = await fetch("/api/books", {
       method: "POST",
@@ -197,9 +194,46 @@ export default function BooksTable() {
         columns={columnsObj}
         tanStackColumns={tanstackColumns}
         onCreateRowButtonPressed={() => setIsAddBookDrawerOpen(true)}
-        onRowSelectionChanged={(state) => console.log(state)}
+        onRowDeleted={(deletedRows) => {
+          setDeletedBooks([...deletedRows]);
+          setIsDeleteBookModalOpen(true);
+        }}
         fetchData={getBooksByPage}
       />
+      <NModal
+        isOpen={isDeleteBookModalOpen}
+        title="Confirm to delete"
+        onModalClose={() => setIsDeleteBookModalOpen(false)}
+      >
+        <section className="p-4">
+          <p className="text-sm text-surface-700">
+            Are you sure you want to delete the selected rows?
+          </p>
+          <p className="text-sm text-surface-700">
+            This action cannot be undone
+          </p>
+        </section>
+        <section className="flex gap-2 justify-end py-3 border-t-[1px] border-surface-300 px-3">
+          <NButton
+            kind="secondary"
+            title="Cancel"
+            onClick={() => setIsDeleteBookModalOpen(false)}
+          />
+          <NButton
+            kind="alert"
+            title="Delete"
+            onClick={async () => {
+              const ids = deletedBooks?.map((rows) => rows.id);
+              const { error } = await fetch("/api/books", {
+                method: "DELETE",
+                body: JSON.stringify({ ids }),
+              }).then((response) => response.json());
+              if (error) throw new Error(error.message);
+              setIsDeleteBookModalOpen(false);
+            }}
+          />
+        </section>
+      </NModal>
     </>
   );
 }
