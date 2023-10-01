@@ -7,18 +7,9 @@ import NButton from "@/components/NButton";
 import LeftArrowIcon from "@/components/icons/LeftArrowIcon";
 import SelectBookDrawer from "./SelectBookDrawer";
 import SelectStudentDrawer from "./SelectStudentDrawer";
-
-function issueBookFormSubmitHandler(formData: IIssuedBook) {
-  const postToSupbase = async () => {
-    const { data, error } = await fetch("/api/issued", {
-      method: "POST",
-      body: JSON.stringify(formData),
-    }).then((response) => response.json());
-
-    if (error) throw new Error(error.message);
-  };
-  postToSupbase();
-}
+import { useContext } from "react";
+import { NAlertContext } from "@/components/NAlert";
+import LoadingIcon from "@/components/icons/LoadingIcon";
 
 type IssueBookDrawerProps = {
   isIssueBookDrawerOpen: boolean;
@@ -33,18 +24,26 @@ export default function IssueBookDrawer({
   const [selectedStudent, setSelectedStudent] = useState<IStudent | null>(null);
   const [isAddBookDrawerOpen, setIsAddBookDrawerOpen] = useState(false);
   const [isAddStudentDrawerOpen, setIsAddStudentDrawerOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { setContent, openAlert } = useContext(NAlertContext);
 
   const {
     register,
     handleSubmit,
     reset,
     setValue,
-    formState: { errors },
+    formState: { errors, isDirty, isValid },
   } = useForm<IIssuedBook>({
     defaultValues: {
       created_at: new Date().toISOString(),
-      student_id: useMemo(() => selectedStudent?.id, [selectedStudent]),
-      book_id: useMemo(() => selectedBook?.id, [selectedBook]),
+      student_id: useMemo(
+        () => (selectedStudent ? selectedStudent.id : 0),
+        [selectedStudent]
+      ),
+      book_id: useMemo(
+        () => (selectedBook ? selectedBook.id : 0),
+        [selectedBook]
+      ),
       due_date: useMemo(() => {
         const days = 5;
         const date = new Date();
@@ -53,6 +52,24 @@ export default function IssueBookDrawer({
       }, []),
     },
   });
+
+  function issueBookFormSubmitHandler(formData: IIssuedBook) {
+    setIsSubmitting(true);
+    const postToSupbase = async () => {
+      const { data, error } = await fetch("/api/issued", {
+        method: "POST",
+        body: JSON.stringify(formData),
+      }).then((response) => response.json());
+      setIsSubmitting(false);
+
+      if (error) {
+        setContent({ title: "Cannot issue book", description: error.message });
+        openAlert();
+        throw new Error(error.message);
+      }
+    };
+    postToSupbase();
+  }
 
   return (
     <>
@@ -156,7 +173,16 @@ export default function IssueBookDrawer({
                 reset();
               }}
             />
-            <NButton title="Issue Book" kind="primary" />
+            <NButton
+              title="Issue Book"
+              kind="primary"
+              icon={
+                isSubmitting ? (
+                  <LoadingIcon className="text-surface-900" size={16} />
+                ) : null
+              }
+              disabled={!isDirty && !isValid && isSubmitting}
+            />
           </section>
         </form>
       </NDrawer>

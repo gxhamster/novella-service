@@ -63,6 +63,8 @@ export interface Database {
           created_at: string;
           due_date: string | null;
           id: number;
+          returned: boolean | null;
+          returned_date: string | null;
           student_id: number;
           user_id: string | null;
         };
@@ -71,6 +73,8 @@ export interface Database {
           created_at?: string;
           due_date?: string | null;
           id?: number;
+          returned?: boolean | null;
+          returned_date?: string | null;
           student_id: number;
           user_id?: string | null;
         };
@@ -79,6 +83,8 @@ export interface Database {
           created_at?: string;
           due_date?: string | null;
           id?: number;
+          returned?: boolean | null;
+          returned_date?: string | null;
           student_id?: number;
           user_id?: string | null;
         };

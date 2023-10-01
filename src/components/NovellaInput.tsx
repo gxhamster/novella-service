@@ -58,8 +58,8 @@ function NovellaInput<NovellaInputField extends string>({
         <div className="flex flex-col col-span-7">
           <div className="relative mt-2">
             <input
-              {...rest}
-              className={`flex-grow px-4 py-2 border-[1px] w-full block transition  appearance-none outline-none bg-surface-200 focus:ring-[1px] placeholder:text-surface-500 ${inputBorderStyles()}`}
+              {...props}
+              className={`flex-grow px-4 py-2 border-[1px] w-full block transition  appearance-none outline-none bg-surface-200 focus:ring-[1px] placeholder:text-surface-500 ${inputBorderStyles()} text-sm`}
               autoComplete={autoCompleteTag()}
               id={inputId()}
               {...reactHookRegister}

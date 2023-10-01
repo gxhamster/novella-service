@@ -14,7 +14,8 @@ export const getIssuedBooksByPage: NDataTableFixedFetchFunction<
     .from("issued")
     .select("*, book_id, books (title), student_id, students (name)", {
       count: "estimated",
-    });
+    })
+    .eq("returned", "FALSE");
   if (filters.length > 0) query = query.or(supabaseFilters);
   if (sorts) query = query.order(sorts.field, { ascending: sorts.ascending });
   query = query.range(pageIndex * pageSize, pageSize * (pageIndex + 1));

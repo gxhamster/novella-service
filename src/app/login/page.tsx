@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import NovellaInput from "@/components/NovellaInput";
 import { signInWithEmail } from "@/supabase/auth";
 import { useForm, SubmitHandler } from "react-hook-form";
+import NButton from "@/components/NButton";
 
 type LoginPageInputs = {
   email: string;
@@ -54,7 +55,7 @@ const Login = () => {
       </section>
       <section className="bg-surface-200 p-12 flex flex-col gap-10 w-1/3 min-w-[450px] min-h-[500px]">
         <section className="flex flex-col gap-2">
-          <h3 className="text-surface-700 text-2xl font-bold">Welcome back</h3>
+          <h3 className="text-surface-700 text-2xl">Welcome back</h3>
           <span className="text-surface-600">Sign in to your account</span>
         </section>
         <form
@@ -85,9 +86,7 @@ const Login = () => {
               Click Here
             </a>
           </div>
-          <button className="bg-primary-500 px-4 py-2 text-black-100 rounded-md">
-            Sign in
-          </button>
+          <NButton kind="primary" title="Sign in" className="text-center" />
         </form>
       </section>
     </main>

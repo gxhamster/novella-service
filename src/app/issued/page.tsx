@@ -9,17 +9,12 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { IssuedBooksTableColumnDef } from "./lib/types";
 import Link from "next/link";
 import IssueBookDrawer from "./components/IssueBookDrawer";
+import { NAlertProvider } from "@/components/NAlert";
 
 export default function Issued() {
-  type ReturnBook = {
-    id: string;
-    value: any;
-    header: string;
-  };
-
   const [isIssueBookDrawerOpen, setIsIssueBookDrawerOpen] = useState(false);
   const [isReturnBookModalOpen, setIsReturnBookModalOpen] = useState(false);
-  const [returnBook, setReturnBook] = useState<ReturnBook[]>([]);
+  const [returnBookID, setReturnBookID] = useState<number>();
   const issuedBooksColHelper = createColumnHelper<IIssuedBookV2>();
   const [deletedBooks, setDeletedBooks] = useState<IIssuedBookV2[] | null>(
     null
@@ -48,16 +43,8 @@ export default function Issued() {
             kind="ghost"
             size="xs"
             onClick={() => {
-              setReturnBook([
-                ...cell.row
-                  .getAllCells()
-                  .map((v) => ({
-                    id: v.column.id,
-                    value: v.getValue() as string,
-                    header: v.column.columnDef.header as string,
-                  }))
-                  .filter((v) => v.value),
-              ]);
+              console.log(cell.row.getAllCells());
+              setReturnBookID(cell.row.getAllCells()[1].getValue() as number);
               setIsReturnBookModalOpen(true);
             }}
           />
@@ -85,72 +72,101 @@ export default function Issued() {
 
   return (
     <>
-      <NDataTableFixed<IIssuedBookV2>
-        columns={issuedBooksTableCols}
-        tanStackColumns={issuedBooksTableColsTanstack}
-        onCreateRowButtonPressed={() => setIsIssueBookDrawerOpen(true)}
-        onRowSelectionChanged={(state) => console.log(state)}
-        onRowDeleted={(deletedBooks) => {
-          setDeletedBooks(deletedBooks);
-          setIsIssueBookDeleteModalOpen(true);
-        }}
-        fetchData={getIssuedBooksByPage}
-      />
-      <NModal
-        isOpen={isIssueBookDeleteModalOpen}
-        title="Confirm to delete"
-        onModalClose={() => setIsIssueBookDeleteModalOpen(false)}
-      >
-        <section className="p-4">
-          <p className="text-sm text-surface-700">
-            Are you sure you want to delete the selected rows?
-          </p>
-          <p className="text-sm text-surface-700">
-            This action cannot be undone
-          </p>
-        </section>
-        <section className="flex gap-2 justify-end py-3 border-t-[1px] border-surface-300 px-3">
-          <NButton
-            kind="secondary"
-            title="Cancel"
-            onClick={() => setIsIssueBookDeleteModalOpen(false)}
-          />
-          <NButton
-            kind="alert"
-            title="Delete"
-            onClick={async () => {
-              const ids = deletedBooks?.map((rows) => rows.id);
-              const { error } = await fetch("/api/issued", {
-                method: "DELETE",
-                body: JSON.stringify({ ids }),
-              }).then((response) => response.json());
-              if (error) throw new Error(error.message);
-              setIsIssueBookDeleteModalOpen(false);
-            }}
-          />
-        </section>
-      </NModal>
-      <NModal
-        title="Return the issued book"
-        isOpen={isReturnBookModalOpen}
-        onModalClose={() => setIsReturnBookModalOpen(false)}
-      >
-        <form>
-          <section className="text-surface-700 p-6">
-            <p className="text-sm">
-              Do you want to return the book from the student to the library ?
+      <NAlertProvider>
+        <NDataTableFixed<IIssuedBookV2>
+          columns={issuedBooksTableCols}
+          tanStackColumns={issuedBooksTableColsTanstack}
+          onCreateRowButtonPressed={() => setIsIssueBookDrawerOpen(true)}
+          onRowSelectionChanged={(state) => console.log(state)}
+          onRowDeleted={(deletedBooks) => {
+            setDeletedBooks(deletedBooks);
+            setIsIssueBookDeleteModalOpen(true);
+          }}
+          fetchData={getIssuedBooksByPage}
+        />
+        <NModal
+          isOpen={isIssueBookDeleteModalOpen}
+          title="Confirm to delete"
+          onModalClose={() => setIsIssueBookDeleteModalOpen(false)}
+        >
+          <section className="p-4">
+            <p className="text-sm text-surface-700">
+              Are you sure you want to delete the selected rows?
+            </p>
+            <p className="text-sm text-surface-700">
+              This action cannot be undone
             </p>
           </section>
-          <section className="flex gap-2 border-t-[1px] border-surface-300 p-2 justify-end">
-            <NButton kind="secondary" size="sm" title="Cancel" />
-            <NButton kind="primary" size="sm" title="Return" />
+          <section className="flex gap-2 justify-end py-3 border-t-[1px] border-surface-300 px-3">
+            <NButton
+              kind="secondary"
+              title="Cancel"
+              onClick={() => setIsIssueBookDeleteModalOpen(false)}
+            />
+            <NButton
+              kind="alert"
+              title="Delete"
+              onClick={async () => {
+                const ids = deletedBooks?.map((rows) => rows.id);
+                const { error } = await fetch("/api/issued", {
+                  method: "DELETE",
+                  body: JSON.stringify({ ids }),
+                }).then((response) => response.json());
+                if (error) throw new Error(error.message);
+                setIsIssueBookDeleteModalOpen(false);
+              }}
+            />
           </section>
-        </form>
-      </NModal>
-      <IssueBookDrawer
-        isIssueBookDrawerOpen={isIssueBookDrawerOpen}
-        setIsIssueBookDrawerOpen={setIsIssueBookDrawerOpen}
-      />
+        </NModal>
+        <NModal
+          title="Return the issued book"
+          isOpen={isReturnBookModalOpen}
+          onModalClose={() => setIsReturnBookModalOpen(false)}
+        >
+          <form>
+            <section className="text-surface-700 p-6">
+              <p className="text-sm">
+                Do you want to return the book from the student to the library ?
+              </p>
+            </section>
+            <section className="flex gap-2 border-t-[1px] border-surface-300 p-2 justify-end">
+              <NButton
+                kind="secondary"
+                size="sm"
+                title="Cancel"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsReturnBookModalOpen(false);
+                }}
+              />
+              <NButton
+                kind="primary"
+                size="sm"
+                title="Return"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  const { error, data } = await fetch(
+                    `/api/issued?id=${returnBookID}`,
+                    {
+                      method: "PUT",
+                      body: JSON.stringify({
+                        returned: true,
+                        returned_date: new Date(),
+                      }),
+                    }
+                  ).then((res) => res.json());
+                  console.log(data, returnBookID);
+                  if (error) throw new Error(error.message);
+                }}
+              />
+            </section>
+          </form>
+        </NModal>
+        <IssueBookDrawer
+          isIssueBookDrawerOpen={isIssueBookDrawerOpen}
+          setIsIssueBookDrawerOpen={setIsIssueBookDrawerOpen}
+        />
+      </NAlertProvider>
     </>
   );
 }

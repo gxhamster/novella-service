@@ -83,7 +83,7 @@ function NAlert({
         leaveTo="opacity-0 translate-x-full"
       >
         <div
-          className={`fixed top-16 right-4 z-40 bg-surface-200 border-l-4 border-alert-600 text-surface-900 pl-6 pr-2 py-5 shadow-md min-w-[20rem] ${className}`}
+          className={`fixed top-16 right-4 z-50 bg-surface-200 border-l-4 border-alert-600 text-surface-900 pl-6 pr-2 py-5 shadow-md min-w-[20rem] ${className}`}
           role="alert"
         >
           <div className="flex items-start justify-between">

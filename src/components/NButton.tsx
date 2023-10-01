@@ -52,7 +52,7 @@ export default function NButton({
       className={`${sizes[size].padding} ${sizes[size].text} flex gap-2 items-center outline-none ${colors[kind]} ${rest.className}`}
     >
       {icon}
-      {title ? <span>{title}</span> : null}
+      {title ? <span className="flex-grow">{title}</span> : null}
     </button>
   );
 }
