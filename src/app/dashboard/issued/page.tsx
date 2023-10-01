@@ -4,7 +4,7 @@ import NDataTableFixed from "@/components/NDataTableFixed";
 import NButton from "@/components/NButton";
 import NModal from "@/components/NModal";
 import { IIssuedBookV2 } from "./lib/types";
-import { getIssuedBooksByPage } from "../api/issued/client";
+import { getIssuedBooksByPage } from "../../api/issued/client";
 import { createColumnHelper } from "@tanstack/react-table";
 import { IssuedBooksTableColumnDef } from "./lib/types";
 import Link from "next/link";
@@ -25,9 +25,9 @@ export default function Issued() {
   const issuedBooksTableCols: Array<IssuedBooksTableColumnDef> = [
     { id: "id", header: "ID" },
     { id: "created_at", header: "Issued Date" },
-    { id: "book_id", header: "Book ID", baseHref: "/books" },
+    { id: "book_id", header: "Book ID", baseHref: "/dashboard/books" },
     { id: "title", header: "Title" },
-    { id: "student_id", header: "Student ID", baseHref: "/students" },
+    { id: "student_id", header: "Student ID", baseHref: "/dashboard/students" },
     { id: "name", header: "Student Name" },
     { id: "due_date", header: "Due Date" },
     { id: "action", header: "Recieve", isDisplayColumn: true },

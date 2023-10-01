@@ -11,7 +11,7 @@ export default function StatCard({
   children,
 }: StatCardProps) {
   return (
-    <div className="bg-surface-200 w-72 min-w-[18rem] shadow-sm shadow-surface-200 py-4 px-6 flex flex-col gap-1">
+    <div className="bg-surface-200 shadow-sm shadow-surface-200 py-4 px-6 flex flex-col gap-1">
       <div className="flex flex-col h-16 gap-1 text-xl">
         <div className="flex items-center gap-4">
           {children}

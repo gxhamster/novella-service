@@ -23,12 +23,12 @@ export default async function Dashboard() {
     .select("*", { count: "exact", head: true });
 
   return (
-    <div className="pt-16 px-16 w-full flex flex-col text-surface-900 gap-y-3 overflow-y-auto">
+    <div className="my-16 mx-auto px-16 w-full flex flex-col text-surface-900 gap-y-3">
       <span className="text-3xl">Dashboard</span>
       <span className="text-md text-surface-600 font-light">
         View manage your library
       </span>
-      <div className="mt-10 flex justify-between">
+      <div className="mt-10 grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-4 lg:grid-cols-4 lg:gap-8">
         <StatCard
           title="Issued Books"
           subtitle="Number of books issued to students"
@@ -57,6 +57,22 @@ export default async function Dashboard() {
         >
           <BookIcon />
         </StatCard>
+      </div>
+      <div className="mt-10">
+        <span className="text-1xl text-surface-800">Recently Issued Books</span>
+        <div className="mt-10">
+          <div className="bg-surface-200 w-full m-0">
+            <DashboardIssuedTable />
+          </div>
+        </div>
+      </div>
+      <div className="mt-10">
+        <span className="text-1xl text-surface-800">Recently Issued Books</span>
+        <div className="mt-10">
+          <div className="bg-surface-200 w-full m-0">
+            <DashboardIssuedTable />
+          </div>
+        </div>
       </div>
       <div className="mt-10">
         <span className="text-1xl text-surface-800">Recently Issued Books</span>

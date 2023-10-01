@@ -20,7 +20,9 @@ export default function RootLayout({
   return (
     // Always set the the theme to dark mode
     <html lang="en" style={{ colorScheme: "dark" }}>
-      <body className={`${ibmPlex.className} min-h-screen bg-surface-100`}>
+      <body
+        className={`${ibmPlex.className} min-h-full flex flex-col overflow-hidden bg-surface-100`}
+      >
         {children}
       </body>
     </html>

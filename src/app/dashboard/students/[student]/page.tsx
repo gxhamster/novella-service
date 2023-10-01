@@ -181,7 +181,7 @@ export default function Student({ params }: StudentProps) {
   }, []);
 
   return (
-    <div className="pt-16 px-16 w-full flex flex-col text-surface-900 gap-y-3 h-full overflow-y-auto ">
+    <div className="m-16 flex flex-col text-surface-900 gap-y-3">
       <NTableOfContents links={categoryLinks} />
       <section className="flex-grow ml-[18rem] flex flex-col gap-8">
         {/* Student Information Update Form */}

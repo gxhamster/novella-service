@@ -7,12 +7,12 @@ type DashboardLayoutProps = {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <div className="bg-surface-100 min-h-screen text-white relative">
-      <NovellaHeader />
+    <div className="bg-surface-100 text-white flex overflow-y-hidden h-screen max-h-screen">
       <NovellaSidebar />
-      <main className="fixed top-[58px] left-[64px] h-[calc(100%-58px)] pb-8 w-[calc(100%-64px)] overflow-y-auto">
-        {children}
-      </main>
+      <section className="flex flex-col flex-1 w-full overflow-x-hidden">
+        <NovellaHeader />
+        <main className="overflow-y-auto flex-1 max-h-screen">{children}</main>
+      </section>
     </div>
   );
 }

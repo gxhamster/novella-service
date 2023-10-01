@@ -47,15 +47,19 @@ const links = [
   {
     groupTitle: "Books",
     links: [
-      { title: "Add book", href: "/books", icon: <BookIcon size={20} /> },
+      {
+        title: "Add book",
+        href: "/dashboard/books",
+        icon: <BookIcon size={20} />,
+      },
       {
         title: "Issue book",
-        href: "/issued",
+        href: "/dashboard/issued",
         icon: <IssueBookIcon size={20} />,
       },
       {
         title: "Unreturned book",
-        href: "/books",
+        href: "/dashboard/books",
         icon: <UnreturnedBookIcon size={20} />,
       },
     ],
@@ -63,14 +67,18 @@ const links = [
   {
     groupTitle: "Students",
     links: [
-      { title: "Students", href: "/students", icon: <UserIcon size={20} /> },
+      {
+        title: "Students",
+        href: "/dashboard/students",
+        icon: <UserIcon size={20} />,
+      },
     ],
   },
 ];
 
 export default function NovellaSidebar() {
   return (
-    <div className="fixed top-0 min-h-screen bg-surface-100 w-[64px] border-r-[1px] border-surface-200 flex flex-col p-2 items-center gap-2 z-10">
+    <div className="overflow-y-hidden bg-surface-100 w-[64px] border-r-[1px] border-surface-200 flex flex-col p-2 items-center gap-2">
       <div className="bg-surface-100 h-12 w-12 flex justify-center items-center text-primary-500">
         <Image src={NovellaLogo} width={48} height={48} alt="Novella logo" />
       </div>

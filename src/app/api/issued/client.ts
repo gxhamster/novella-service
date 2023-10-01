@@ -1,5 +1,5 @@
 import { NDataTableFixedFetchFunction } from "@/components/NDataTableFixed";
-import { IIssuedBookV2 } from "@/app/issued/lib/types";
+import { IIssuedBookV2 } from "@/app/dashboard/issued/lib/types";
 import { NDataTableFixedConvertToSupabaseFilters } from "@/components/NDataTableFixed";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "@/supabase/types/supabase";
