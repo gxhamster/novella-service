@@ -192,19 +192,7 @@ export default function BookSummary({ data }: { data: IBook }) {
 
   return (
     <div className="relative">
-      <div className="flex flex-col fixed">
-        <span className="text-surface-800 mb-3">Contents</span>
-        {categories.map((category) => (
-          <a
-            key={category.title}
-            href={`#${category.title}`}
-            className="py-2 px-3 text-sm font-light text-surface-600 border-l-[1px] border-surface-400 hover:text-surface-900 hover:border-surface-600 focus:border-l-[1px] focus:border-primary-400 focus:text-surface-900"
-          >
-            {category.title}
-          </a>
-        ))}
-      </div>
-      <div className="flex-grow ml-[18rem] flex flex-col gap-8">
+      <div className="flex-grow flex flex-col gap-8 px-10">
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
           <div className="flex justify-between items-center">
             <div>

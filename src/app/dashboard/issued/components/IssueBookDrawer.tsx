@@ -25,7 +25,7 @@ export default function IssueBookDrawer({
   const [isAddBookDrawerOpen, setIsAddBookDrawerOpen] = useState(false);
   const [isAddStudentDrawerOpen, setIsAddStudentDrawerOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { setContent, openAlert } = useContext(NAlertContext);
+  const { setContent, openAlert, isOpen } = useContext(NAlertContext);
 
   const {
     register,
@@ -77,6 +77,7 @@ export default function IssueBookDrawer({
         title="Issue book to student"
         isOpen={isIssueBookDrawerOpen}
         closeDrawer={() =>
+          !isOpen &&
           !isAddBookDrawerOpen &&
           !isAddStudentDrawerOpen &&
           setIsIssueBookDrawerOpen(false)

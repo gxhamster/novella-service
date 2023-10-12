@@ -10,12 +10,15 @@ import { IssuedBooksTableColumnDef } from "./lib/types";
 import Link from "next/link";
 import IssueBookDrawer from "./components/IssueBookDrawer";
 import { NAlertProvider } from "@/components/NAlert";
+import LoadingIcon from "@/components/icons/LoadingIcon";
+import NDeleteModal from "@/components/NDeleteModal";
 
 export default function Issued() {
   const [isIssueBookDrawerOpen, setIsIssueBookDrawerOpen] = useState(false);
   const [isReturnBookModalOpen, setIsReturnBookModalOpen] = useState(false);
   const [returnBookID, setReturnBookID] = useState<number>();
   const issuedBooksColHelper = createColumnHelper<IIssuedBookV2>();
+  const [deleteButtonLoading, setDeleteButtonLoading] = useState(false);
   const [deletedBooks, setDeletedBooks] = useState<IIssuedBookV2[] | null>(
     null
   );
@@ -85,40 +88,21 @@ export default function Issued() {
           fetchData={getIssuedBooksByPage}
         />
         {/* Delete Issued book Modal */}
-        <NModal
+        <NDeleteModal
           isOpen={isIssueBookDeleteModalOpen}
-          title="Confirm to delete"
-          onModalClose={() => setIsIssueBookDeleteModalOpen(false)}
-        >
-          <section className="p-4">
-            <p className="text-sm text-surface-700">
-              Are you sure you want to delete the selected rows?
-            </p>
-            <p className="text-sm text-surface-700">
-              This action cannot be undone
-            </p>
-          </section>
-          <section className="flex gap-2 justify-end py-3 border-t-[1px] border-surface-300 px-3">
-            <NButton
-              kind="secondary"
-              title="Cancel"
-              onClick={() => setIsIssueBookDeleteModalOpen(false)}
-            />
-            <NButton
-              kind="alert"
-              title="Delete"
-              onClick={async () => {
-                const ids = deletedBooks?.map((rows) => rows.id);
-                const { error } = await fetch("/api/issued", {
-                  method: "DELETE",
-                  body: JSON.stringify({ ids }),
-                }).then((response) => response.json());
-                if (error) throw new Error(error.message);
-                setIsIssueBookDeleteModalOpen(false);
-              }}
-            />
-          </section>
-        </NModal>
+          closeModal={() => setIsIssueBookDeleteModalOpen(false)}
+          onDelete={async () => {
+            setDeleteButtonLoading(true);
+            const ids = deletedBooks?.map((rows) => rows.id);
+            const { error } = await fetch("/api/issued", {
+              method: "DELETE",
+              body: JSON.stringify({ ids }),
+            }).then((response) => response.json());
+            if (error) throw new Error(error.message);
+            setDeleteButtonLoading(false);
+            setIsIssueBookDeleteModalOpen(false);
+          }}
+        />
         {/* Return Book Modal */}
         <NModal
           title="Return the issued book"

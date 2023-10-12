@@ -12,8 +12,7 @@ import {
   NDrawerCreateForm,
   NDrawerCreateFormFieldsType,
 } from "@/components/NDrawer";
-import NButton from "@/components/NButton";
-import NModal from "@/components/NModal";
+import NDeleteModal from "@/components/NDeleteModal";
 
 export default function BooksTable() {
   const columnHelper = createColumnHelper<IBook>();
@@ -200,40 +199,19 @@ export default function BooksTable() {
         }}
         fetchData={getBooksByPage}
       />
-      <NModal
+      <NDeleteModal
         isOpen={isDeleteBookModalOpen}
-        title="Confirm to delete"
-        onModalClose={() => setIsDeleteBookModalOpen(false)}
-      >
-        <section className="p-4">
-          <p className="text-sm text-surface-700">
-            Are you sure you want to delete the selected rows?
-          </p>
-          <p className="text-sm text-surface-700">
-            This action cannot be undone
-          </p>
-        </section>
-        <section className="flex gap-2 justify-end py-3 border-t-[1px] border-surface-300 px-3">
-          <NButton
-            kind="secondary"
-            title="Cancel"
-            onClick={() => setIsDeleteBookModalOpen(false)}
-          />
-          <NButton
-            kind="alert"
-            title="Delete"
-            onClick={async () => {
-              const ids = deletedBooks?.map((rows) => rows.id);
-              const { error } = await fetch("/api/books", {
-                method: "DELETE",
-                body: JSON.stringify({ ids }),
-              }).then((response) => response.json());
-              if (error) throw new Error(error.message);
-              setIsDeleteBookModalOpen(false);
-            }}
-          />
-        </section>
-      </NModal>
+        closeModal={() => setIsDeleteBookModalOpen(false)}
+        onDelete={async () => {
+          const ids = deletedBooks?.map((rows) => rows.id);
+          const { error } = await fetch("/api/books", {
+            method: "DELETE",
+            body: JSON.stringify({ ids }),
+          }).then((response) => response.json());
+          if (error) throw new Error(error.message);
+          setIsDeleteBookModalOpen(false);
+        }}
+      />
     </>
   );
 }

@@ -12,9 +12,8 @@ import NDataTableFixed, {
   NDataTableFixedFetchFunction,
   NDataTableFixedConvertToSupabaseFilters,
 } from "@/components/NDataTableFixed";
-import NModal from "@/components/NModal";
-import NButton from "@/components/NButton";
 import { NAlertContext, NAlertContextType } from "@/components/NAlert";
+import NDeleteModal from "@/components/NDeleteModal";
 
 export default function StudentsTable() {
   const columnHelper = createColumnHelper<IStudent>();
@@ -182,47 +181,26 @@ export default function StudentsTable() {
         }}
         fetchData={getBooksByPage}
       />
-      <NModal
+      <NDeleteModal
         isOpen={isDeleteStudentModalOpen}
-        title="Confirm to delete"
-        onModalClose={() => setIsDeleteStudentModalOpen(false)}
-      >
-        <section className="p-4">
-          <p className="text-sm text-surface-700">
-            Are you sure you want to delete the selected rows?
-          </p>
-          <p className="text-sm text-surface-700">
-            This action cannot be undone
-          </p>
-        </section>
-        <section className="flex gap-2 justify-end py-3 border-t-[1px] border-surface-300 px-3">
-          <NButton
-            kind="secondary"
-            title="Cancel"
-            onClick={() => setIsDeleteStudentModalOpen(false)}
-          />
-          <NButton
-            kind="alert"
-            title="Delete"
-            onClick={async () => {
-              const ids = deletedStudentsRows?.map((rows) => rows.id);
-              const { error } = await fetch("/api/students", {
-                method: "DELETE",
-                body: JSON.stringify({ ids }),
-              }).then((response) => response.json());
-              if (error) {
-                setContent({
-                  title: "Could not delete the student",
-                  description: error.message,
-                });
-                openAlert();
-                // throw new Error(error.message);
-              }
-              setIsDeleteStudentModalOpen(false);
-            }}
-          />
-        </section>
-      </NModal>
+        closeModal={() => setIsDeleteStudentModalOpen(false)}
+        onDelete={async () => {
+          const ids = deletedStudentsRows?.map((rows) => rows.id);
+          const { error } = await fetch("/api/students", {
+            method: "DELETE",
+            body: JSON.stringify({ ids }),
+          }).then((response) => response.json());
+          if (error) {
+            setContent({
+              title: "Could not delete the student",
+              description: error.message,
+            });
+            openAlert();
+            // throw new Error(error.message);
+          }
+          setIsDeleteStudentModalOpen(false);
+        }}
+      />
     </>
   );
 }
