@@ -1,4 +1,4 @@
-import { Transition } from "@headlessui/react";
+import { Popover, Transition } from "@headlessui/react";
 import { Fragment, createContext, useState } from "react";
 import AlertIcon from "./icons/AlertIcon";
 import CloseIcon from "./icons/CloseIcon";
@@ -73,37 +73,39 @@ function NAlert({
 }: NAlertProps) {
   return (
     <Transition appear show={show} as={Fragment}>
-      <Transition.Child
-        as={Fragment}
-        enter="ease-out duration-300"
-        enterFrom="opacity-0 translate-x-full"
-        enterTo="opacity-100 translate-x-0"
-        leave="ease-in duration-300"
-        leaveFrom="opacity-100 translate-x-0"
-        leaveTo="opacity-0 translate-x-full"
-      >
-        <div
-          className={`fixed top-16 right-4 z-50 bg-surface-200 border-l-4 border-alert-600 text-surface-900 pl-6 pr-2 py-5 shadow-md min-w-[20rem] ${className}`}
-          role="alert"
+      <Popover as="div" className="relative z-50">
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0 translate-x-full"
+          enterTo="opacity-100 translate-x-0"
+          leave="ease-in duration-300"
+          leaveFrom="opacity-100 translate-x-0"
+          leaveTo="opacity-0 translate-x-full"
         >
-          <div className="flex items-start justify-between">
-            <section className="flex gap-2 max-w-md">
-              <div className="py-1">
-                <AlertIcon size={24} className="text-alert-600" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <p className="">{title}</p>
-                <p className="text-sm text-surface-800">{description}</p>
-              </div>
-            </section>
-            <NButton
-              kind="ghost"
-              icon={<CloseIcon size={15} />}
-              onClick={closeAlert}
-            />
-          </div>
-        </div>
-      </Transition.Child>
+          <Popover.Panel
+            className={`fixed top-16 right-4 bg-surface-200 border-l-4 border-alert-600 text-surface-900 pl-6 pr-2 py-5 shadow-md min-w-[20rem] ${className}`}
+            role="alert"
+          >
+            <div className="flex items-start justify-between">
+              <section className="flex gap-2 max-w-md">
+                <div className="py-1">
+                  <AlertIcon size={24} className="text-alert-600" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <p className="">{title}</p>
+                  <p className="text-sm text-surface-800">{description}</p>
+                </div>
+              </section>
+              <NButton
+                kind="ghost"
+                icon={<CloseIcon size={15} />}
+                onClick={closeAlert}
+              />
+            </div>
+          </Popover.Panel>
+        </Transition.Child>
+      </Popover>
     </Transition>
   );
 }

@@ -13,13 +13,13 @@ type NTableOfContentsProps = {
 
 function NTableOfContents({ links }: NTableOfContentsProps) {
   return (
-    <div className="flex flex-col fixed">
-      <span className="text-surface-800 mb-3">Contents</span>
+    <div className="flex flex-col gap-2 p-7 border-r-[1px] border-surface-300 w-64">
+      <span className="text-surface-500 mb-3">Contents</span>
       {links.map(({ href, title }) => (
         <a
           key={href}
           href={`#${href}`}
-          className="py-2 px-3 text-sm font-light text-surface-600 border-l-[1px] border-surface-400 hover:text-surface-900 hover:border-surface-600 focus:border-l-[1px] focus:border-primary-400 focus:text-surface-900"
+          className="py-1 px-2 text-sm font-light text-surface-700 hover:bg-surface-400/20"
         >
           {title}
         </a>
@@ -181,48 +181,50 @@ export default function Student({ params }: StudentProps) {
   }, []);
 
   return (
-    <div className="m-16 flex flex-col text-surface-900 gap-y-3">
+    <div className="flex text-surface-900 gap-y-3 relative max-h-full overflow-hidden">
       <NTableOfContents links={categoryLinks} />
-      <section className="flex-grow ml-[18rem] flex flex-col gap-8">
-        {/* Student Information Update Form */}
-        <form
-          className="flex flex-col gap-8"
-          onSubmit={handleSubmit(studentFormSubmitHandler)}
-        >
-          {/* Title Section */}
-          <div className="flex justify-between items-center">
-            <h3 className="text-2xl text-surface-700 font-light">{`Student Ref: ${params.student}`}</h3>
-            <div className="flex gap-2">
-              <ButtonSecondary
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (studentData) reset(studentData);
-                }}
-                disabled={!formValuesChanged}
-                title="Cancel"
-              />
-              <ButtonPrimary disabled={!formValuesChanged} title="Save" />
-            </div>
-          </div>
-          {categories.map((category) => (
-            <NCategoryCard
-              title={category.title}
-              subtitle={category.description}
-            >
-              {category.fields.map((field) => (
-                <NovellaInput
-                  key={field.field}
-                  type="text"
-                  title={field.title}
-                  reactHookRegister={register(field.field, {
-                    disabled: field.disabled,
-                  })}
-                  reactHookErrorMessage={errors[field.field]}
+      <section className="max-h-full overflow-y-auto flex-grow">
+        <section className="flex-grow flex-1 flex-col gap-8 m-16">
+          {/* Student Information Update Form */}
+          <form
+            className="flex flex-col gap-8"
+            onSubmit={handleSubmit(studentFormSubmitHandler)}
+          >
+            {/* Title Section */}
+            <div className="flex justify-between items-center">
+              <h3 className="text-2xl text-surface-700 font-light">{`Student Ref: ${params.student}`}</h3>
+              <div className="flex gap-2">
+                <ButtonSecondary
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (studentData) reset(studentData);
+                  }}
+                  disabled={!formValuesChanged}
+                  title="Cancel"
                 />
-              ))}
-            </NCategoryCard>
-          ))}
-        </form>
+                <ButtonPrimary disabled={!formValuesChanged} title="Save" />
+              </div>
+            </div>
+            {categories.map((category) => (
+              <NCategoryCard
+                title={category.title}
+                subtitle={category.description}
+              >
+                {category.fields.map((field) => (
+                  <NovellaInput
+                    key={field.field}
+                    type="text"
+                    title={field.title}
+                    reactHookRegister={register(field.field, {
+                      disabled: field.disabled,
+                    })}
+                    reactHookErrorMessage={errors[field.field]}
+                  />
+                ))}
+              </NCategoryCard>
+            ))}
+          </form>
+        </section>
       </section>
     </div>
   );

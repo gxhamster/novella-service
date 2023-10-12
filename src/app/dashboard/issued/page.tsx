@@ -84,6 +84,7 @@ export default function Issued() {
           }}
           fetchData={getIssuedBooksByPage}
         />
+        {/* Delete Issued book Modal */}
         <NModal
           isOpen={isIssueBookDeleteModalOpen}
           title="Confirm to delete"
@@ -118,6 +119,7 @@ export default function Issued() {
             />
           </section>
         </NModal>
+        {/* Return Book Modal */}
         <NModal
           title="Return the issued book"
           isOpen={isReturnBookModalOpen}
@@ -145,18 +147,38 @@ export default function Issued() {
                 title="Return"
                 onClick={async (e) => {
                   e.preventDefault();
-                  const { error, data } = await fetch(
+                  // Retrieve Issued Book Details before deleting
+                  const { data: issuedBook, error: issuedBookError } =
+                    await fetch(`/api/issued?id=${returnBookID}`).then((res) =>
+                      res.json()
+                    );
+                  // First Delete book from Issued Table
+                  const { error } = await fetch(
                     `/api/issued?id=${returnBookID}`,
                     {
-                      method: "PUT",
-                      body: JSON.stringify({
-                        returned: true,
-                        returned_date: new Date(),
-                      }),
+                      method: "DELETE",
+                      body: JSON.stringify({ ids: [returnBookID] }),
                     }
                   ).then((res) => res.json());
-                  console.log(data, returnBookID);
-                  if (error) throw new Error(error.message);
+
+                  // Add Issue Detail to History Table
+                  const historyBookRecord = {
+                    book_id: issuedBook.book_id,
+                    student_id: issuedBook.student_id,
+                    due_date: issuedBook.due_date,
+                    issued_date: issuedBook.created_at,
+                    returned_date: new Date().toISOString(),
+                  };
+                  const { data: historyBook, error: historyBookError } =
+                    await fetch(`/api/issued/history`, {
+                      method: "POST",
+                      body: JSON.stringify(historyBookRecord),
+                    }).then((res) => res.json());
+
+                  if (error || issuedBookError || historyBookError)
+                    throw new Error(error.message);
+
+                  setIsReturnBookModalOpen(false);
                 }}
               />
             </section>

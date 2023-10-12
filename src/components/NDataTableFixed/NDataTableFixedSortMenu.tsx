@@ -1,5 +1,4 @@
 import { Dispatch, SetStateAction, useState, Fragment } from "react";
-import { Popover, Transition } from "@headlessui/react";
 import ButtonGhost from "../ButtonGhost";
 import ButtonSecondary from "../ButtonSecondary";
 import CloseIcon from "../icons/CloseIcon";

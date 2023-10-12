@@ -1,17 +1,20 @@
 import { NDataTableFixedFetchFunction } from "@/components/NDataTableFixed";
-import { IIssuedBookV2 } from "@/app/dashboard/issued/lib/types";
+import { IHistory } from "@/supabase/types/supabase";
 import { NDataTableFixedConvertToSupabaseFilters } from "@/components/NDataTableFixed";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "@/supabase/types/supabase";
 
-export const getIssuedBooksByPage: NDataTableFixedFetchFunction<
-  IIssuedBookV2
-> = async ({ pageIndex, pageSize, filters, sorts }) => {
+export const getHistoryByPage: NDataTableFixedFetchFunction<IHistory> = async ({
+  pageIndex,
+  pageSize,
+  filters,
+  sorts,
+}) => {
   const supabaseFilters = NDataTableFixedConvertToSupabaseFilters(filters);
   const supabase = createClientComponentClient<Database>();
 
   let query = supabase
-    .from("issued")
+    .from("history")
     .select("*, book_id, books (title), student_id, students (name)", {
       count: "estimated",
     });

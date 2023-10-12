@@ -4,6 +4,8 @@ import NovellaInput from "@/components/NovellaInput";
 import { signInWithEmail } from "@/supabase/auth";
 import { useForm, SubmitHandler } from "react-hook-form";
 import NButton from "@/components/NButton";
+import { useState } from "react";
+import LoadingIcon from "@/components/icons/LoadingIcon";
 
 type LoginPageInputs = {
   email: string;
@@ -18,8 +20,9 @@ const Login = () => {
   } = useForm<LoginPageInputs>();
 
   const router = useRouter();
-
+  const [isLoading, setIsLoading] = useState(false);
   const signInSupabase: SubmitHandler<LoginPageInputs> = async (formData) => {
+    setIsLoading(true);
     const { data, error } = await signInWithEmail(
       formData.email,
       formData.password
@@ -28,6 +31,7 @@ const Login = () => {
       console.error("Cannot sign into Novella :(", error);
     } else {
       console.log("Succesfully signed into Novella :)", data.user);
+      setIsLoading(false);
       router.push("/dashboard");
     }
   };
@@ -86,7 +90,16 @@ const Login = () => {
               Click Here
             </a>
           </div>
-          <NButton kind="primary" title="Sign in" className="text-center" />
+          <NButton
+            kind="primary"
+            title="Sign in"
+            className="text-center"
+            icon={
+              isLoading ? (
+                <LoadingIcon size={16} className="text-surface-900" />
+              ) : null
+            }
+          />
         </form>
       </section>
     </main>

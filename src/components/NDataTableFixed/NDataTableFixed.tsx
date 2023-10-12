@@ -42,6 +42,7 @@ type NovellaDataTableProps<TableType> = {
   fetchData: NDataTableFixedFetchFunction<TableType>;
   tanStackColumns: ColumnDef<TableType, any>[];
   columns: Array<{ id: keyof TableType; header: string }>;
+  showCreateButton?: boolean;
   onCreateRowButtonPressed?: () => void;
   onRowSelectionChanged?: (state: Array<any>) => void;
   onRowDeleted?: (deletedRows: Array<TableType>) => void;
@@ -53,6 +54,7 @@ export default function NDataTableFixed<TableType>({
   columns,
   onCreateRowButtonPressed,
   onRowSelectionChanged = () => null,
+  showCreateButton = true,
   onRowDeleted,
 }: NovellaDataTableProps<TableType>) {
   // Fixme: Remove the any type and put proper typing :(
@@ -211,26 +213,28 @@ export default function NDataTableFixed<TableType>({
               }}
               tableProps={columns.map((col) => col.id)}
             />
-            <ButtonPrimary
-              title="Create"
-              icon={<AddIcon size={18} />}
-              onClick={() =>
-                onCreateRowButtonPressed && onCreateRowButtonPressed()
-              }
-            />
+            {showCreateButton && (
+              <ButtonPrimary
+                title="Create"
+                icon={<AddIcon size={18} />}
+                onClick={() =>
+                  onCreateRowButtonPressed && onCreateRowButtonPressed()
+                }
+              />
+            )}
           </div>
         )}
       </div>
       {/* FIXME: WTH need to cleaner solution */}
       <div className="h-[calc(100vh-(58px+45px+39px))] overflow-scroll bg-surface-100 m-0 relative">
-        <table className="w-full">
+        <table className="w-full table-auto">
           <thead className="text-surface-900 bg-surface-200 sticky top-0 m-0">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header, idx) => (
                   <th
                     key={header.id}
-                    className={`text-start p-2 px-4 font-normal text-sm border-x-[0.7px] border-surface-300`}
+                    className={`text-start p-2 px-4 font-normal text-sm border-x-[0.7px] border-surface-300 whitespace-nowrap`}
                   >
                     {header.isPlaceholder
                       ? null

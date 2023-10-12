@@ -30,7 +30,7 @@ const sizes = {
 
 const colors = {
   primary:
-    "bg-primary-500 hover:bg-primary-400 border-[1px] border-primary-500 focus:border-primary-900 transition-colors disabled:bg-primary-400 disabled:opacity-80",
+    "bg-primary-500 hover:bg-primary-400 text-surface-900 border-[1px] border-primary-500 focus:border-primary-900 transition-colors disabled:bg-primary-400 disabled:opacity-80",
   secondary:
     "text-surface-900 bg-surface-400 hover:bg-surface-500 border-[1px] border-surface-400 focus:border-surface-900 transition-colors disabled:text-surface-700 disabled:opacity-80 disabled:bg-surface-300",
   ghost:
@@ -49,7 +49,7 @@ export default function NButton({
   return (
     <button
       {...rest}
-      className={`${sizes[size].padding} ${sizes[size].text} flex gap-2 items-center outline-none ${colors[kind]} ${rest.className}`}
+      className={`${sizes[size].padding} ${sizes[size].text} flex gap-2 items-center outline-none justify-center ${colors[kind]} ${rest.className}`}
     >
       {icon}
       {title ? <span className="flex-grow">{title}</span> : null}

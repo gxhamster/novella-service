@@ -57,14 +57,58 @@ export interface Database {
         };
         Relationships: [];
       };
+      history: {
+        Row: {
+          book_id: number | null;
+          created_at: string;
+          due_date: string | null;
+          id: number;
+          issued_date: string | null;
+          returned_date: string | null;
+          student_id: number | null;
+          user_id: string | null;
+        };
+        Insert: {
+          book_id?: number | null;
+          created_at?: string;
+          due_date?: string | null;
+          id?: number;
+          issued_date?: string | null;
+          returned_date?: string | null;
+          student_id?: number | null;
+          user_id?: string | null;
+        };
+        Update: {
+          book_id?: number | null;
+          created_at?: string;
+          due_date?: string | null;
+          id?: number;
+          issued_date?: string | null;
+          returned_date?: string | null;
+          student_id?: number | null;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "history_book_id_fkey";
+            columns: ["book_id"];
+            referencedRelation: "books";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "history_student_id_fkey";
+            columns: ["student_id"];
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       issued: {
         Row: {
           book_id: number;
           created_at: string;
           due_date: string | null;
           id: number;
-          returned: boolean | null;
-          returned_date: string | null;
           student_id: number;
           user_id: string | null;
         };
@@ -73,8 +117,6 @@ export interface Database {
           created_at?: string;
           due_date?: string | null;
           id?: number;
-          returned?: boolean | null;
-          returned_date?: string | null;
           student_id: number;
           user_id?: string | null;
         };
@@ -83,8 +125,6 @@ export interface Database {
           created_at?: string;
           due_date?: string | null;
           id?: number;
-          returned?: boolean | null;
-          returned_date?: string | null;
           student_id?: number;
           user_id?: string | null;
         };
@@ -164,5 +204,6 @@ export interface Database {
 export type IBook = Database["public"]["Tables"]["books"]["Row"];
 export type IStudent = Database["public"]["Tables"]["students"]["Row"];
 export type IIssuedBook = Database["public"]["Tables"]["issued"]["Row"];
+export type IHistory = Database["public"]["Tables"]["history"]["Row"];
 
 export type ITables = keyof Database["public"]["Tables"];
