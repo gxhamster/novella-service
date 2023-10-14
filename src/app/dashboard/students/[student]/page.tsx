@@ -1,32 +1,13 @@
+// FIXME: Fetch initial data on server and pass to a client component
 "use client";
 import { useForm, useWatch } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { IStudent } from "@/supabase/types/supabase";
-import ButtonPrimary from "@/components/ButtonPrimary";
 import ButtonSecondary from "@/components/ButtonSecondary";
-import NCategoryCard from "@/components/NCategoryCard";
+import ButtonPrimary from "@/components/ButtonPrimary";
 import NovellaInput from "@/components/NovellaInput";
-
-type NTableOfContentsProps = {
-  links: Array<{ href: string; title: string }>;
-};
-
-function NTableOfContents({ links }: NTableOfContentsProps) {
-  return (
-    <div className="flex flex-col gap-2 p-7 border-r-[1px] border-surface-300 w-64">
-      <span className="text-surface-500 mb-3">Contents</span>
-      {links.map(({ href, title }) => (
-        <a
-          key={href}
-          href={`#${href}`}
-          className="py-1 px-2 text-sm font-light text-surface-700 hover:bg-surface-400/20"
-        >
-          {title}
-        </a>
-      ))}
-    </div>
-  );
-}
+import NCategoryCard from "@/components/NCategoryCard";
+import { trpc } from "@/app/_trpc/client";
 
 type StudentFieldsCategories<T> = {
   title: string;
@@ -128,8 +109,8 @@ function useFormValuesChanged<T>({
 type StudentProps = {
   params: { student: string };
 };
+
 export default function Student({ params }: StudentProps) {
-  const [studentData, setStudentData] = useState<IStudent | null>(null);
   const {
     register,
     handleSubmit,
@@ -137,23 +118,32 @@ export default function Student({ params }: StudentProps) {
     control,
     formState: { errors },
   } = useForm<IStudent>();
+
   const watchedFormValues = useWatch({ control });
+
+  const getStudentByIdQuery = trpc.students.getStudentById.useQuery(
+    Number(params.student)
+  );
+
+  const updateStudentByIdMutation = trpc.students.updateStudentById.useMutation(
+    {
+      onError: (_error) => {
+        throw new Error(_error.message, {
+          cause: _error.data,
+        });
+      },
+      onSuccess: () => {
+        getStudentByIdQuery.refetch();
+        if (getStudentByIdQuery.data?.data)
+          reset(getStudentByIdQuery.data?.data);
+      },
+    }
+  );
+
   const formValuesChanged = useFormValuesChanged({
-    srcData: studentData,
+    srcData: getStudentByIdQuery.data?.data,
     currentFormValues: watchedFormValues,
   });
-
-  async function getStudentData() {
-    const { data, error } = await fetch(
-      `/api/students?id=${params.student}`
-    ).then((response) => response.json());
-    if (error) throw new Error(error.message);
-    else {
-      setStudentData(data);
-      // Set useForm default values
-      reset(data);
-    }
-  }
 
   function studentFormSubmitHandler(formData: IStudent) {
     const keys = Object.keys(formData) as Array<keyof IStudent>;
@@ -162,23 +152,15 @@ export default function Student({ params }: StudentProps) {
       if (filteredFormData[key] == undefined) delete filteredFormData[key];
     }
 
-    async function updateStudent() {
-      const { _, error } = await fetch(`/api/students?id=${params.student}`, {
-        cache: "no-cache",
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(filteredFormData),
-      }).then((res) => res.json());
-
-      if (error) throw new Error(error.message);
-    }
-    updateStudent();
-    getStudentData();
+    updateStudentByIdMutation.mutate({
+      ...formData,
+      id: Number(params.student),
+    });
   }
 
   useEffect(() => {
-    getStudentData();
-  }, []);
+    if (getStudentByIdQuery.data?.data) reset(getStudentByIdQuery.data.data);
+  }, [getStudentByIdQuery.data?.data]);
 
   return (
     <div className="flex text-surface-900 gap-y-3 relative max-h-full overflow-hidden justify-center">
@@ -197,7 +179,8 @@ export default function Student({ params }: StudentProps) {
                 <ButtonSecondary
                   onClick={(e) => {
                     e.preventDefault();
-                    if (studentData) reset(studentData);
+                    if (getStudentByIdQuery.data?.data)
+                      reset(getStudentByIdQuery.data?.data);
                   }}
                   disabled={!formValuesChanged}
                   title="Cancel"
@@ -207,6 +190,7 @@ export default function Student({ params }: StudentProps) {
             </div>
             {categories.map((category) => (
               <NCategoryCard
+                key={category.title}
                 title={category.title}
                 subtitle={category.description}
               >

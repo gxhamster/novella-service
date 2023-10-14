@@ -13,8 +13,12 @@ export const StudentRouter = router({
     const { input } = opts;
     const { supabase } = opts.ctx;
 
-    const { data, error } = await supabase.from("").select("*").eq("id", input);
+    const { data, error } = await supabase
+      .from("students")
+      .select("*")
+      .eq("id", input);
 
+    console.log(data);
     const resultStudent = data ? data[0] : null;
 
     if (error)
