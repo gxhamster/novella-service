@@ -17,9 +17,9 @@ import RefreshIcon from "../icons/RefreshIcon";
 import NDataTableFixedFilterMenu from "./NDataTableFixedFilterMenu";
 import NDataTableFixedSortMenu from "./NDataTableFixedSortMenu";
 import {
-  NDataTableFixedFetchFunction,
   NDataTableFixedSort,
   NDataTableFixedFilter,
+  NDataTableFixedFetchFunctionProps,
 } from ".";
 import NButton from "../NButton";
 import TrashIcon from "../icons/TrashIcon";
@@ -39,41 +39,44 @@ function TableCheckbox({ indeterminate, ...rest }: TableCheckboxProps) {
 }
 
 type NovellaDataTableProps<TableType> = {
-  fetchData: NDataTableFixedFetchFunction<TableType>;
+  onRefresh: () => void;
+  onPaginationChanged: ({
+    filters,
+    sorts,
+    pageIndex,
+    pageSize,
+  }: NDataTableFixedFetchFunctionProps<TableType>) => void;
+  data: Array<TableType>;
+  dataCount: number;
   tanStackColumns: ColumnDef<TableType, any>[];
   columns: Array<{ id: keyof TableType; header: string }>;
   showCreateButton?: boolean;
+  isDataLoading?: boolean;
   onCreateRowButtonPressed?: () => void;
   onRowSelectionChanged?: (state: Array<any>) => void;
   onRowDeleted?: (deletedRows: Array<TableType>) => void;
 };
 
 export default function NDataTableFixed<TableType>({
-  fetchData,
+  onPaginationChanged,
+  data,
+  dataCount,
+  onRefresh,
   tanStackColumns,
   columns,
+  isDataLoading = false,
   onCreateRowButtonPressed,
   onRowSelectionChanged = () => null,
   showCreateButton = true,
   onRowDeleted,
 }: NovellaDataTableProps<TableType>) {
   // Fixme: Remove the any type and put proper typing :(
-  const [data, setData] = useState<Array<any>>([]);
   const [filters, setFilters] = useState<NDataTableFixedFilter[]>([]);
   const [rowSelection, setRowSelection] = useState({});
-  const selectedData = useMemo(() => {
-    const selectedData = Object.keys(rowSelection).map((key) => {
-      return data[Number(key)];
-    });
-    return selectedData;
-  }, [rowSelection]);
-
   const [sorts, setSorts] = useState<NDataTableFixedSort<TableType> | null>(
     null
   );
-  const [totalPageCount, setTotalPageCount] = useState(data.length);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [totalPageCount, setTotalPageCount] = useState(0);
   const [refreshBtnIcon, setRefreshBtnIcon] = useState(
     <RefreshIcon size={18} />
   );
@@ -81,6 +84,14 @@ export default function NDataTableFixed<TableType>({
     pageIndex: 0,
     pageSize: 10,
   });
+
+  const selectedData = useMemo(() => {
+    const selectedData = Object.keys(rowSelection).map((key) => {
+      return data[Number(key)];
+    });
+    return selectedData;
+  }, [rowSelection]);
+
   const pagination = useMemo(
     () => ({
       pageIndex,
@@ -134,31 +145,21 @@ export default function NDataTableFixed<TableType>({
     debugTable: true,
   });
 
-  const getData = async () => {
-    setIsLoading(true);
-    setRefreshBtnIcon(<LoadingIcon size={18} />);
-    const { data, count } = await fetchData({
-      pageIndex,
-      pageSize,
-      filters,
-      sorts,
-    });
-    // Fixme: Put the proper typing
-    setData([...data]);
-    const pageCount = Math.ceil(count / pageSize);
-    setTotalRecords(count);
-    setTotalPageCount(pageCount < 1 ? 1 : pageCount);
-    setIsLoading(false);
-    setRefreshBtnIcon(<RefreshIcon size={18} />);
-  };
-
   useEffect(() => {
-    getData();
-  }, [pageIndex, pageSize, fetchData, filters, sorts]);
+    onPaginationChanged({ filters, sorts, pageIndex, pageSize });
+    const pageCount = Math.ceil(dataCount / pageSize);
+    setTotalPageCount(pageCount < 1 ? 1 : pageCount);
+  }, [pageIndex, pageSize, filters, sorts, dataCount]);
 
   useEffect(() => {
     onRowSelectionChanged(selectedData);
   }, [selectedData]);
+
+  useEffect(() => {
+    setRefreshBtnIcon(() =>
+      isDataLoading ? <LoadingIcon size={18} /> : <RefreshIcon size={18} />
+    );
+  }, [isDataLoading]);
 
   return (
     <div className="m-0">
@@ -168,9 +169,7 @@ export default function NDataTableFixed<TableType>({
           <ButtonGhost
             icon={refreshBtnIcon}
             title="Refresh"
-            onClick={async () => {
-              await getData();
-            }}
+            onClick={() => onRefresh()}
           />
         </div>
         {selectedData.length ? (
@@ -280,8 +279,8 @@ export default function NDataTableFixed<TableType>({
                 </option>
               ))}
             </select>
-            <p>{totalRecords} records</p>
-            {isLoading ? (
+            <p>{dataCount} records</p>
+            {isDataLoading ? (
               <div className="flex gap-2 text-xxs items-center">
                 {" "}
                 <LoadingIcon size={18} /> <span>Loading data...</span>

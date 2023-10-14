@@ -1,11 +1,12 @@
 import NDrawer from "@/components/NDrawer";
 import NDataTableFixedSmall from "@/components/NDataTableFixed/NDataTableFixedSmall";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { BooksTableColumnDef } from "../lib/types";
 import { createColumnHelper } from "@tanstack/react-table";
 import { IBook, IIssuedBook } from "@/supabase/types/supabase";
-import { getBooksByPage } from "@/app/api/books/client";
 import { UseFormSetValue } from "react-hook-form";
+import { trpc } from "@/app/_trpc/client";
+import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
 
 const booksColHelper = createColumnHelper<IBook>();
 const booksTableCols: Array<BooksTableColumnDef> = [
@@ -42,6 +43,19 @@ export default function SelectBookDrawer({
   setSelectedBook,
   formSetValue,
 }: SelectBookDrawerProps) {
+  const [fetchFunctionOpts, setFetchFunctionOpts] = useState<
+    NDataTableFixedFetchFunctionProps<IBook>
+  >({
+    pageIndex: 0,
+    pageSize: 100,
+    filters: [],
+    sorts: null,
+  });
+  const getBooksByPageQuery = trpc.books.getBooksByPage.useQuery(
+    fetchFunctionOpts,
+    { keepPreviousData: true }
+  );
+
   return (
     <NDrawer
       title="Select a book to issue"
@@ -51,6 +65,10 @@ export default function SelectBookDrawer({
       <NDataTableFixedSmall<IBook>
         columns={booksTableCols}
         tanStackColumns={booksTableColsTanstack}
+        isDataLoading={
+          getBooksByPageQuery.isLoading || getBooksByPageQuery.isRefetching
+        }
+        data={getBooksByPageQuery.data ? getBooksByPageQuery.data.data : []}
         onRowSelectionChanged={(state) => {
           if (state) {
             setIsAddBookDrawerOpen(false);
@@ -58,7 +76,11 @@ export default function SelectBookDrawer({
             formSetValue("book_id", state.id);
           }
         }}
-        fetchData={getBooksByPage}
+        dataCount={
+          getBooksByPageQuery.data ? getBooksByPageQuery.data.count : 0
+        }
+        onPaginationChanged={(opts) => setFetchFunctionOpts(opts)}
+        onRefresh={() => getBooksByPageQuery.refetch()}
       />
     </NDrawer>
   );

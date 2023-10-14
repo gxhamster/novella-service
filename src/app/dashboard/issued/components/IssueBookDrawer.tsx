@@ -10,15 +10,18 @@ import SelectStudentDrawer from "./SelectStudentDrawer";
 import { useContext } from "react";
 import { NAlertContext } from "@/components/NAlert";
 import LoadingIcon from "@/components/icons/LoadingIcon";
+import { trpc } from "@/app/_trpc/client";
 
 type IssueBookDrawerProps = {
   isIssueBookDrawerOpen: boolean;
   setIsIssueBookDrawerOpen: Dispatch<SetStateAction<boolean>>;
+  onBookIssued: () => void;
 };
 
 export default function IssueBookDrawer({
   isIssueBookDrawerOpen,
   setIsIssueBookDrawerOpen,
+  onBookIssued,
 }: IssueBookDrawerProps) {
   const [selectedBook, setSelectedBook] = useState<IBook | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<IStudent | null>(null);
@@ -26,6 +29,13 @@ export default function IssueBookDrawer({
   const [isAddStudentDrawerOpen, setIsAddStudentDrawerOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { setContent, openAlert, isOpen } = useContext(NAlertContext);
+  const createIssuedBookMutation = trpc.issued.createIssuedBook.useMutation({
+    onError: (_error) => {
+      setContent({ title: "Cannot issue book", description: _error.message });
+      openAlert();
+      throw new Error(_error.message);
+    },
+  });
 
   const {
     register,
@@ -54,21 +64,8 @@ export default function IssueBookDrawer({
   });
 
   function issueBookFormSubmitHandler(formData: IIssuedBook) {
-    setIsSubmitting(true);
-    const postToSupbase = async () => {
-      const { data, error } = await fetch("/api/issued", {
-        method: "POST",
-        body: JSON.stringify(formData),
-      }).then((response) => response.json());
-      setIsSubmitting(false);
-
-      if (error) {
-        setContent({ title: "Cannot issue book", description: error.message });
-        openAlert();
-        throw new Error(error.message);
-      }
-    };
-    postToSupbase();
+    createIssuedBookMutation.mutate(formData);
+    onBookIssued();
   }
 
   return (

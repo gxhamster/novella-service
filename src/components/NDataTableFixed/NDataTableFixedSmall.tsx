@@ -15,13 +15,22 @@ import RefreshIcon from "../icons/RefreshIcon";
 import NDataTableFixedFilterMenu from "./NDataTableFixedFilterMenu";
 import NDataTableFixedSortMenu from "./NDataTableFixedSortMenu";
 import {
-  NDataTableFixedFetchFunction,
+  NDataTableFixedFetchFunctionProps,
   NDataTableFixedSort,
   NDataTableFixedFilter,
 } from ".";
 
 type NovellaDataTableProps<TableType> = {
-  fetchData: NDataTableFixedFetchFunction<TableType>;
+  data: Array<TableType>;
+  dataCount: number;
+  isDataLoading: boolean;
+  onRefresh: () => void;
+  onPaginationChanged: ({
+    filters,
+    sorts,
+    pageIndex,
+    pageSize,
+  }: NDataTableFixedFetchFunctionProps<TableType>) => void;
   tanStackColumns: ColumnDef<TableType, any>[];
   columns: Array<{ id: keyof TableType; header: string }>;
   onRowSelectionChanged?: (state: TableType) => void;
@@ -31,21 +40,22 @@ type NovellaDataTableProps<TableType> = {
   Table allows only 1 row to be selected. To be used inside drawers
 */
 export default function NDataTableFixedSmall<TableType>({
-  fetchData,
+  data,
+  dataCount,
+  isDataLoading,
+  onPaginationChanged,
+  onRefresh,
   tanStackColumns,
   columns,
   onRowSelectionChanged = () => null,
 }: NovellaDataTableProps<TableType>) {
   // Fixme: Remove the any type and put proper typing :(
-  const [data, setData] = useState<Array<any>>([]);
   const [filters, setFilters] = useState<NDataTableFixedFilter[]>([]);
   const [rowSelection, setRowSelection] = useState({});
   const [sorts, setSorts] = useState<NDataTableFixedSort<TableType> | null>(
     null
   );
   const [totalPageCount, setTotalPageCount] = useState(data.length);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
   const [refreshBtnIcon, setRefreshBtnIcon] = useState(
     <RefreshIcon size={18} />
   );
@@ -78,27 +88,11 @@ export default function NDataTableFixedSmall<TableType>({
     debugTable: true,
   });
 
-  const getData = async () => {
-    setIsLoading(true);
-    setRefreshBtnIcon(<LoadingIcon size={18} />);
-    const { data, count } = await fetchData({
-      pageIndex,
-      pageSize,
-      filters,
-      sorts,
-    });
-    // Fixme: Put the proper typing
-    setData([...data]);
-    const pageCount = Math.ceil(count / pageSize);
-    setTotalRecords(count);
-    setTotalPageCount(pageCount < 1 ? 1 : pageCount);
-    setIsLoading(false);
-    setRefreshBtnIcon(<RefreshIcon size={18} />);
-  };
-
   useEffect(() => {
-    getData();
-  }, [pageIndex, pageSize, fetchData, filters, sorts]);
+    const pageCount = Math.ceil(dataCount / pageSize);
+    setTotalPageCount(pageCount < 1 ? 1 : pageCount);
+    setRefreshBtnIcon(<RefreshIcon size={18} />);
+  }, [pageIndex, pageSize, filters, sorts, dataCount]);
 
   useEffect(() => {
     const selectedData = Object.keys(rowSelection).map((key) => {
@@ -106,6 +100,12 @@ export default function NDataTableFixedSmall<TableType>({
     })[0];
     onRowSelectionChanged(selectedData);
   }, [rowSelection]);
+
+  useEffect(() => {
+    setRefreshBtnIcon(() =>
+      isDataLoading ? <LoadingIcon size={18} /> : <RefreshIcon size={18} />
+    );
+  }, [isDataLoading]);
 
   return (
     <div className="h-full flex flex-col justify-between w-[42rem]">
@@ -115,9 +115,7 @@ export default function NDataTableFixedSmall<TableType>({
           <ButtonGhost
             icon={refreshBtnIcon}
             title="Refresh"
-            onClick={async () => {
-              await getData();
-            }}
+            onClick={() => onRefresh()}
           />
           {/* Sort Control */}
           <NDataTableFixedSortMenu<TableType>
@@ -159,7 +157,7 @@ export default function NDataTableFixedSmall<TableType>({
         </div>
       </div>
       <div className="h-[calc(100vh-43px-57px)] overflow-y-auto bg-surface-100 relative">
-        <table>
+        <table className="w-full">
           <thead className="text-surface-900 bg-surface-200 sticky top-0">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>

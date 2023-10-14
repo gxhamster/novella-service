@@ -1,29 +1,55 @@
 "use client";
 import { useState } from "react";
-import NDataTableFixed from "@/components/NDataTableFixed";
+import NDataTableFixed, {
+  NDataTableFixedFetchFunctionProps,
+} from "@/components/NDataTableFixed";
 import NButton from "@/components/NButton";
-import NModal from "@/components/NModal";
 import { IIssuedBookV2 } from "./lib/types";
-import { getIssuedBooksByPage } from "../../api/issued/client";
 import { createColumnHelper } from "@tanstack/react-table";
 import { IssuedBooksTableColumnDef } from "./lib/types";
 import Link from "next/link";
 import IssueBookDrawer from "./components/IssueBookDrawer";
 import { NAlertProvider } from "@/components/NAlert";
-import LoadingIcon from "@/components/icons/LoadingIcon";
 import NDeleteModal from "@/components/NDeleteModal";
+import { trpc } from "@/app/_trpc/client";
+import ReturnBookModal from "./components/ReturnBookModal";
 
 export default function Issued() {
   const [isIssueBookDrawerOpen, setIsIssueBookDrawerOpen] = useState(false);
   const [isReturnBookModalOpen, setIsReturnBookModalOpen] = useState(false);
   const [returnBookID, setReturnBookID] = useState<number>();
   const issuedBooksColHelper = createColumnHelper<IIssuedBookV2>();
-  const [deleteButtonLoading, setDeleteButtonLoading] = useState(false);
-  const [deletedBooks, setDeletedBooks] = useState<IIssuedBookV2[] | null>(
-    null
-  );
+  const [deletedBooks, setDeletedBooks] = useState<IIssuedBookV2[]>([]);
   const [isIssueBookDeleteModalOpen, setIsIssueBookDeleteModalOpen] =
     useState(false);
+  const [fetchFunctionOpts, setFetchFunctionOpts] = useState<
+    NDataTableFixedFetchFunctionProps<IIssuedBookV2>
+  >({
+    pageIndex: 0,
+    pageSize: 10,
+    filters: [],
+    sorts: null,
+  });
+
+  const getIssuedBooksByPageQuery =
+    trpc.issued.getIssuedBooksByPage.useQuery(fetchFunctionOpts);
+
+  const deleteIssuedBooksQuery = trpc.issued.deleteIssuedBooksById.useMutation({
+    onError: (_error) => {
+      throw new Error(_error.message, {
+        cause: _error.shape?.data,
+      });
+    },
+    onSuccess: () => {
+      setIsIssueBookDeleteModalOpen(false);
+      getIssuedBooksByPageQuery.refetch();
+    },
+  });
+
+  const onIssuedBooksDeleted = async () => {
+    const ids = deletedBooks?.map((rows) => rows.id);
+    deleteIssuedBooksQuery.mutate(ids);
+  };
 
   const issuedBooksTableCols: Array<IssuedBooksTableColumnDef> = [
     { id: "id", header: "ID" },
@@ -81,94 +107,40 @@ export default function Issued() {
           tanStackColumns={issuedBooksTableColsTanstack}
           onCreateRowButtonPressed={() => setIsIssueBookDrawerOpen(true)}
           onRowSelectionChanged={(state) => console.log(state)}
+          isDataLoading={
+            getIssuedBooksByPageQuery.isLoading ||
+            getIssuedBooksByPageQuery.isRefetching
+          }
           onRowDeleted={(deletedBooks) => {
             setDeletedBooks(deletedBooks);
             setIsIssueBookDeleteModalOpen(true);
           }}
-          fetchData={getIssuedBooksByPage}
+          data={
+            getIssuedBooksByPageQuery.data
+              ? getIssuedBooksByPageQuery.data.data
+              : []
+          }
+          dataCount={
+            getIssuedBooksByPageQuery.data
+              ? getIssuedBooksByPageQuery.data.count
+              : 0
+          }
+          onRefresh={() => getIssuedBooksByPageQuery.refetch()}
+          onPaginationChanged={(opts) => setFetchFunctionOpts(opts)}
         />
         {/* Delete Issued book Modal */}
         <NDeleteModal
           isOpen={isIssueBookDeleteModalOpen}
           closeModal={() => setIsIssueBookDeleteModalOpen(false)}
-          onDelete={async () => {
-            setDeleteButtonLoading(true);
-            const ids = deletedBooks?.map((rows) => rows.id);
-            const { error } = await fetch("/api/issued", {
-              method: "DELETE",
-              body: JSON.stringify({ ids }),
-            }).then((response) => response.json());
-            if (error) throw new Error(error.message);
-            setDeleteButtonLoading(false);
-            setIsIssueBookDeleteModalOpen(false);
-          }}
+          onDelete={onIssuedBooksDeleted}
         />
-        {/* Return Book Modal */}
-        <NModal
-          title="Return the issued book"
-          isOpen={isReturnBookModalOpen}
-          onModalClose={() => setIsReturnBookModalOpen(false)}
-        >
-          <form>
-            <section className="text-surface-700 p-6">
-              <p className="text-sm">
-                Do you want to return the book from the student to the library ?
-              </p>
-            </section>
-            <section className="flex gap-2 border-t-[1px] border-surface-300 p-2 justify-end">
-              <NButton
-                kind="secondary"
-                size="sm"
-                title="Cancel"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsReturnBookModalOpen(false);
-                }}
-              />
-              <NButton
-                kind="primary"
-                size="sm"
-                title="Return"
-                onClick={async (e) => {
-                  e.preventDefault();
-                  // Retrieve Issued Book Details before deleting
-                  const { data: issuedBook, error: issuedBookError } =
-                    await fetch(`/api/issued?id=${returnBookID}`).then((res) =>
-                      res.json()
-                    );
-                  // First Delete book from Issued Table
-                  const { error } = await fetch(
-                    `/api/issued?id=${returnBookID}`,
-                    {
-                      method: "DELETE",
-                      body: JSON.stringify({ ids: [returnBookID] }),
-                    }
-                  ).then((res) => res.json());
-
-                  // Add Issue Detail to History Table
-                  const historyBookRecord = {
-                    book_id: issuedBook.book_id,
-                    student_id: issuedBook.student_id,
-                    due_date: issuedBook.due_date,
-                    issued_date: issuedBook.created_at,
-                    returned_date: new Date().toISOString(),
-                  };
-                  const { data: historyBook, error: historyBookError } =
-                    await fetch(`/api/issued/history`, {
-                      method: "POST",
-                      body: JSON.stringify(historyBookRecord),
-                    }).then((res) => res.json());
-
-                  if (error || issuedBookError || historyBookError)
-                    throw new Error(error.message);
-
-                  setIsReturnBookModalOpen(false);
-                }}
-              />
-            </section>
-          </form>
-        </NModal>
+        <ReturnBookModal
+          isReturnBookModalOpen={isReturnBookModalOpen}
+          setIsReturnBookModalOpen={setIsReturnBookModalOpen}
+          returnBookID={returnBookID}
+        />
         <IssueBookDrawer
+          onBookIssued={() => getIssuedBooksByPageQuery.refetch()}
           isIssueBookDrawerOpen={isIssueBookDrawerOpen}
           setIsIssueBookDrawerOpen={setIsIssueBookDrawerOpen}
         />

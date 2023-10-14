@@ -2,19 +2,20 @@
 import { useState } from "react";
 import ButtonPrimary from "@/components/ButtonPrimary";
 import { IBook } from "@/supabase/types/supabase";
-import { addBookToSupabase } from "@/app/api/books/client";
 import {
   NDrawerCreateForm,
   NDrawerCreateFormFieldsType,
 } from "@/components/NDrawer";
+import { trpc } from "@/app/_trpc/client";
 
 export default function BookCreate() {
   const [saveButtonLoading, setSaveButtonLoading] = useState(false);
   const [isAddBookDrawerOpen, setIsAddBookDrawerOpen] = useState(false);
+  const createBookMutation = trpc.books.createBook.useMutation();
 
   const bookSubmitHandler = async (formData: IBook) => {
     setSaveButtonLoading(true);
-    await addBookToSupabase(formData);
+    createBookMutation.mutate(formData);
     setSaveButtonLoading(false);
   };
 
@@ -111,7 +112,7 @@ export default function BookCreate() {
         title="Add new book to library"
         saveButtonLoadingState={saveButtonLoading}
         isOpen={isAddBookDrawerOpen}
-        onFormSubmit={addBookToSupabase}
+        onFormSubmit={bookSubmitHandler}
         closeDrawer={() => setIsAddBookDrawerOpen(false)}
         formFieldsCategories={bookFieldCategories}
         defaultValues={{

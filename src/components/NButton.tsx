@@ -1,8 +1,11 @@
+import LoadingIcon from "./icons/LoadingIcon";
+
 interface NButton extends React.ComponentPropsWithoutRef<"button"> {
   kind?: "primary" | "secondary" | "ghost" | "alert";
   title?: string;
   size?: "xs" | "sm" | "normal" | "lg" | "xl";
   icon?: React.ReactNode;
+  isLoading?: boolean;
 }
 
 const sizes = {
@@ -44,6 +47,7 @@ export default function NButton({
   icon,
   size = "sm",
   kind = "primary",
+  isLoading = false,
   ...rest
 }: NButton) {
   return (
@@ -51,8 +55,12 @@ export default function NButton({
       {...rest}
       className={`${sizes[size].padding} ${sizes[size].text} flex gap-2 items-center outline-none justify-center ${colors[kind]} ${rest.className}`}
     >
-      {icon}
-      {title ? <span className="flex-grow">{title}</span> : null}
+      {isLoading ? (
+        <LoadingIcon className="text-surface-900" size={16} />
+      ) : (
+        icon
+      )}
+      {title ? <span className="">{title}</span> : null}
     </button>
   );
 }

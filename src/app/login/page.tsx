@@ -6,6 +6,8 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import NButton from "@/components/NButton";
 import { useState } from "react";
 import LoadingIcon from "@/components/icons/LoadingIcon";
+import Image from "next/image";
+import NovellaLogo from "../../../public/icon.png";
 
 type LoginPageInputs = {
   email: string;
@@ -31,29 +33,16 @@ const Login = () => {
       console.error("Cannot sign into Novella :(", error);
     } else {
       console.log("Succesfully signed into Novella :)", data.user);
-      setIsLoading(false);
       router.push("/dashboard");
     }
+    setIsLoading(false);
   };
 
   return (
     <main className="flex flex-col min-h-screen items-center px-16 bg-surface-100 text-white">
       <section className="p-10">
         <div className="flex gap-2 items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="40"
-            height="40"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-          </svg>
+          <Image src={NovellaLogo} width={64} height={64} alt="Novella Logo" />
           <h2 className="text-4xl font-semibold">Novella</h2>
         </div>
       </section>

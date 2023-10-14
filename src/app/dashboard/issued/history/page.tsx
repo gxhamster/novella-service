@@ -4,15 +4,26 @@ import NDataTableFixed from "@/components/NDataTableFixed";
 import { createColumnHelper } from "@tanstack/react-table";
 import Link from "next/link";
 import { NAlertProvider } from "@/components/NAlert";
-import { IHistory } from "@/supabase/types/supabase";
-import { getHistoryByPage } from "@/app/api/issued/history/client";
 import NDeleteModal from "@/components/NDeleteModal";
+import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
+import { trpc } from "@/app/_trpc/client";
+import { IHistory } from "@/supabase/types/supabase";
 
 export default function Issued() {
   const issuedBooksColHelper = createColumnHelper<IHistory>();
   const [deletedBooks, setDeletedBooks] = useState<IHistory[] | null>(null);
   const [isIssueBookDeleteModalOpen, setIsIssueBookDeleteModalOpen] =
     useState(false);
+  const [fetchFunctionOpts, setFetchFunctionOpts] = useState<
+    NDataTableFixedFetchFunctionProps<IHistory>
+  >({
+    pageIndex: 0,
+    pageSize: 10,
+    filters: [],
+    sorts: null,
+  });
+  const getHistoryByPageQuery =
+    trpc.history.getHistoryByPage.useQuery(fetchFunctionOpts);
 
   type HistoryBooksTableDef = {
     id: any;
@@ -23,9 +34,7 @@ export default function Issued() {
   const historyBooksTableCols: Array<HistoryBooksTableDef> = [
     { id: "id", header: "ID" },
     { id: "book_id", header: "Book ID", baseHref: "/dashboard/books" },
-    { id: "title", header: "Title" },
     { id: "student_id", header: "Student ID", baseHref: "/dashboard/students" },
-    { id: "name", header: "Student Name" },
     { id: "issued_date", header: "Issued Date" },
     { id: "due_date", header: "Due Date" },
     { id: "returned_date", header: "Returned Date" },
@@ -58,12 +67,23 @@ export default function Issued() {
           columns={historyBooksTableCols}
           tanStackColumns={issuedBooksTableColsTanstack}
           showCreateButton={false}
+          isDataLoading={
+            getHistoryByPageQuery.isLoading ||
+            getHistoryByPageQuery.isRefetching
+          }
           onRowSelectionChanged={(state) => console.log(state)}
           onRowDeleted={(deletedBooks) => {
             setDeletedBooks(deletedBooks);
             setIsIssueBookDeleteModalOpen(true);
           }}
-          fetchData={getHistoryByPage}
+          data={
+            getHistoryByPageQuery.data ? getHistoryByPageQuery.data.data : []
+          }
+          dataCount={
+            getHistoryByPageQuery.data ? getHistoryByPageQuery.data.count : 0
+          }
+          onRefresh={() => getHistoryByPageQuery.refetch()}
+          onPaginationChanged={(opts) => setFetchFunctionOpts(opts)}
         />
         {/* Delete Issued book Modal */}
         <NDeleteModal

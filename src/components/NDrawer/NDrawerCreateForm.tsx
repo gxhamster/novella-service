@@ -50,7 +50,10 @@ export default function NDrawerCreateForm<TableType extends FieldValues>({
       <div className="flex flex-col justify-between h-[calc(100vh-57px)] overflow-y-auto">
         <form onSubmit={handleSubmit(onFormSubmit)} className="flex flex-col">
           {formFieldsCategories.map((category) => (
-            <div className="flex flex-col gap-7 border-b-[1px] border-surface-300 p-6">
+            <div
+              key={category.title}
+              className="flex flex-col gap-7 border-b-[1px] border-surface-300 p-6"
+            >
               {category.title || category.description ? (
                 <section className="flex flex-col gap-2">
                   <h3 className="text-md text-surface-800">{category.title}</h3>
@@ -61,6 +64,7 @@ export default function NDrawerCreateForm<TableType extends FieldValues>({
               ) : null}
               {category.fields.map((field) => (
                 <NovellaInput<typeof field.field>
+                  key={field.field}
                   type="text"
                   fontSize="xs"
                   helpText={field.help}

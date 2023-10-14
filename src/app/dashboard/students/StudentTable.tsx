@@ -2,48 +2,65 @@
 import { useContext, useState } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
 import Link from "next/link";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { Database, IStudent } from "@/supabase/types/supabase";
+import { IStudent } from "@/supabase/types/supabase";
 import {
   NDrawerCreateForm,
   NDrawerCreateFormFieldsType,
 } from "@/components/NDrawer";
-import NDataTableFixed, {
-  NDataTableFixedFetchFunction,
-  NDataTableFixedConvertToSupabaseFilters,
-} from "@/components/NDataTableFixed";
+import NDataTableFixed from "@/components/NDataTableFixed";
 import { NAlertContext, NAlertContextType } from "@/components/NAlert";
 import NDeleteModal from "@/components/NDeleteModal";
+import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
+import { trpc } from "@/app/_trpc/client";
 
 export default function StudentsTable() {
   const columnHelper = createColumnHelper<IStudent>();
   const [isAddBookDrawerOpen, setIsAddBookDrawerOpen] = useState(false);
   const [isDeleteStudentModalOpen, setIsDeleteStudentModalOpen] =
     useState(false);
-  const [deletedStudentsRows, setDeletedStudentRows] = useState<IStudent[]>();
+  const [deletedStudentsRows, setDeletedStudentRows] = useState<IStudent[]>([]);
   const [saveButtonLoading, setSaveButtonLoading] = useState(false);
+  const [fetchFunctionOpts, setFetchFunctionOpts] = useState<
+    NDataTableFixedFetchFunctionProps<IStudent>
+  >({
+    pageIndex: 0,
+    pageSize: 10,
+    filters: [],
+    sorts: null,
+  });
   const { openAlert, setContent, isOpen } = useContext(
     NAlertContext
   ) as NAlertContextType;
 
-  const getBooksByPage: NDataTableFixedFetchFunction<IStudent> = async ({
-    pageIndex,
-    pageSize,
-    filters,
-    sorts,
-  }) => {
-    const supabaseFilters = NDataTableFixedConvertToSupabaseFilters(filters);
-    const supabase = createClientComponentClient<Database>();
+  const getStudentsByPageQuery =
+    trpc.students.getStudentsByPage.useQuery(fetchFunctionOpts);
 
-    let query = supabase.from("students").select("*", { count: "estimated" });
-    if (filters.length > 0) query = query.or(supabaseFilters);
-    if (sorts) query = query.order(sorts.field, { ascending: sorts.ascending });
-    query = query.range(pageIndex * pageSize, pageSize * (pageIndex + 1));
-    const { data, count, error } = await query;
+  const addStudentMutation = trpc.students.createStudent.useMutation({
+    onError: (_error) => {
+      setSaveButtonLoading(false);
+      throw new Error(_error.message);
+    },
+    onSettled: () => {
+      setSaveButtonLoading(false);
+      getStudentsByPageQuery.refetch();
+    },
+  });
 
-    if (error) throw new Error(error.message);
+  const deleteStudentMutation = trpc.students.deleteStudentsById.useMutation({
+    onError: (_error) => {
+      throw new Error(_error.message, {
+        cause: _error.shape?.data,
+      });
+    },
+    onSettled: () => {
+      setIsDeleteStudentModalOpen(false);
+      getStudentsByPageQuery.refetch();
+    },
+  });
 
-    return { data, count: count ? count : 0 };
+  const addStudentToSupabase = async (formData: IStudent) => {
+    setSaveButtonLoading(true);
+    addStudentMutation.mutate(formData);
   };
 
   const columnsObj: Array<{
@@ -76,27 +93,6 @@ export default function StudentsTable() {
       header: column.header,
     })
   );
-
-  const addStudentToSupabase = async (formData: IStudent) => {
-    setSaveButtonLoading(true);
-    const { _, error } = await fetch("/api/students", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    }).then((res) => res.json());
-
-    if (error) {
-      setSaveButtonLoading(false);
-      throw new Error(error.message);
-    }
-    setSaveButtonLoading(false);
-  };
-
-  type IStudentV2 = {
-    [Property in keyof IStudent]: Property extends "id"
-      ? JSX.Element
-      : IStudent[Property];
-  };
 
   const studentCategories: NDrawerCreateFormFieldsType<IStudent>[] = [
     {
@@ -175,30 +171,33 @@ export default function StudentsTable() {
         columns={columnsObj}
         tanStackColumns={tanstackColumns}
         onCreateRowButtonPressed={() => setIsAddBookDrawerOpen(true)}
+        isDataLoading={
+          getStudentsByPageQuery.isLoading ||
+          getStudentsByPageQuery.isRefetching
+        }
         onRowDeleted={(deletedRows) => {
           setDeletedStudentRows([...deletedRows]);
           setIsDeleteStudentModalOpen(true);
         }}
-        fetchData={getBooksByPage}
+        data={
+          getStudentsByPageQuery.data ? getStudentsByPageQuery.data.data : []
+        }
+        dataCount={
+          getStudentsByPageQuery.data ? getStudentsByPageQuery.data.count : 0
+        }
+        onRefresh={() => {
+          getStudentsByPageQuery.refetch();
+        }}
+        onPaginationChanged={(opts) => {
+          setFetchFunctionOpts(opts);
+        }}
       />
       <NDeleteModal
         isOpen={isDeleteStudentModalOpen}
         closeModal={() => setIsDeleteStudentModalOpen(false)}
         onDelete={async () => {
           const ids = deletedStudentsRows?.map((rows) => rows.id);
-          const { error } = await fetch("/api/students", {
-            method: "DELETE",
-            body: JSON.stringify({ ids }),
-          }).then((response) => response.json());
-          if (error) {
-            setContent({
-              title: "Could not delete the student",
-              description: error.message,
-            });
-            openAlert();
-            // throw new Error(error.message);
-          }
-          setIsDeleteStudentModalOpen(false);
+          deleteStudentMutation.mutate(ids);
         }}
       />
     </>

@@ -3,9 +3,10 @@ import NDataTableFixedSmall from "@/components/NDataTableFixed/NDataTableFixedSm
 import { StudentsTableColumnDef } from "../lib/types";
 import { createColumnHelper } from "@tanstack/react-table";
 import { IIssuedBook, IStudent } from "@/supabase/types/supabase";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { UseFormSetValue } from "react-hook-form";
-import { getStudentsByPage } from "@/app/api/students/client";
+import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
+import { trpc } from "@/app/_trpc/client";
 
 const studentsColHelper = createColumnHelper<IStudent>();
 const studentsTableCols: Array<StudentsTableColumnDef> = [
@@ -38,6 +39,20 @@ export default function SelectStudentDrawer({
   setSelectedStudent,
   formSetValue,
 }: SelectStudentDrawerProps) {
+  const [fetchFunctionOpts, setFetchFunctionOpts] = useState<
+    NDataTableFixedFetchFunctionProps<IStudent>
+  >({
+    pageIndex: 0,
+    pageSize: 10,
+    filters: [],
+    sorts: null,
+  });
+
+  const getStudentsByPageQuery = trpc.students.getStudentsByPage.useQuery(
+    fetchFunctionOpts,
+    { keepPreviousData: true }
+  );
+
   return (
     <NDrawer
       title="Select a student to issue to"
@@ -47,6 +62,18 @@ export default function SelectStudentDrawer({
       <NDataTableFixedSmall<IStudent>
         columns={studentsTableCols}
         tanStackColumns={studentsTableColsTanstack}
+        isDataLoading={
+          getStudentsByPageQuery.isLoading ||
+          getStudentsByPageQuery.isRefetching
+        }
+        data={
+          getStudentsByPageQuery.data ? getStudentsByPageQuery.data.data : []
+        }
+        dataCount={
+          getStudentsByPageQuery.data ? getStudentsByPageQuery.data.count : 0
+        }
+        onPaginationChanged={(opts) => setFetchFunctionOpts(opts)}
+        onRefresh={() => getStudentsByPageQuery.refetch()}
         onRowSelectionChanged={(state) => {
           if (state) {
             setIsAddStudentDrawerOpen(false);
@@ -54,7 +81,6 @@ export default function SelectStudentDrawer({
             formSetValue("student_id", state.id);
           }
         }}
-        fetchData={getStudentsByPage}
       />
     </NDrawer>
   );
