@@ -10,6 +10,7 @@ export type IssuedBooksTableColumnDef = {
   id: any;
   header: string;
   baseHref?: string;
+  isDate?: boolean;
   isDisplayColumn?: boolean;
 };
 

@@ -7,9 +7,7 @@ import NButton from "@/components/NButton";
 import LeftArrowIcon from "@/components/icons/LeftArrowIcon";
 import SelectBookDrawer from "./SelectBookDrawer";
 import SelectStudentDrawer from "./SelectStudentDrawer";
-import { useContext } from "react";
-import { NAlertContext } from "@/components/NAlert";
-import LoadingIcon from "@/components/icons/LoadingIcon";
+import { toast } from "react-toastify";
 import { trpc } from "@/app/_trpc/client";
 
 type IssueBookDrawerProps = {
@@ -27,13 +25,14 @@ export default function IssueBookDrawer({
   const [selectedStudent, setSelectedStudent] = useState<IStudent | null>(null);
   const [isAddBookDrawerOpen, setIsAddBookDrawerOpen] = useState(false);
   const [isAddStudentDrawerOpen, setIsAddStudentDrawerOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { setContent, openAlert, isOpen } = useContext(NAlertContext);
   const createIssuedBookMutation = trpc.issued.createIssuedBook.useMutation({
     onError: (_error) => {
-      setContent({ title: "Cannot issue book", description: _error.message });
-      openAlert();
+      toast.error(`Cannot issue book. ${_error.message}`);
       throw new Error(_error.message);
+    },
+    onSuccess: () => {
+      toast.success(`Successfully issued a new book`);
+      onBookIssued();
     },
   });
 
@@ -74,7 +73,6 @@ export default function IssueBookDrawer({
         title="Issue book to student"
         isOpen={isIssueBookDrawerOpen}
         closeDrawer={() =>
-          !isOpen &&
           !isAddBookDrawerOpen &&
           !isAddStudentDrawerOpen &&
           setIsIssueBookDrawerOpen(false)
@@ -174,12 +172,10 @@ export default function IssueBookDrawer({
             <NButton
               title="Issue Book"
               kind="primary"
-              icon={
-                isSubmitting ? (
-                  <LoadingIcon className="text-surface-900" size={16} />
-                ) : null
+              isLoading={createIssuedBookMutation.isLoading}
+              disabled={
+                !isDirty && !isValid && createIssuedBookMutation.isLoading
               }
-              disabled={!isDirty && !isValid && isSubmitting}
             />
           </section>
         </form>

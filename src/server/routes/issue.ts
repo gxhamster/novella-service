@@ -14,7 +14,7 @@ export const IssueRouter = router({
     const { supabase } = opts.ctx;
 
     const { data, error } = await supabase
-      .from("issue")
+      .from("issued")
       .select("*, book_id, books (id, title), student_id, students (id, name)")
       .eq("id", input);
 

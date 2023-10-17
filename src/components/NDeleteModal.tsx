@@ -7,6 +7,7 @@ type NDeleteModalProps = {
   isOpen: boolean;
   closeModal: () => void;
   onDelete: () => Promise<any>;
+  isDeleting?: boolean;
   title?: string;
   description?: string;
 };
@@ -15,10 +16,10 @@ export default function NDeleteModal({
   title = "Confirm to delete",
   description = "Are you sure you want to delete the selected rows? This action cannot be undone",
   isOpen,
+  isDeleting = false,
   closeModal,
   onDelete,
 }: NDeleteModalProps) {
-  const [isButtonLoading, setIsButtonLoading] = useState(false);
   return (
     <NModal isOpen={isOpen} title={title} onModalClose={closeModal}>
       <section className="p-4">
@@ -30,14 +31,12 @@ export default function NDeleteModal({
           kind="alert"
           title="Delete"
           icon={
-            isButtonLoading ? (
+            isDeleting ? (
               <LoadingIcon size={16} className="text-surface-900" />
             ) : null
           }
-          onClick={async () => {
-            setIsButtonLoading(true);
-            await onDelete();
-            setIsButtonLoading(false);
+          onClick={() => {
+            onDelete();
           }}
         />
       </section>

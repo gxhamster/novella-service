@@ -64,6 +64,10 @@ const config: Config = {
         900: "#ffd7d9",
         950: "#fff1f1",
       },
+      warning: {
+        100: "#ff832b",
+        200: "#f1c21b",
+      },
     },
   },
   plugins: [],

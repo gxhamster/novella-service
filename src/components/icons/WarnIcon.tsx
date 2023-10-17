@@ -1,8 +1,9 @@
-type BookIconProps = {
+type WarnIconProps = {
   size?: number;
+  className: string;
 };
 
-export default function BookIcon({ size = 24 }: BookIconProps) {
+export default function WarnIcon({ size = 24, className }: WarnIconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -15,8 +16,9 @@ export default function BookIcon({ size = 24 }: BookIconProps) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
     </svg>
   );
 }

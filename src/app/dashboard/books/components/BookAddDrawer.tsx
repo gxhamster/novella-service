@@ -5,6 +5,7 @@ import { useState } from "react";
 import { trpc } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
 import { NDrawerCreateFormFieldsType } from "@/components/NDrawer";
+import { toast } from "react-toastify";
 
 const bookFieldCategories: NDrawerCreateFormFieldsType<IBook>[] = [
   {
@@ -106,6 +107,7 @@ export default function BookAddDrawer({
 
   const bookAddMutation = trpc.books.createBook.useMutation({
     onError: (_error) => {
+      toast.error(`Could not create book: ${_error.message}`);
       throw new Error(_error.message, {
         cause: _error.shape?.data,
       });
@@ -115,6 +117,7 @@ export default function BookAddDrawer({
     },
     onSuccess: () => {
       router.refresh();
+      toast.success("Successfully added a new book to library");
       onBookAdded();
     },
   });

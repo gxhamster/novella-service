@@ -6,9 +6,10 @@ import NovellaInput from "@/components/NovellaInput";
 import { IBook, IBookUpdate } from "@/supabase/types/supabase";
 import BookCategoryCard from "./BookCatergoryCard";
 import BookDeleteCard from "./BookDeleteCard";
-import NModal from "@/components/NModal";
 import { trpc } from "@/app/_trpc/client";
 import NButton from "@/components/NButton";
+import NDeleteModal from "@/components/NDeleteModal";
+import { toast } from "react-toastify";
 
 export default function BookSummary({ data }: { data: IBook }) {
   let defaultInputValues = {};
@@ -30,22 +31,26 @@ export default function BookSummary({ data }: { data: IBook }) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const updateBookByIdMutation = trpc.books.updateBookById.useMutation({
     onError: (_error) => {
+      toast.error(`Cannot update book: ${_error.message}`);
       throw new Error(_error.message, {
         cause: `Error occured when trying to update book with ID: ${data.id}`,
       });
     },
     onSuccess: () => {
+      toast.success("Succesfully updated book fields");
       router.refresh();
       setFormValuesChangedFromDefault(false);
     },
   });
   const deleteBookByIdMutation = trpc.books.deleteBookById.useMutation({
     onError: (_error) => {
+      toast.error(`Cannot delete book: ${_error.message}`);
       throw new Error(_error.message);
     },
     onSuccess: () => {
       router.back();
       setIsDeleteModalOpen(false);
+      toast.success("Succesfully deleted the book");
     },
   });
 
@@ -55,6 +60,7 @@ export default function BookSummary({ data }: { data: IBook }) {
     });
 
     let filteredFormData = formData;
+    filteredFormData.id = Number(data.id);
     return filteredFormData;
   }
 
@@ -100,6 +106,11 @@ export default function BookSummary({ data }: { data: IBook }) {
         {
           title: "Reference ID",
           field: "id",
+          disabled: true,
+        },
+        {
+          title: "Created Date",
+          field: "created_at",
           disabled: true,
         },
       ],
@@ -242,30 +253,13 @@ export default function BookSummary({ data }: { data: IBook }) {
           ))}
         </form>
         <BookDeleteCard onClick={() => setIsDeleteModalOpen(true)} />
-        <NModal
-          title={`Confirm deletion of book Ref: ${data.id}`}
+        <NDeleteModal
           isOpen={isDeleteModalOpen}
-          onModalClose={() => setIsDeleteModalOpen(false)}
-        >
-          <div className="mt-2">
-            <p className="text-sm text-surface-500">
-              This will permanently delete the book from the database and cannot
-              be recovered
-            </p>
-          </div>
-          <div className="mt-6 flex gap-2">
-            <NButton
-              kind="alert"
-              title="Delete book"
-              onClick={deleteModalCloseHandler}
-            />
-            <NButton
-              kind="secondary"
-              title="Cancel"
-              onClick={() => setIsDeleteModalOpen(false)}
-            />
-          </div>
-        </NModal>
+          description="This will permanently delete the book from the database and cannot be recovered"
+          isDeleting={deleteBookByIdMutation.isLoading}
+          closeModal={() => setIsDeleteModalOpen(false)}
+          onDelete={deleteModalCloseHandler}
+        />
       </div>
     </div>
   );

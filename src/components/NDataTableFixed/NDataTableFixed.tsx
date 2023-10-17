@@ -233,7 +233,7 @@ export default function NDataTableFixed<TableType>({
                 {headerGroup.headers.map((header, idx) => (
                   <th
                     key={header.id}
-                    className={`text-start p-2 px-4 font-normal text-sm border-x-[0.7px] border-surface-300 whitespace-nowrap`}
+                    className={`text-start p-2 px-4 font-normal text-sm border-x-[0.7px] border-surface-400 whitespace-nowrap`}
                   >
                     {header.isPlaceholder
                       ? null

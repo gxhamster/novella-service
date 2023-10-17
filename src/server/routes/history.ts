@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { publicProcedure, router } from "../trpc";
-import { ZHistoryInsert, ZTableFetchFunctionOptions } from "@/supabase/schema";
+import {
+  ZHistory,
+  ZHistoryInsert,
+  ZTableFetchFunctionOptions,
+} from "@/supabase/schema";
 import { TRPCError } from "@trpc/server";
 import { NDataTableFixedConvertToSupabaseFilters } from "@/components/NDataTableFixed";
 
@@ -44,12 +48,41 @@ export const HistoryRouter = router({
     }),
 
   createHistory: publicProcedure
-    .input(ZHistoryInsert)
+    .input(ZHistory.partial())
     .mutation(async (opts) => {
       const { input } = opts;
       const { supabase } = opts.ctx;
 
       const { error } = await supabase.from("history").insert(input).select();
+
+      if (error)
+        throw new TRPCError({
+          message: error.message,
+          code: "BAD_REQUEST",
+          cause: error.details,
+        });
+    }),
+  deleteHistoryById: publicProcedure
+    .input(z.number())
+    .mutation(async (opts) => {
+      const { input } = opts;
+      const { supabase } = opts.ctx;
+      const { error } = await supabase.from("history").delete().eq("id", input);
+
+      if (error)
+        throw new TRPCError({
+          message: error.message,
+          code: "BAD_REQUEST",
+          cause: error.details,
+        });
+    }),
+
+  deleteHistoryByIds: publicProcedure
+    .input(z.array(z.number()))
+    .mutation(async (opts) => {
+      const { input } = opts;
+      const { supabase } = opts.ctx;
+      const { error } = await supabase.from("history").delete().in("id", input);
 
       if (error)
         throw new TRPCError({

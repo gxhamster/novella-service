@@ -1,18 +1,72 @@
 import NModal from "@/components/NModal";
 import NButton from "@/components/NButton";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, MouseEventHandler, SetStateAction } from "react";
+import { trpc } from "@/app/_trpc/client";
+import { toast } from "react-toastify";
 
 type ReturnBookModalProps = {
   isReturnBookModalOpen: boolean;
-  returnBookID: number | undefined;
+  returnBookID: number | null;
   setIsReturnBookModalOpen: Dispatch<SetStateAction<boolean>>;
+  onBookReturned: () => void;
 };
 
 export default function ReturnBookModal({
   isReturnBookModalOpen,
   setIsReturnBookModalOpen,
   returnBookID,
+  onBookReturned,
 }: ReturnBookModalProps) {
+  const getIssuedBookByIdQuery = trpc.issued.getIssuedBookById.useQuery(
+    returnBookID ? returnBookID : 0
+  );
+
+  const deleteIssuedBookByIdMutation =
+    trpc.issued.deleteIssuedBookById.useMutation({
+      onError: (_error) => {
+        toast.error(`Could not return the book: ${_error.message}`);
+        throw new Error(_error.message);
+      },
+    });
+
+  const createHistoryMutation = trpc.history.createHistory.useMutation({
+    onSuccess: () => {
+      setIsReturnBookModalOpen(false);
+      toast.success("Added book to history");
+      onBookReturned();
+    },
+    onError: (_error) => {
+      setIsReturnBookModalOpen(false);
+      toast.error(`Could not add book to history: ${_error.message}`);
+      throw new Error(_error.message);
+    },
+  });
+
+  const returnButtonHandler: MouseEventHandler<HTMLButtonElement> = (event) => {
+    event.preventDefault();
+    // Retrieve Issued Book Details before deleting
+    const issuedBook = getIssuedBookByIdQuery.data?.data;
+
+    // Delete book from Issued Table
+    if (returnBookID) deleteIssuedBookByIdMutation.mutate(returnBookID);
+
+    if (issuedBook) {
+      const historyBookRecord = {
+        book_id: issuedBook.book_id,
+        student_id: issuedBook.student_id,
+        due_date: issuedBook.due_date,
+        issued_date: issuedBook.created_at,
+        returned_date: new Date().toISOString(),
+      };
+      // Add Issue Detail to History Table
+      createHistoryMutation.mutate(historyBookRecord);
+    }
+
+    if (getIssuedBookByIdQuery.isError) {
+      throw new Error(getIssuedBookByIdQuery.error.message);
+    }
+  };
+
   return (
     <NModal
       title="Return the issued book"
@@ -39,37 +93,11 @@ export default function ReturnBookModal({
             kind="primary"
             size="sm"
             title="Return"
-            onClick={async (e) => {
-              e.preventDefault();
-              // Retrieve Issued Book Details before deleting
-              const { data: issuedBook, error: issuedBookError } = await fetch(
-                `/api/issued?id=${returnBookID}`
-              ).then((res) => res.json());
-              // First Delete book from Issued Table
-              const { error } = await fetch(`/api/issued?id=${returnBookID}`, {
-                method: "DELETE",
-                body: JSON.stringify({ ids: [returnBookID] }),
-              }).then((res) => res.json());
-
-              // Add Issue Detail to History Table
-              const historyBookRecord = {
-                book_id: issuedBook.book_id,
-                student_id: issuedBook.student_id,
-                due_date: issuedBook.due_date,
-                issued_date: issuedBook.created_at,
-                returned_date: new Date().toISOString(),
-              };
-              const { data: historyBook, error: historyBookError } =
-                await fetch(`/api/issued/history`, {
-                  method: "POST",
-                  body: JSON.stringify(historyBookRecord),
-                }).then((res) => res.json());
-
-              if (error || issuedBookError || historyBookError)
-                throw new Error(error.message);
-
-              setIsReturnBookModalOpen(false);
-            }}
+            isLoading={
+              deleteIssuedBookByIdMutation.isLoading ||
+              createHistoryMutation.isLoading
+            }
+            onClick={returnButtonHandler}
           />
         </section>
       </form>

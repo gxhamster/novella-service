@@ -9,15 +9,15 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { IssuedBooksTableColumnDef } from "./lib/types";
 import Link from "next/link";
 import IssueBookDrawer from "./components/IssueBookDrawer";
-import { NAlertProvider } from "@/components/NAlert";
 import NDeleteModal from "@/components/NDeleteModal";
 import { trpc } from "@/app/_trpc/client";
 import ReturnBookModal from "./components/ReturnBookModal";
+import { format } from "date-fns";
 
 export default function Issued() {
   const [isIssueBookDrawerOpen, setIsIssueBookDrawerOpen] = useState(false);
   const [isReturnBookModalOpen, setIsReturnBookModalOpen] = useState(false);
-  const [returnBookID, setReturnBookID] = useState<number>();
+  const [returnBookID, setReturnBookID] = useState<number | null>(null);
   const issuedBooksColHelper = createColumnHelper<IIssuedBookV2>();
   const [deletedBooks, setDeletedBooks] = useState<IIssuedBookV2[]>([]);
   const [isIssueBookDeleteModalOpen, setIsIssueBookDeleteModalOpen] =
@@ -46,19 +46,19 @@ export default function Issued() {
     },
   });
 
-  const onIssuedBooksDeleted = async () => {
+  const deleteIssuedBooks = async () => {
     const ids = deletedBooks?.map((rows) => rows.id);
     deleteIssuedBooksQuery.mutate(ids);
   };
 
   const issuedBooksTableCols: Array<IssuedBooksTableColumnDef> = [
     { id: "id", header: "ID" },
-    { id: "created_at", header: "Issued Date" },
+    { id: "created_at", header: "Issued Date", isDate: true },
     { id: "book_id", header: "Book ID", baseHref: "/dashboard/books" },
     { id: "title", header: "Title" },
     { id: "student_id", header: "Student ID", baseHref: "/dashboard/students" },
     { id: "name", header: "Student Name" },
-    { id: "due_date", header: "Due Date" },
+    { id: "due_date", header: "Due Date", isDate: true },
     { id: "action", header: "Recieve", isDisplayColumn: true },
   ];
 
@@ -67,16 +67,16 @@ export default function Issued() {
       return issuedBooksColHelper.display({
         id: column.id,
         cell: (cell) => (
-          <NButton
+          <button
             title="Return"
-            kind="ghost"
-            size="xs"
+            className="text-sm appearance-none underline text-primary-600"
             onClick={() => {
-              console.log(cell.row.getAllCells());
               setReturnBookID(cell.row.getAllCells()[1].getValue() as number);
               setIsReturnBookModalOpen(true);
             }}
-          />
+          >
+            Return
+          </button>
         ),
         header: "Return",
       });
@@ -92,6 +92,11 @@ export default function Issued() {
         ),
         header: column.header,
       });
+    else if (column.isDate)
+      return issuedBooksColHelper.accessor(column.id, {
+        header: column.header,
+        cell: (cell) => format(new Date(cell.getValue()), "dd-MM-yyyy hh:mm"),
+      });
     else
       return issuedBooksColHelper.accessor(column.id, {
         cell: (cell) => cell.getValue(),
@@ -101,50 +106,50 @@ export default function Issued() {
 
   return (
     <>
-      <NAlertProvider>
-        <NDataTableFixed<IIssuedBookV2>
-          columns={issuedBooksTableCols}
-          tanStackColumns={issuedBooksTableColsTanstack}
-          onCreateRowButtonPressed={() => setIsIssueBookDrawerOpen(true)}
-          onRowSelectionChanged={(state) => console.log(state)}
-          isDataLoading={
-            getIssuedBooksByPageQuery.isLoading ||
-            getIssuedBooksByPageQuery.isRefetching
-          }
-          onRowDeleted={(deletedBooks) => {
-            setDeletedBooks(deletedBooks);
-            setIsIssueBookDeleteModalOpen(true);
-          }}
-          data={
-            getIssuedBooksByPageQuery.data
-              ? getIssuedBooksByPageQuery.data.data
-              : []
-          }
-          dataCount={
-            getIssuedBooksByPageQuery.data
-              ? getIssuedBooksByPageQuery.data.count
-              : 0
-          }
-          onRefresh={() => getIssuedBooksByPageQuery.refetch()}
-          onPaginationChanged={(opts) => setFetchFunctionOpts(opts)}
-        />
-        {/* Delete Issued book Modal */}
-        <NDeleteModal
-          isOpen={isIssueBookDeleteModalOpen}
-          closeModal={() => setIsIssueBookDeleteModalOpen(false)}
-          onDelete={onIssuedBooksDeleted}
-        />
-        <ReturnBookModal
-          isReturnBookModalOpen={isReturnBookModalOpen}
-          setIsReturnBookModalOpen={setIsReturnBookModalOpen}
-          returnBookID={returnBookID}
-        />
-        <IssueBookDrawer
-          onBookIssued={() => getIssuedBooksByPageQuery.refetch()}
-          isIssueBookDrawerOpen={isIssueBookDrawerOpen}
-          setIsIssueBookDrawerOpen={setIsIssueBookDrawerOpen}
-        />
-      </NAlertProvider>
+      <NDataTableFixed<IIssuedBookV2>
+        columns={issuedBooksTableCols}
+        tanStackColumns={issuedBooksTableColsTanstack}
+        onCreateRowButtonPressed={() => setIsIssueBookDrawerOpen(true)}
+        onRowSelectionChanged={(state) => console.log(state)}
+        isDataLoading={
+          getIssuedBooksByPageQuery.isLoading ||
+          getIssuedBooksByPageQuery.isRefetching
+        }
+        onRowDeleted={(deletedBooks) => {
+          setDeletedBooks(deletedBooks);
+          setIsIssueBookDeleteModalOpen(true);
+        }}
+        data={
+          getIssuedBooksByPageQuery.data
+            ? getIssuedBooksByPageQuery.data.data
+            : []
+        }
+        dataCount={
+          getIssuedBooksByPageQuery.data
+            ? getIssuedBooksByPageQuery.data.count
+            : 0
+        }
+        onRefresh={() => getIssuedBooksByPageQuery.refetch()}
+        onPaginationChanged={(opts) => setFetchFunctionOpts(opts)}
+      />
+      {/* Delete Issued book Modal */}
+      <NDeleteModal
+        isOpen={isIssueBookDeleteModalOpen}
+        closeModal={() => setIsIssueBookDeleteModalOpen(false)}
+        isDeleting={deleteIssuedBooksQuery.isLoading}
+        onDelete={deleteIssuedBooks}
+      />
+      <ReturnBookModal
+        isReturnBookModalOpen={isReturnBookModalOpen}
+        setIsReturnBookModalOpen={setIsReturnBookModalOpen}
+        onBookReturned={() => getIssuedBooksByPageQuery.refetch()}
+        returnBookID={returnBookID}
+      />
+      <IssueBookDrawer
+        onBookIssued={() => getIssuedBooksByPageQuery.refetch()}
+        isIssueBookDrawerOpen={isIssueBookDrawerOpen}
+        setIsIssueBookDrawerOpen={setIsIssueBookDrawerOpen}
+      />
     </>
   );
 }

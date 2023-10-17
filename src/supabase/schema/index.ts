@@ -26,6 +26,7 @@ export const ZBook = z.object({
   edition: z.string().nullable(),
   genre: z.string().nullable(),
   isbn: z.number().nullable(),
+  author: z.string().nullable(),
   language: z.string().nullable(),
   pages: z.number().nullable(),
   publisher: z.string().nullable(),
@@ -35,14 +36,14 @@ export const ZBook = z.object({
 });
 
 export const ZHistory = z.object({
-  book_id: z.number(),
+  book_id: z.number().nullable(),
   created_at: z.string(),
-  due_date: z.string(),
+  due_date: z.string().nullable(),
   id: z.number(),
-  issued_date: z.string(),
-  returned_date: z.string(),
-  student_id: z.number(),
-  user_id: z.string(),
+  issued_date: z.string().nullable(),
+  returned_date: z.string().nullable(),
+  student_id: z.number().nullable(),
+  user_id: z.string().nullable(),
 });
 
 export const ZHistoryInsert = z.object({

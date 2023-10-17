@@ -8,7 +8,6 @@ import {
   NDrawerCreateFormFieldsType,
 } from "@/components/NDrawer";
 import NDataTableFixed from "@/components/NDataTableFixed";
-import { NAlertContext, NAlertContextType } from "@/components/NAlert";
 import NDeleteModal from "@/components/NDeleteModal";
 import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
 import { trpc } from "@/app/_trpc/client";
@@ -28,9 +27,6 @@ export default function StudentsTable() {
     filters: [],
     sorts: null,
   });
-  const { openAlert, setContent, isOpen } = useContext(
-    NAlertContext
-  ) as NAlertContextType;
 
   const getStudentsByPageQuery =
     trpc.students.getStudentsByPage.useQuery(fetchFunctionOpts);

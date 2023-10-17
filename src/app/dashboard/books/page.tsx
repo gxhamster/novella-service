@@ -10,6 +10,7 @@ import NDeleteModal from "@/components/NDeleteModal";
 import { IBook } from "@/supabase/types/supabase";
 import { trpc } from "@/app/_trpc/client";
 import BookAddDrawer from "./components/BookAddDrawer";
+import { toast } from "react-toastify";
 
 export default function Books() {
   const columnHelper = createColumnHelper<IBook>();
@@ -32,6 +33,7 @@ export default function Books() {
 
   const booksDeleteMutation = trpc.books.deleteBooksById.useMutation({
     onError: (_error) => {
+      toast.error(`Could not delete book: ${_error.message}`);
       throw new Error(_error.message, {
         cause: _error.shape?.data,
       });
@@ -40,6 +42,7 @@ export default function Books() {
       setIsDeleteBookModalOpen(false);
     },
     onSuccess: () => {
+      toast.success(`Succesfully deleted book from library`);
       router.refresh();
       getBooksByPageQuery.refetch();
     },
@@ -114,6 +117,7 @@ export default function Books() {
         isOpen={isDeleteBookModalOpen}
         closeModal={() => setIsDeleteBookModalOpen(false)}
         onDelete={onBooksDeleted}
+        isDeleting={booksDeleteMutation.isLoading}
       />
       <BookAddDrawer
         isAddBookDrawerOpen={isAddBookDrawerOpen}
