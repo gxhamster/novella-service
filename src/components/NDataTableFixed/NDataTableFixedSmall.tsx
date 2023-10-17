@@ -92,6 +92,7 @@ export default function NDataTableFixedSmall<TableType>({
     const pageCount = Math.ceil(dataCount / pageSize);
     setTotalPageCount(pageCount < 1 ? 1 : pageCount);
     setRefreshBtnIcon(<RefreshIcon size={18} />);
+    onPaginationChanged({ filters, sorts, pageIndex, pageSize });
   }, [pageIndex, pageSize, filters, sorts, dataCount]);
 
   useEffect(() => {

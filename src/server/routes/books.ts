@@ -22,7 +22,6 @@ export const BooksRouter = router({
     .query(async (opts) => {
       const { filters, sorts, pageIndex, pageSize } = opts.input;
       const { supabase } = opts.ctx;
-
       const supabaseFilters = NDataTableFixedConvertToSupabaseFilters(filters);
 
       let query = supabase.from("books").select("*", { count: "estimated" });

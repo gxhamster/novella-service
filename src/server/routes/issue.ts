@@ -27,6 +27,7 @@ export const IssueRouter = router({
 
     return { data: resultIssuedBook };
   }),
+
   getIssuedBooksByPage: publicProcedure
     .input(ZTableFetchFunctionOptions)
     .query(async (opts) => {
@@ -61,6 +62,7 @@ export const IssueRouter = router({
 
       return { data: flatData ? flatData : [], count: count ? count : 0 };
     }),
+
   updateIssuedBookById: publicProcedure
     .input(ZIssued.partial())
     .mutation(async (opts) => {
@@ -88,6 +90,7 @@ export const IssueRouter = router({
         cause: error.details,
       });
     }),
+
   deleteIssuedBookById: publicProcedure
     .input(z.number())
     .mutation(async (opts) => {
@@ -102,6 +105,7 @@ export const IssueRouter = router({
           cause: error.details,
         });
     }),
+
   deleteIssuedBooksById: publicProcedure
     .input(z.array(z.number()))
     .mutation(async (opts) => {
@@ -116,6 +120,7 @@ export const IssueRouter = router({
           cause: error.details,
         });
     }),
+
   createIssuedBook: publicProcedure
     .input(ZIssuedInsert)
     .mutation(async (opts) => {

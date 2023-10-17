@@ -69,9 +69,9 @@ export const ZIssuedInsert = z.object({
   book_id: z.number(),
   created_at: z.string().optional(),
   due_date: z.string().nullable(),
-  id: z.number(),
+  id: z.number().optional(),
   student_id: z.number(),
-  user_id: z.string().nullable(),
+  user_id: z.string().nullable().optional(),
 });
 
 export const ZIssuedV2 = z.object({

@@ -1,15 +1,14 @@
 "use client";
-import ButtonPrimary from "@/components/ButtonPrimary";
-import ButtonSecondary from "@/components/ButtonSecondary";
-import NovellaInput from "@/components/NovellaInput";
-import { IBook } from "@/supabase/types/supabase";
 import { useEffect, useState } from "react";
-import { SubmitHandler, useForm, useWatch } from "react-hook-form";
-import BookCategoryCard from "./BookCatergoryCard";
 import { useRouter } from "next/navigation";
+import { SubmitHandler, useForm, useWatch } from "react-hook-form";
+import NovellaInput from "@/components/NovellaInput";
+import { IBook, IBookUpdate } from "@/supabase/types/supabase";
+import BookCategoryCard from "./BookCatergoryCard";
 import BookDeleteCard from "./BookDeleteCard";
-import ButtonDanger from "@/components/ButtonDanger";
 import NModal from "@/components/NModal";
+import { trpc } from "@/app/_trpc/client";
+import NButton from "@/components/NButton";
 
 export default function BookSummary({ data }: { data: IBook }) {
   let defaultInputValues = {};
@@ -29,42 +28,46 @@ export default function BookSummary({ data }: { data: IBook }) {
   const [formValuesChangedFromDefault, setFormValuesChangedFromDefault] =
     useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const updateBookByIdMutation = trpc.books.updateBookById.useMutation({
+    onError: (_error) => {
+      throw new Error(_error.message, {
+        cause: `Error occured when trying to update book with ID: ${data.id}`,
+      });
+    },
+    onSuccess: () => {
+      router.refresh();
+      setFormValuesChangedFromDefault(false);
+    },
+  });
+  const deleteBookByIdMutation = trpc.books.deleteBookById.useMutation({
+    onError: (_error) => {
+      throw new Error(_error.message);
+    },
+    onSuccess: () => {
+      router.back();
+      setIsDeleteModalOpen(false);
+    },
+  });
 
-  const onSubmit: SubmitHandler<IBook> = async (formData) => {
+  function removeEmptyFields(formData: IBookUpdate) {
     (Object.keys(formData) as (keyof typeof formData)[]).forEach((key) => {
       formData[key] === undefined && delete formData[key];
     });
 
     let filteredFormData = formData;
+    return filteredFormData;
+  }
 
-    const { data: result, error } = await fetch(`/api/books?id=${data.id}`, {
-      cache: "no-cache",
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(filteredFormData),
-    }).then((res) => res.json());
-
-    if (error) {
-      throw new Error(error.message, {
-        cause: `Error occured when trying to update book with ID: ${data.id}`,
-      });
-    } else {
-      router.refresh();
-      setFormValuesChangedFromDefault(false);
-    }
+  const onSubmit: SubmitHandler<IBookUpdate> = async (
+    formData: IBookUpdate
+  ) => {
+    // Updaing database with update fields
+    const emptyFieldsRemoved = removeEmptyFields(formData);
+    updateBookByIdMutation.mutate(emptyFieldsRemoved);
   };
 
   const deleteModalCloseHandler = async () => {
-    setIsDeleteModalOpen(false);
-
-    const { error } = await fetch(`/api/books?id=${data.id}`, {
-      method: "DELETE",
-    }).then((res) => res.json());
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    router.back();
+    deleteBookByIdMutation.mutate(data.id);
   };
 
   type BookField = {
@@ -202,7 +205,8 @@ export default function BookSummary({ data }: { data: IBook }) {
               </h3>
             </div>
             <div className="flex gap-2">
-              <ButtonSecondary
+              <NButton
+                kind="secondary"
                 onClick={(e) => {
                   e.preventDefault();
                   reset(data);
@@ -210,7 +214,8 @@ export default function BookSummary({ data }: { data: IBook }) {
                 disabled={!formValuesChangedFromDefault}
                 title="Cancel"
               />
-              <ButtonPrimary
+              <NButton
+                kind="primary"
                 disabled={!formValuesChangedFromDefault}
                 title="Save"
               />
@@ -249,11 +254,13 @@ export default function BookSummary({ data }: { data: IBook }) {
             </p>
           </div>
           <div className="mt-6 flex gap-2">
-            <ButtonDanger
+            <NButton
+              kind="alert"
               title="Delete book"
               onClick={deleteModalCloseHandler}
             />
-            <ButtonSecondary
+            <NButton
+              kind="secondary"
               title="Cancel"
               onClick={() => setIsDeleteModalOpen(false)}
             />

@@ -79,7 +79,9 @@ export default function SelectBookDrawer({
         dataCount={
           getBooksByPageQuery.data ? getBooksByPageQuery.data.count : 0
         }
-        onPaginationChanged={(opts) => setFetchFunctionOpts(opts)}
+        onPaginationChanged={(opts) => {
+          setFetchFunctionOpts({ ...opts });
+        }}
         onRefresh={() => getBooksByPageQuery.refetch()}
       />
     </NDrawer>
