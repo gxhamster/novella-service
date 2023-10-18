@@ -29,7 +29,7 @@ function QueryResultItems({ books, onClick }: queryResultsProps) {
           <Link
             onClick={() => onClick(book)}
             href={`/dashboard/books/${book.id}`}
-            className="flex items-center hover:bg-surface-300 justify-between p-2 cursor-pointer"
+            className="flex items-center hover:bg-surface-300 hover:text-surface-900 justify-between p-2 cursor-pointer transition-all duration-75"
           >
             <div className="flex gap-2 items-center">
               <BookIcon size={30} />
@@ -55,6 +55,7 @@ export default function NGlobalSearch() {
 
   useEffect(() => {
     async function doTextSearch() {
+      // FIXME: Put into API routes
       const { data, error } = await supabase
         .from("books")
         .select()
@@ -69,10 +70,10 @@ export default function NGlobalSearch() {
     <>
       <button
         onClick={() => setIsSearchModalOpen(true)}
-        className="apperance-none outline-none px-4 py-2 flex justify-between bg-surface-100 border-[1px] border-surface-100 hover:bg-surface-200/50 min-w-[20rem] cursor-pointer transition-all text-sm"
+        className="apperance-none outline-none px-4 py-2 flex justify-between bg-surface-200/30 border-[1px] border-surface-100 hover:bg-surface-200/50 hover:text-surface-900 min-w-[20rem] cursor-pointer transition-all text-sm"
       >
         <span>Search libary...</span>
-        <SearchIcon size={20} className="text-surface-900" />
+        <SearchIcon size={20} className="" />
       </button>
       <NGlobalSearchModal
         searchSection={

@@ -1,7 +1,7 @@
 type StatCardProps = {
   title: string;
   subtitle: string;
-  stat: number;
+  stat: number | null;
   children: React.ReactNode;
 };
 export default function StatCard({
@@ -19,7 +19,11 @@ export default function StatCard({
         </div>
         <span className="text-surface-700 text-sm">{subtitle}</span>
       </div>
-      <span className="text-5xl text-surface-950 font-bold mt-6">{stat}</span>
+      {stat ? (
+        <span className="text-6xl text-surface-950 mt-6">{stat}</span>
+      ) : (
+        0
+      )}
     </div>
   );
 }

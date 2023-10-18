@@ -6,11 +6,14 @@ import StatCard from "./StatCard";
 import DashboardIssuedTable from "./DashboardIssuedTable";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
+import AddIcon from "@/components/icons/AddIcon";
+import NButtonLink from "@/components/NButtonLink";
 
 export default async function Dashboard() {
+  // FIXME: Move to server
   const supabase = createServerComponentClient({ cookies });
   const { count: totalIssuedBooks } = await supabase
-    .from("issued")
+    .from("history")
     .select("*", { count: "exact", head: true });
   const { count: totalUnreturnedBooks } = await supabase
     .from("issued")
@@ -24,10 +27,21 @@ export default async function Dashboard() {
 
   return (
     <div className="my-16 mx-auto px-16 w-full flex flex-col text-surface-900 gap-y-3">
-      <span className="text-3xl">Dashboard</span>
-      <span className="text-md text-surface-600 font-light">
-        View manage your library
-      </span>
+      <section className="flex justify-between items-start">
+        <div className="flex flex-col">
+          <span className="text-3xl">Dashboard</span>
+          <span className="text-md text-surface-600 font-light">
+            View manage your library
+          </span>
+        </div>
+        <NButtonLink
+          href="/dashboard/issued"
+          kind="primary"
+          title="Issue book"
+          size="normal"
+          icon={<AddIcon size={20} />}
+        />
+      </section>
       <div className="mt-10 grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-4 lg:grid-cols-4 lg:gap-8">
         <StatCard
           title="Issued Books"

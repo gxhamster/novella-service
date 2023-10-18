@@ -29,7 +29,7 @@ export default function NGlobalSearchModal({
           <div className="fixed inset-0 bg-black bg-opacity-25" />
         </Transition.Child>
         // Add backdrop
-        <div className="fixed inset-0 bg-surface-100/50" aria-hidden="true" />
+        <div className="fixed inset-0 bg-surface-100/70" aria-hidden="true" />
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex  mt-20 items-start justify-center text-center">
             <Transition.Child

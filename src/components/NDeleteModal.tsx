@@ -6,7 +6,7 @@ import LoadingIcon from "./icons/LoadingIcon";
 type NDeleteModalProps = {
   isOpen: boolean;
   closeModal: () => void;
-  onDelete: () => Promise<any>;
+  onDelete: () => void;
   isDeleting?: boolean;
   title?: string;
   description?: string;
