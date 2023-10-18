@@ -44,6 +44,7 @@ export default async function Dashboard() {
       </section>
       <div className="mt-10 grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-4 lg:grid-cols-4 lg:gap-8">
         <StatCard
+          href="/dashboard/history"
           title="Issued Books"
           subtitle="Number of books issued to students"
           stat={totalIssuedBooks}
@@ -51,6 +52,7 @@ export default async function Dashboard() {
           <IssueBookIcon />
         </StatCard>
         <StatCard
+          href="/dashboard/issued"
           title="Unreturned Books"
           subtitle="Books that are not returned back to the library"
           stat={totalUnreturnedBooks}
@@ -58,6 +60,7 @@ export default async function Dashboard() {
           <UnreturnedBookIcon />
         </StatCard>
         <StatCard
+          href="/dashboard/students"
           title="Students"
           subtitle="Number of students registered in the libraary"
           stat={totalStudents}
@@ -65,6 +68,7 @@ export default async function Dashboard() {
           <UserIcon />
         </StatCard>
         <StatCard
+          href="/dashboard/books"
           title="Books"
           subtitle="Number of books added to library"
           stat={totalBooks}

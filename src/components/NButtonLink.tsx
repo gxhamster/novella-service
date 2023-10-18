@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 interface NButtonLink extends React.ComponentPropsWithoutRef<"a"> {
-  kind?: "primary" | "secondary" | "ghost" | "alert";
+  kind?: "primary" | "secondary" | "ghost" | "alert" | "default";
   title?: string;
   size?: "xs" | "sm" | "normal" | "lg" | "xl";
   icon?: React.ReactNode;
@@ -31,6 +31,7 @@ const sizes = {
 };
 
 const colors = {
+  default: "",
   primary:
     "bg-primary-500 hover:bg-primary-400 text-surface-900 border-[1px] border-primary-500 focus:border-primary-900 transition-colors disabled:bg-primary-400 disabled:opacity-80",
   secondary:
