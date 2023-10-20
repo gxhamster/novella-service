@@ -4,8 +4,8 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import Image from "next/image";
 import NovellaInput from "@/components/NovellaInput";
 import NButton from "@/components/NButton";
-import NovellaLogo from "../../../public/icon.png";
-import { trpc } from "../_trpc/client";
+import NovellaLogo from "@/../public/icon.png";
+import { trpc } from "../../_trpc/client";
 import { toast } from "react-toastify";
 
 type LoginPageInputs = {

@@ -1,8 +1,11 @@
 import NModal from "@/components/NModal";
 import NButton from "@/components/NButton";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { Dispatch, MouseEventHandler, SetStateAction } from "react";
 import { trpc } from "@/app/_trpc/client";
 import { toast } from "react-toastify";
+import NovellaInput from "@/components/NovellaInput";
+import { format } from "date-fns";
 
 type ReturnBookModalProps = {
   isReturnBookModalOpen: boolean;
@@ -17,6 +20,20 @@ export default function ReturnBookModal({
   returnBookID,
   onBookReturned,
 }: ReturnBookModalProps) {
+  type ReturnBookForm = {
+    returned_date: string;
+  };
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ReturnBookForm>({
+    defaultValues: {
+      returned_date: format(new Date(), "yyyy-MM-dd'T'hh:mm"),
+    },
+  });
+
   const getIssuedBookByIdQuery = trpc.issued.getIssuedBookById.useQuery(
     returnBookID ? returnBookID : 0
   );
@@ -42,8 +59,7 @@ export default function ReturnBookModal({
     },
   });
 
-  const returnButtonHandler: MouseEventHandler<HTMLButtonElement> = (event) => {
-    event.preventDefault();
+  const returnButtonHandler: SubmitHandler<ReturnBookForm> = (formData) => {
     // Retrieve Issued Book Details before deleting
     const issuedBook = getIssuedBookByIdQuery.data?.data;
 
@@ -56,7 +72,7 @@ export default function ReturnBookModal({
         student_id: issuedBook.student_id,
         due_date: issuedBook.due_date,
         issued_date: issuedBook.created_at,
-        returned_date: new Date().toISOString(),
+        returned_date: new Date(formData.returned_date).toISOString(),
       };
       // Add Issue Detail to History Table
       createHistoryMutation.mutate(historyBookRecord);
@@ -73,11 +89,18 @@ export default function ReturnBookModal({
       isOpen={isReturnBookModalOpen}
       onModalClose={() => setIsReturnBookModalOpen(false)}
     >
-      <form>
-        <section className="text-surface-700 p-6">
+      <form onSubmit={handleSubmit(returnButtonHandler)}>
+        <section className="text-surface-700 p-6 flex flex-col gap-3">
           <p className="text-sm">
             Do you want to return the book from the student to the library ?
           </p>
+          <NovellaInput
+            type="datetime-local"
+            title="Return Date"
+            helpText="Returned date will default to today"
+            reactHookErrorMessage={errors.returned_date}
+            reactHookRegister={register("returned_date")}
+          />
         </section>
         <section className="flex gap-2 border-t-[1px] border-surface-300 p-2 justify-end">
           <NButton
@@ -97,7 +120,6 @@ export default function ReturnBookModal({
               deleteIssuedBookByIdMutation.isLoading ||
               createHistoryMutation.isLoading
             }
-            onClick={returnButtonHandler}
           />
         </section>
       </form>

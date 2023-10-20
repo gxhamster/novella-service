@@ -9,7 +9,7 @@ const stylesContext: Record<TypeOptions, { borderColor: string }> = {
     borderColor: "border-primary-600",
   },
   success: {
-    borderColor: "border-success-600",
+    borderColor: "border-success-700",
   },
   warning: {
     borderColor: "border-warning-200",

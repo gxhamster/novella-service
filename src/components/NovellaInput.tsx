@@ -6,8 +6,8 @@ interface NovellaInputProps<NovellaInputField extends string>
   title: string;
   reactHookRegister: UseFormRegisterReturn<NovellaInputField>;
   reactHookErrorMessage: FieldError | undefined;
-  helpText?: string;
   labelDirection?: "horizontal" | "vertical";
+  helpText?: string;
   fontSize?: "xs" | "sm" | "md" | "lg";
   suffixContent?: React.ReactNode;
 }
@@ -71,7 +71,7 @@ function NovellaInput<NovellaInputField extends string>({
           <span className={`mt-2 text-alert-600 block text-${fontSize}`}>
             {reactHookErrorMessage?.message}
           </span>
-          <span className="mt-2 text-surface-500 block text-sm">
+          <span className="mt-1 text-surface-500 block text-sm">
             {helpText}
           </span>
         </div>
