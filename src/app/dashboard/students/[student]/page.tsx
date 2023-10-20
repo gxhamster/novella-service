@@ -3,11 +3,11 @@
 import { useForm, useWatch } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { IStudent } from "@/supabase/types/supabase";
-import ButtonSecondary from "@/components/ButtonSecondary";
-import ButtonPrimary from "@/components/ButtonPrimary";
 import NovellaInput from "@/components/NovellaInput";
 import NCategoryCard from "@/components/NCategoryCard";
 import { trpc } from "@/app/_trpc/client";
+import NButton from "@/components/NButton";
+import { toast } from "react-toastify";
 
 type StudentFieldsCategories<T> = {
   title: string;
@@ -16,6 +16,7 @@ type StudentFieldsCategories<T> = {
     title: string;
     field: keyof T;
     disabled: boolean;
+    isNumber?: boolean;
   }>;
 };
 const categories: StudentFieldsCategories<IStudent>[] = [
@@ -27,6 +28,7 @@ const categories: StudentFieldsCategories<IStudent>[] = [
         title: "ID",
         field: "id",
         disabled: true,
+        isNumber: true,
       },
       {
         title: "Created At",
@@ -74,6 +76,7 @@ const categories: StudentFieldsCategories<IStudent>[] = [
         title: "Index",
         field: "index",
         disabled: false,
+        isNumber: true,
       },
     ],
   },
@@ -128,11 +131,13 @@ export default function Student({ params }: StudentProps) {
   const updateStudentByIdMutation = trpc.students.updateStudentById.useMutation(
     {
       onError: (_error) => {
+        toast.error(`Could not update student: ${_error.message}`);
         throw new Error(_error.message, {
           cause: _error.data,
         });
       },
       onSuccess: () => {
+        toast.success(`Successfully updated student`);
         getStudentByIdQuery.refetch();
         if (getStudentByIdQuery.data?.data)
           reset(getStudentByIdQuery.data?.data);
@@ -176,7 +181,8 @@ export default function Student({ params }: StudentProps) {
             <div className="flex justify-between items-center">
               <h3 className="text-2xl text-surface-700 font-light">{`Student Ref: ${params.student}`}</h3>
               <div className="flex gap-2">
-                <ButtonSecondary
+                <NButton
+                  kind="secondary"
                   onClick={(e) => {
                     e.preventDefault();
                     if (getStudentByIdQuery.data?.data)
@@ -185,7 +191,12 @@ export default function Student({ params }: StudentProps) {
                   disabled={!formValuesChanged}
                   title="Cancel"
                 />
-                <ButtonPrimary disabled={!formValuesChanged} title="Save" />
+                <NButton
+                  kind="primary"
+                  disabled={!formValuesChanged}
+                  title="Update"
+                  isLoading={updateStudentByIdMutation.isLoading}
+                />
               </div>
             </div>
             {categories.map((category) => (
@@ -200,6 +211,7 @@ export default function Student({ params }: StudentProps) {
                     type="text"
                     title={field.title}
                     reactHookRegister={register(field.field, {
+                      valueAsNumber: field.isNumber,
                       disabled: field.disabled,
                     })}
                     reactHookErrorMessage={errors[field.field]}

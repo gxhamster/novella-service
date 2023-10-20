@@ -44,7 +44,7 @@ export default async function Dashboard() {
       </section>
       <div className="mt-10 grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-4 lg:grid-cols-4 lg:gap-8">
         <StatCard
-          href="/dashboard/history"
+          href="/dashboard/issued/history"
           title="Issued Books"
           subtitle="Number of books issued to students"
           stat={totalIssuedBooks}

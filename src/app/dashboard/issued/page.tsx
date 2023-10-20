@@ -69,7 +69,7 @@ export default function Issued() {
         cell: (cell) => (
           <button
             title="Return"
-            className="text-sm appearance-none underline text-primary-600"
+            className="text-sm appearance-none  text-primary-600 hover:text-primary-700 hover:underline"
             onClick={() => {
               setReturnBookID(cell.row.getAllCells()[1].getValue() as number);
               setIsReturnBookModalOpen(true);

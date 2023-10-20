@@ -227,8 +227,9 @@ export default function BookSummary({ data }: { data: IBook }) {
               />
               <NButton
                 kind="primary"
+                isLoading={updateBookByIdMutation.isLoading}
                 disabled={!formValuesChangedFromDefault}
-                title="Save"
+                title="Update"
               />
             </div>
           </div>
