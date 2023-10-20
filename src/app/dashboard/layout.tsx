@@ -1,7 +1,6 @@
 "use client";
 import NovellaHeader from "@/components/NovellaHeader";
 import NovellaSidebar from "@/components/NovellaSidebar";
-import Provider from "../_trpc/Provider";
 import ToastProvider from "@/components/ToastProvider";
 
 type DashboardLayoutProps = {
@@ -10,7 +9,7 @@ type DashboardLayoutProps = {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <Provider>
+    <>
       <ToastProvider />
       <div className="bg-surface-100 text-white flex overflow-y-hidden h-screen max-h-screen">
         <NovellaSidebar />
@@ -21,6 +20,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </main>
         </section>
       </div>
-    </Provider>
+    </>
   );
 }

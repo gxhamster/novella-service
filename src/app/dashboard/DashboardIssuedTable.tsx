@@ -1,36 +1,47 @@
 "use client";
 import NovellaDataTable from "@/components/NovellaDataTable";
 import { createColumnHelper } from "@tanstack/react-table";
-import { IssuedBooksResult } from "@/supabase/client";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "@/supabase/types/supabase";
+
+type IssuedBookDef = {
+  id: number;
+  student_name: string;
+  title: string;
+  issue_date: string;
+  due_date: string;
+};
 
 export default function DashboardIssuedTable({ issuedBooks }: any) {
   const getIssuedBooks = async () => {
     const supabase = createClientComponentClient<Database>();
-    let { data: issued, error } = await supabase
+    let { data: issued } = await supabase
       .from("issued")
       .select("id, created_at, due_date, students(name), books(title)");
 
-    const issuedBooks = issued?.map((books) => {
-      const newObj = {
-        id: books.id,
-        student_name: books?.students?.name,
-        title: books?.books?.title,
-        issue_date: books.created_at,
-        due_date: books.due_date,
-      } as IssuedBooksResult;
+    if (issued) {
+      const issuedBooks: IssuedBookDef[] = issued?.map((books) => {
+        const newObj = {
+          id: books.id,
+          student_name: books.students?.name ? books.students.name : "",
+          title: books?.books?.title ? books.books.title : "",
+          issue_date: books.created_at,
+          due_date: books.due_date ? books.due_date : "",
+        };
 
-      return newObj;
-    });
+        return newObj;
+      });
 
-    const { data, count } = await supabase
-      .from("issued")
-      .select("*", { head: true, count: "exact" });
+      const { count } = await supabase
+        .from("issued")
+        .select("*", { head: true, count: "exact" });
 
-    return { data: issuedBooks, count };
+      return { data: issuedBooks, count: count ? count : 0 };
+    } else {
+      return { data: [], count: 0 };
+    }
   };
-  const columnHelper = createColumnHelper<IssuedBooksResult>();
+  const columnHelper = createColumnHelper<IssuedBookDef>();
   const columns = [
     columnHelper.accessor("id", {
       cell: (info) => info.getValue(),
@@ -54,7 +65,7 @@ export default function DashboardIssuedTable({ issuedBooks }: any) {
     }),
   ];
   return (
-    <NovellaDataTable<IssuedBooksResult>
+    <NovellaDataTable<IssuedBookDef>
       columns={columns}
       fetchData={getIssuedBooks}
     />

@@ -13,7 +13,7 @@ import LoadingIcon from "../icons/LoadingIcon";
 
 type QueryResultItem = {
   id: number;
-  type: "book" | "student"
+  type: "book" | "student";
   title: string;
   subtitle: string;
   baseHref: string;
@@ -42,10 +42,11 @@ function QueryResultItems({ items, onClick }: QueryResultsProps) {
             className="flex items-center hover:bg-surface-300 hover:text-surface-900 justify-between p-2 cursor-pointer transition-all duration-75"
           >
             <div className="flex gap-2 items-center">
-              {
-                item.type === "book" ? <BookIcon size={30} /> : <UserIcon size={30}/>
-
-              }
+              {item.type === "book" ? (
+                <BookIcon size={30} />
+              ) : (
+                <UserIcon size={30} />
+              )}
               <div className="flex flex-col transition-all">
                 <span className="text-lg font-light">{item.title}</span>
                 <span className="text-sm text-surface-600">
@@ -76,7 +77,10 @@ export default function NGlobalSearch() {
       const { data: booksSearchResult } = await supabase
         .from("books")
         .select()
-        .textSearch("searchcol", `${debouncedSearchValue.split(" ").join("|")}`);
+        .textSearch(
+          "searchcol",
+          `${debouncedSearchValue.split(" ").join("|")}`
+        );
 
       if (booksSearchResult !== null) {
         const newBookSearchResult: QueryResultItem[] = booksSearchResult.map(
@@ -86,7 +90,7 @@ export default function NGlobalSearch() {
             title: book.title ? book.title : "",
             subtitle: book.author ? book.author : "",
             baseHref: "/dashboard/books/",
-          }),
+          })
         );
         setQueryResults([...newBookSearchResult]);
       }
@@ -94,7 +98,10 @@ export default function NGlobalSearch() {
       const { data: studentsSearchResults } = await supabase
         .from("students")
         .select()
-        .textSearch("searchcol", `${debouncedSearchValue.split(" ").join("|")}`);
+        .textSearch(
+          "searchcol",
+          `${debouncedSearchValue.split(" ").join("|")}`
+        );
 
       if (studentsSearchResults !== null) {
         const newStudentsSearchResult: QueryResultItem[] =
@@ -105,7 +112,10 @@ export default function NGlobalSearch() {
             subtitle: student.index ? String(student.index) : "",
             baseHref: "/dashboard/students/",
           }));
-        setQueryResults((oldValue) => [...oldValue, ...newStudentsSearchResult]);
+        setQueryResults((oldValue) => [
+          ...oldValue,
+          ...newStudentsSearchResult,
+        ]);
       }
       setIsSearchResultsLoading(false);
     }
@@ -131,10 +141,15 @@ export default function NGlobalSearch() {
               className="appearance-none outline-none bg-opacity-0 bg-surface-100 w-full text-base"
             />
             <div className="flex gap-2 items-center">
-            { isSearchResultsLoading ? <LoadingIcon />: null}
-            <button className="flex items-center" onClick={() => setIsSearchModalOpen(false)}>
-              <kbd className="text-xs px-1 py-0.5 border-[1px] rounded-sm">Esc</kbd>
-            </button>
+              {isSearchResultsLoading ? <LoadingIcon /> : null}
+              <button
+                className="flex items-center"
+                onClick={() => setIsSearchModalOpen(false)}
+              >
+                <kbd className="text-xs px-1 py-0.5 border-[1px] rounded-sm">
+                  ESC
+                </kbd>
+              </button>
             </div>
           </div>
         }

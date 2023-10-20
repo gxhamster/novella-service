@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { IBM_Plex_Sans } from "next/font/google";
+import Provider from "./_trpc/Provider";
 
 const ibmPlex = IBM_Plex_Sans({
   weight: ["100", "200", "300", "400", "500", "600", "700"],
@@ -23,7 +24,7 @@ export default function RootLayout({
       <body
         className={`${ibmPlex.className} min-h-full flex flex-col overflow-hidden bg-surface-100`}
       >
-        {children}
+        <Provider>{children}</Provider>
       </body>
     </html>
   );

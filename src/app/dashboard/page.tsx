@@ -84,22 +84,6 @@ export default async function Dashboard() {
           </div>
         </div>
       </div>
-      <div className="mt-10">
-        <span className="text-1xl text-surface-800">Recently Issued Books</span>
-        <div className="mt-10">
-          <div className="bg-surface-200 w-full m-0">
-            <DashboardIssuedTable />
-          </div>
-        </div>
-      </div>
-      <div className="mt-10">
-        <span className="text-1xl text-surface-800">Recently Issued Books</span>
-        <div className="mt-10">
-          <div className="bg-surface-200 w-full m-0">
-            <DashboardIssuedTable />
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

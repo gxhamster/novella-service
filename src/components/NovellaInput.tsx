@@ -68,7 +68,7 @@ function NovellaInput<NovellaInputField extends string>({
               {suffixContent}
             </div>
           </div>
-          <span className={`mt-2 text-alert-600 block ${fontSize}`}>
+          <span className={`mt-2 text-alert-600 block text-${fontSize}`}>
             {reactHookErrorMessage?.message}
           </span>
           <span className="mt-2 text-surface-500 block text-sm">
