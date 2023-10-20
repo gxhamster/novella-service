@@ -36,7 +36,7 @@ export default function ToastProvider() {
       toastClassName={(opts) => {
         return `bg-surface-300 text-surface-800 text-sm border-l-4 ${
           stylesContext[opts?.type ? opts.type : "default"].borderColor
-        } m-2 relative flex p-2 min-h-10 rounded-md justify-between overflow-hidden cursor-pointer`;
+        } m-2 relative flex p-2 min-h-10 justify-between overflow-hidden cursor-pointer`;
       }}
     />
   );
