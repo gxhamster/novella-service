@@ -2,7 +2,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { trpc } from "./client";
-import { isProduction, productionUrl } from "./serverClient";
+import { vercelIsProduction, vercelProductionUrl } from "@/productionEnv";
 
 type ProviderProps = {
   children: React.ReactNode;
@@ -13,7 +13,9 @@ export default function Provider({ children }: ProviderProps) {
   const trpcClient = trpc.createClient({
     links: [
       httpBatchLink({
-        url: isProduction ? productionUrl : "http://localhost:3000/api/trpc",
+        url: vercelIsProduction
+          ? vercelProductionUrl
+          : "http://localhost:3000/api/trpc",
       }),
     ],
   });
