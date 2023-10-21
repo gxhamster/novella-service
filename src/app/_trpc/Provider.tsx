@@ -2,20 +2,25 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { trpc } from "./client";
-import { vercelIsProduction, vercelProductionUrl } from "@/productionEnv";
 
 type ProviderProps = {
   children: React.ReactNode;
 };
+
+function getBaseUrl() {
+  if (process.env.VERCEL_ENV === "production" && process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+
+  return `http://localhost:${process.env.PORT ?? 3000}`;
+}
 
 export default function Provider({ children }: ProviderProps) {
   const queryClient = new QueryClient();
   const trpcClient = trpc.createClient({
     links: [
       httpBatchLink({
-        url: vercelIsProduction
-          ? vercelProductionUrl
-          : "http://localhost:3000/api/trpc",
+        url: `${getBaseUrl()}/api/trpc`,
       }),
     ],
   });
