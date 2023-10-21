@@ -7,15 +7,14 @@ import { Database } from "@/supabase/types/supabase";
 import { inferAsyncReturnType } from "@trpc/server";
 
 export function createContext() {
-  const cookieStore = cookies();
   const supabase = createRouteHandlerClient<Database>({
-    cookies: () => cookieStore,
+    cookies,
   });
   return { supabase };
 }
 export type Context = inferAsyncReturnType<typeof createContext>;
 
-const handler = (req: Request) =>
+const handler = async (req: Request) =>
   fetchRequestHandler({
     endpoint: "/api/trpc",
     req,

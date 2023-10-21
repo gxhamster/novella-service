@@ -29,7 +29,7 @@ export default function Login() {
     },
     onSuccess: () => {
       toast.success("Succesfully logged in to novella 👍");
-      router.push("/dashboard");
+      router.replace("/dashboard");
     },
   });
 
@@ -46,8 +46,8 @@ export default function Login() {
           <div className="flex gap-2 items-center">
             <Image
               src={NovellaLogo}
-              width={40}
-              height={40}
+              width={50}
+              height={50}
               alt="Novella Logo"
             />
             <h2 className="text-2xl font-semibold text-surface-900">novella</h2>
@@ -103,7 +103,7 @@ export default function Login() {
         </div>
       </section>
       <section className="flex items-center justify-center p-40">
-        <p className="text-5xl leading-snug">
+        <p className="text-4xl leading-snug text-surface-800">
           Manage your library more efficiently and productively with novella. It
           shouldn't be hard to do this. 👍
         </p>

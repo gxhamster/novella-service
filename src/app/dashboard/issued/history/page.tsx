@@ -49,7 +49,9 @@ export default function Issued() {
   const historyBooksTableCols: Array<HistoryBooksTableDef> = [
     { id: "id", header: "ID" },
     { id: "book_id", header: "Book ID", baseHref: "/dashboard/books" },
+    { id: "books.title", header: "Title" },
     { id: "student_id", header: "Student ID", baseHref: "/dashboard/students" },
+    { id: "students.name", header: "Name" },
     { id: "issued_date", header: "Issued Date", isDate: true },
     { id: "due_date", header: "Due Date", isDate: true },
     { id: "returned_date", header: "Returned Date", isDate: true },

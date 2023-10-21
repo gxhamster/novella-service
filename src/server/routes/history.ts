@@ -34,9 +34,11 @@ export const HistoryRouter = router({
       const { supabase } = opts.ctx;
       const supabaseFilters = NDataTableFixedConvertToSupabaseFilters(filters);
 
-      let query = supabase.from("history").select("*", {
-        count: "estimated",
-      });
+      let query = supabase
+        .from("history")
+        .select("*, book_id, books(title), student_id, students(name)", {
+          count: "estimated",
+        });
       if (filters.length > 0) query = query.or(supabaseFilters);
       if (sorts)
         query = query.order(sorts.field, { ascending: sorts.ascending });

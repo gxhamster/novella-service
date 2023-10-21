@@ -20,16 +20,16 @@ export default function StatCard({
       <div className="flex flex-col h-16 gap-1 text-xl">
         <div className="flex items-center gap-4">
           {children}
-          <span className="text-surface-800 group-hover:text-surface-900 text-xl">{title}</span>
+          <span className="text-surface-800 group-hover:text-surface-900 text-xl">
+            {title}
+          </span>
         </div>
-        <span className="text-surface-700 group-hover:text-surface-900 text-sm">{subtitle}</span>
+        <span className="text-surface-700 group-hover:text-surface-900 text-sm">
+          {subtitle}
+        </span>
       </div>
       <div className="flex justify-between items-end">
-        {stat ? (
-          <span className="text-6xl text-surface-950 mt-6">{stat}</span>
-        ) : (
-          0
-        )}
+        <span className="text-6xl text-surface-950 mt-6">{stat || 0}</span>
         <NButtonLink
           kind="default"
           href={href}
