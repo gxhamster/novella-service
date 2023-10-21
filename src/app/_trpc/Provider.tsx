@@ -2,6 +2,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { trpc } from "./client";
+import { isProduction, productionUrl } from "./serverClient";
 
 type ProviderProps = {
   children: React.ReactNode;
@@ -12,7 +13,7 @@ export default function Provider({ children }: ProviderProps) {
   const trpcClient = trpc.createClient({
     links: [
       httpBatchLink({
-        url: "http://localhost:3000/api/trpc",
+        url: isProduction ? productionUrl : "http://localhost:3000/api/trpc",
       }),
     ],
   });
