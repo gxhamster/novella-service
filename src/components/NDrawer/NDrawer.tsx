@@ -17,7 +17,6 @@ export default function NDrawer({
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-20" onClose={closeDrawer}>
-        // Add backdrop
         <div className="fixed inset-0 bg-surface-100/50" aria-hidden="true" />
         <div className="fixed inset-0 overflow-x-hidden">
           <Transition.Child

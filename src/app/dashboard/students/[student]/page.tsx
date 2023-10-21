@@ -104,7 +104,7 @@ function useFormValuesChanged<T>({
         if (currentFormValues[key] !== srcData[key]) setResult(true);
       }
     }
-  }, [currentFormValues]);
+  }, [currentFormValues, srcData]);
 
   return result;
 }

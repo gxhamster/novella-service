@@ -105,7 +105,7 @@ export default function Login() {
       <section className="flex items-center justify-center p-40">
         <p className="text-4xl leading-snug text-surface-800">
           Manage your library more efficiently and productively with novella. It
-          shouldn't be hard to do this. 👍
+          shouldn&apos;t be hard to do this.👍
         </p>
       </section>
     </>

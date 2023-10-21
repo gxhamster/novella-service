@@ -92,7 +92,7 @@ function SortControls<T>({
           Pick a column to sort by
         </option>
         {fields.map((field) => (
-          <option>{String(field.id)}</option>
+          <option key={Number(field.id)}>{String(field.id)}</option>
         ))}
       </Select>
       <ButtonSecondary

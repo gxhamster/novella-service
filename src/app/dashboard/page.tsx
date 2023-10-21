@@ -9,6 +9,8 @@ import { cookies } from "next/headers";
 import AddIcon from "@/components/icons/AddIcon";
 import NButtonLink from "@/components/NButtonLink";
 
+export const dynamic = "force-dynamic";
+
 export default async function Dashboard() {
   // FIXME: Move to server
   const supabase = createServerComponentClient({ cookies });

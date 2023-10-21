@@ -202,7 +202,7 @@ export default function BookSummary({ data }: { data: IBook }) {
   useEffect(() => {
     const result = checkIfFieldsChanged();
     setFormValuesChangedFromDefault(result);
-  }, [formWatchedValues]);
+  }, [formWatchedValues, checkIfFieldsChanged]);
 
   return (
     <div className="relative">

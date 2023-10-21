@@ -82,6 +82,7 @@ function FilterGroup({ filters, setFilters, tableProps }: FilterGroupProps) {
     <div className="flex flex-col gap-3 items-center w-full text-surface-600">
       {filters.map((filter, idx) => (
         <FilterItem
+          key={filter.id}
           filter={filter}
           tableProps={tableProps}
           filterItemRemoved={() => {
