@@ -7,6 +7,9 @@ export function NDataTableFixedConvertToSupabaseFilters(
   filters: NDataTableFixedFilter[]
 ): string {
   const filterStrArr = filters.map((filter, idx) => {
+    if (filter.operator === "like") {
+      return `${filter.prop}.${filter.operator}.%${filter.value}%`;
+    }
     return `${filter.prop}.${filter.operator}.${filter.value}`;
   });
 

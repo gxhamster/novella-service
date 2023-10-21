@@ -49,7 +49,7 @@ function FilterItem({
           filterItemChanged({ ...filter, operator: e.target.value });
         }}
       >
-        {["eq", "gt", "lt"].map((v) => (
+        {["eq", "gt", "lt", "ilike"].map((v) => (
           <option key={v}>{v}</option>
         ))}
       </Select>
