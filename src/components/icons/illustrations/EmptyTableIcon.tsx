@@ -2,7 +2,7 @@ type EmptyTableIllustrationProps = {
   size: number;
 };
 
-export default function EmptyTableIllustration({
+export default function EmptyTableIcon({
   size = 400,
 }: EmptyTableIllustrationProps) {
   return (

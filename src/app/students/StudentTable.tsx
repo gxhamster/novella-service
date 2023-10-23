@@ -78,7 +78,7 @@ export default function StudentsTable() {
       cell: (info) =>
         column.isLink ? (
           <Link
-            href={`/dashboard/students/${info.getValue()}`}
+            href={`/students/${info.getValue()}`}
             className="hover:underline hover:text-primary-700"
           >
             {info.getValue()}

@@ -1,5 +1,5 @@
 "use client";
-import ToastProvider from "@/components/ToastProvider";
+import ToastProvider from "@/components/NToast/ToastProvider";
 
 type LoginLayoutProps = {
   children: React.ReactNode;

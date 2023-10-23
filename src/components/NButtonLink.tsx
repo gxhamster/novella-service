@@ -3,11 +3,15 @@ import Link from "next/link";
 interface NButtonLink extends React.ComponentPropsWithoutRef<"a"> {
   kind?: "primary" | "secondary" | "ghost" | "alert" | "default";
   title?: string;
-  size?: "xs" | "sm" | "normal" | "lg" | "xl";
+  size?: "default" | "xs" | "sm" | "normal" | "lg" | "xl";
   icon?: React.ReactNode;
 }
 
 const sizes = {
+  default: {
+    padding: "",
+    text: "text-xs",
+  },
   xs: {
     padding: "px-1 py-1",
     text: "text-xs",

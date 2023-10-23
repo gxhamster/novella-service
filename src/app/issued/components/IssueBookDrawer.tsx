@@ -7,8 +7,8 @@ import NButton from "@/components/NButton";
 import LeftArrowIcon from "@/components/icons/LeftArrowIcon";
 import SelectBookDrawer from "./SelectBookDrawer";
 import SelectStudentDrawer from "./SelectStudentDrawer";
-import { toast } from "react-toastify";
 import { trpc } from "@/app/_trpc/client";
+import NToast from "@/components/NToast";
 
 type IssueBookDrawerProps = {
   isIssueBookDrawerOpen: boolean;
@@ -27,11 +27,11 @@ export default function IssueBookDrawer({
   const [isAddStudentDrawerOpen, setIsAddStudentDrawerOpen] = useState(false);
   const createIssuedBookMutation = trpc.issued.createIssuedBook.useMutation({
     onError: (_error) => {
-      toast.error(`Cannot issue book. ${_error.message}`);
+      NToast.error("Cannot Issue Book", `${_error.message}`);
       throw new Error(_error.message);
     },
     onSuccess: () => {
-      toast.success(`Successfully issued a new book`);
+      NToast.success("Successful", `Issued a new book`);
       onBookIssued();
     },
   });

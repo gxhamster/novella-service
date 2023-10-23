@@ -10,22 +10,22 @@ import { useEffect, useMemo, useState } from "react";
 import RightArrowIcon from "./icons/RightArrowIcon";
 import LeftArrowIcon from "./icons/LeftArrowIcon";
 import LoadingIcon from "./icons/LoadingIcon";
+import BoxIcon from "./icons/BoxIcon";
 
 type NovellaDataTableProps<T> = {
-  fetchData: ({
-    pageIndex,
-    pageSize,
-  }: PaginationState) => Promise<{ data: any; count: number }>;
+  data: T[] | undefined;
+  isDataLoading: boolean;
+  isDataRefetching: boolean;
   columns: ColumnDef<T, any>[];
 };
 export default function NovellaDataTable<T>({
-  fetchData,
+  data,
+  isDataLoading = true,
+  isDataRefetching = true,
   columns,
 }: NovellaDataTableProps<T>) {
   // Fixme: Remove the any type and put proper typing :(
-  const [data, setData] = useState<any>([]);
-  const [totalPageCount, setTotalPageCount] = useState(data.length);
-  const [isLoading, setIsLoading] = useState(true);
+  const [totalPageCount, setTotalPageCount] = useState(data ? data.length : 0);
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -39,7 +39,7 @@ export default function NovellaDataTable<T>({
   );
 
   const table = useReactTable({
-    data,
+    data: data ? data : [],
     columns,
     state: {
       pagination,
@@ -52,18 +52,7 @@ export default function NovellaDataTable<T>({
     getCoreRowModel: getCoreRowModel(),
   });
 
-  useEffect(() => {
-    setIsLoading(true);
-    const getData = async () => {
-      const { data, count } = await fetchData({ pageIndex, pageSize });
-      // Fixme: Put the proper typing
-      setData(() => [...data]);
-      const pageCount = Math.floor(count / pageSize);
-      setTotalPageCount(pageCount < 1 ? 1 : pageCount);
-      setIsLoading(false);
-    };
-    getData();
-  }, [pageIndex, pageSize, fetchData]);
+  useEffect(() => {}, [pageIndex, pageSize]);
 
   return (
     <div>
@@ -72,7 +61,10 @@ export default function NovellaDataTable<T>({
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <th key={header.id} className="text-start p-2 px-4 text-sm">
+                <th
+                  key={header.id}
+                  className="text-start p-2 px-4 font-medium text-sm"
+                >
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -85,25 +77,37 @@ export default function NovellaDataTable<T>({
           ))}
         </thead>
         <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr
-              key={row.id}
-              className={`${
-                row.getIsSelected() ? "bg-surface-300/40" : "bg-surface-200"
-              } text-surface-800 font-light text-sm border-b-[0.7px] border-surface-400 cursor-pointer hover:bg-surface-300/40 transition-colors`}
-              onClick={() => row.toggleSelected()}
-            >
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="p-2 px-4 text-ellipsis">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
+          {data && data.length !== 0 ? (
+            table.getRowModel().rows.map((row) => (
+              <tr
+                key={row.id}
+                className={`${
+                  row.getIsSelected() ? "bg-surface-300/40" : "bg-surface-200"
+                } text-surface-800 font-[350] text-sm border-b-[0.7px] border-surface-400 transition-colors`}
+                onClick={() => row.toggleSelected()}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className="p-2 px-4 text-ellipsis">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={12} className="">
+                <div className=" text-surface-800  w-full text-center p-4 flex items-center justify-center gap-2">
+                  <BoxIcon size={20} />
+                  <span className="font-light text-lg">Empty table</span>
+                </div>
+              </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
+
       {/* Table Controls */}
-      <div className="flex justify-between items-center px-4 py-1 bg-surface-200 gap-2 text-sm">
+      <div className="flex justify-between items-center px-4 py-1 border-t-[1px] border-surface-300 bg-surface-200 text-surface-700 gap-2 text-sm">
         <div className="flex gap-6 items-center">
           <p>Items per page</p>
           <select
@@ -117,7 +121,7 @@ export default function NovellaDataTable<T>({
               </option>
             ))}
           </select>
-          {isLoading ? (
+          {isDataLoading || isDataRefetching ? (
             <div className="flex gap-2 text-xs items-center">
               {" "}
               <LoadingIcon size={18} /> <span>Loading data...</span>

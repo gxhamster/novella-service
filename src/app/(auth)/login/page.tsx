@@ -6,7 +6,7 @@ import NovellaInput from "@/components/NovellaInput";
 import NButton from "@/components/NButton";
 import NovellaLogo from "@/../public/icon.png";
 import { trpc } from "../../_trpc/client";
-import { toast } from "react-toastify";
+import NToast from "@/components/NToast";
 
 type LoginPageInputs = {
   email: string;
@@ -22,13 +22,13 @@ export default function Login() {
 
   const signInMutation = trpc.auth.login.useMutation({
     onError: (_error) => {
-      toast.error(`Could not login due to: ${_error.message}`);
+      NToast.error("Could not login", `${_error.message}`);
       throw new Error(_error.message, {
         cause: _error.data,
       });
     },
     onSuccess: () => {
-      toast.success("Succesfully logged in to novella 👍");
+      NToast.success("Succesfully logged in to novella 👍");
       router.replace("/dashboard");
     },
   });

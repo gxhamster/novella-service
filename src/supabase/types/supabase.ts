@@ -21,6 +21,9 @@ export interface Database {
           language: string | null;
           pages: number | null;
           publisher: string | null;
+          searchcol: unknown | null;
+          times_issued: number | null;
+          times_returned: number | null;
           title: string | null;
           user_id: string;
           year: number | null;
@@ -36,6 +39,9 @@ export interface Database {
           language?: string | null;
           pages?: number | null;
           publisher?: string | null;
+          searchcol?: unknown | null;
+          times_issued?: number | null;
+          times_returned?: number | null;
           title?: string | null;
           user_id?: string;
           year?: number | null;
@@ -51,6 +57,9 @@ export interface Database {
           language?: string | null;
           pages?: number | null;
           publisher?: string | null;
+          searchcol?: unknown | null;
+          times_issued?: number | null;
+          times_returned?: number | null;
           title?: string | null;
           user_id?: string;
           year?: number | null;
@@ -153,6 +162,7 @@ export interface Database {
           island: string | null;
           name: string | null;
           phone: number | null;
+          searchcol: unknown | null;
           user_id: string;
           name_index: string | null;
         };
@@ -165,6 +175,7 @@ export interface Database {
           island?: string | null;
           name?: string | null;
           phone?: number | null;
+          searchcol?: unknown | null;
           user_id?: string;
         };
         Update: {
@@ -176,6 +187,7 @@ export interface Database {
           island?: string | null;
           name?: string | null;
           phone?: number | null;
+          searchcol?: unknown | null;
           user_id?: string;
         };
         Relationships: [];

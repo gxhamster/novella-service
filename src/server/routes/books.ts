@@ -17,6 +17,7 @@ export const BooksRouter = router({
     const resultBook = data ? data[0] : null;
     return { data: resultBook, error };
   }),
+
   getBooksByPage: publicProcedure
     .input(ZTableFetchFunctionOptions)
     .query(async (opts) => {
@@ -38,6 +39,7 @@ export const BooksRouter = router({
 
       return { data, count: count ? count : 0 };
     }),
+
   updateBookById: publicProcedure
     .input(ZBook.partial())
     .mutation(async (opts) => {
@@ -108,5 +110,34 @@ export const BooksRouter = router({
         code: "BAD_REQUEST",
         cause: error.details,
       });
+  }),
+
+  getTotalBooksCount: publicProcedure.query(async (opts) => {
+    const { supabase } = opts.ctx;
+
+    const { count } = await supabase
+      .from("books")
+      .select("*", { count: "exact", head: true });
+
+    return { count };
+  }),
+
+  getMostPopular: publicProcedure.query(async (opts) => {
+    const { supabase } = opts.ctx;
+
+    const { data, error } = await supabase
+      .from("books")
+      .select("*")
+      .order("times_issued", { ascending: false });
+
+    if (error) {
+      throw new TRPCError({
+        message: error.message,
+        cause: error.details,
+        code: "INTERNAL_SERVER_ERROR",
+      });
+    }
+
+    return { data: data ? data[0] : null };
   }),
 });

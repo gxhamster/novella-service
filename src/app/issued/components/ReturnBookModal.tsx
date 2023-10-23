@@ -1,11 +1,11 @@
 import NModal from "@/components/NModal";
 import NButton from "@/components/NButton";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Dispatch, MouseEventHandler, SetStateAction } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { trpc } from "@/app/_trpc/client";
-import { toast } from "react-toastify";
 import NovellaInput from "@/components/NovellaInput";
 import { format } from "date-fns";
+import NToast from "@/components/NToast";
 
 type ReturnBookModalProps = {
   isReturnBookModalOpen: boolean;
@@ -34,52 +34,27 @@ export default function ReturnBookModal({
     },
   });
 
-  const getIssuedBookByIdQuery = trpc.issued.getIssuedBookById.useQuery(
-    returnBookID ? returnBookID : 0
-  );
-
-  const deleteIssuedBookByIdMutation =
-    trpc.issued.deleteIssuedBookById.useMutation({
-      onError: (_error) => {
-        toast.error(`Could not return the book: ${_error.message}`);
-        throw new Error(_error.message);
-      },
-    });
-
-  const createHistoryMutation = trpc.history.createHistory.useMutation({
+  const returnBookMutation = trpc.issued.returnIssuedBook.useMutation({
     onSuccess: () => {
       setIsReturnBookModalOpen(false);
-      toast.success("Added book to history");
+      NToast.success("Successful", "Added book to history");
       onBookReturned();
     },
     onError: (_error) => {
       setIsReturnBookModalOpen(false);
-      toast.error(`Could not add book to history: ${_error.message}`);
+      NToast.error("Could not add book to history", `${_error.message}`);
       throw new Error(_error.message);
     },
   });
 
+  // FIXME: Move the intermdiary steps of moving to history to server. Have 1 function that can
+  // transfer a issued book to the history
   const returnButtonHandler: SubmitHandler<ReturnBookForm> = (formData) => {
-    // Retrieve Issued Book Details before deleting
-    const issuedBook = getIssuedBookByIdQuery.data?.data;
-
-    // Delete book from Issued Table
-    if (returnBookID) deleteIssuedBookByIdMutation.mutate(returnBookID);
-
-    if (issuedBook) {
-      const historyBookRecord = {
-        book_id: issuedBook.book_id,
-        student_id: issuedBook.student_id,
-        due_date: issuedBook.due_date,
-        issued_date: issuedBook.created_at,
+    if (returnBookID) {
+      returnBookMutation.mutate({
+        id: returnBookID,
         returned_date: new Date(formData.returned_date).toISOString(),
-      };
-      // Add Issue Detail to History Table
-      createHistoryMutation.mutate(historyBookRecord);
-    }
-
-    if (getIssuedBookByIdQuery.isError) {
-      throw new Error(getIssuedBookByIdQuery.error.message);
+      });
     }
   };
 
@@ -105,7 +80,7 @@ export default function ReturnBookModal({
         <section className="flex gap-2 border-t-[1px] border-surface-300 p-2 justify-end">
           <NButton
             kind="secondary"
-            size="sm"
+            size="normal"
             title="Cancel"
             onClick={(e) => {
               e.preventDefault();
@@ -114,12 +89,9 @@ export default function ReturnBookModal({
           />
           <NButton
             kind="primary"
-            size="sm"
+            size="normal"
             title="Return"
-            isLoading={
-              deleteIssuedBookByIdMutation.isLoading ||
-              createHistoryMutation.isLoading
-            }
+            isLoading={returnBookMutation.isLoading}
           />
         </section>
       </form>

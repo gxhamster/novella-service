@@ -7,8 +7,8 @@ import NDeleteModal from "@/components/NDeleteModal";
 import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
 import { trpc } from "@/app/_trpc/client";
 import { IHistory } from "@/supabase/types/supabase";
-import { toast } from "react-toastify";
 import { format } from "date-fns";
+import NToast from "@/components/NToast";
 
 export default function Issued() {
   const issuedBooksColHelper = createColumnHelper<IHistory>();
@@ -29,12 +29,12 @@ export default function Issued() {
 
   const deleteHistoryMutation = trpc.history.deleteHistoryByIds.useMutation({
     onError: (_error) => {
-      toast.error(`Could not delete history: ${_error.message}`);
+      NToast.error("Could not delete history", `${_error.message}`);
       throw new Error(_error.message);
     },
     onSuccess: () => {
       getHistoryByPageQuery.refetch();
-      toast.success(`Succesfully deleted the history`);
+      NToast.success("Successful", `Deleted the history`);
       setIsIssueBookDeleteModalOpen(false);
     },
   });

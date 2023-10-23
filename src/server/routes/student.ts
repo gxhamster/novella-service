@@ -127,4 +127,14 @@ export const StudentRouter = router({
           cause: error.details,
         });
     }),
+
+  getTotalStudents: publicProcedure.query(async (opts) => {
+    const { supabase } = opts.ctx;
+
+    const { count } = await supabase
+      .from("students")
+      .select("*", { count: "exact", head: true });
+
+    return { count };
+  }),
 });

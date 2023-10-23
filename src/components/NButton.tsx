@@ -10,16 +10,16 @@ interface NButton extends React.ComponentPropsWithoutRef<"button"> {
 
 const sizes = {
   xs: {
-    padding: "px-1 py-1",
+    padding: "px-1 py-0.5",
     text: "text-xs",
   },
   sm: {
-    padding: "px-2 py-2",
+    padding: "px-2 py-1",
     text: "text-sm",
   },
   normal: {
     padding: "px-4 py-2",
-    text: "text-normal",
+    text: "text-base",
   },
   lg: {
     padding: "px-5 py-3",
@@ -45,7 +45,7 @@ const colors = {
 export default function NButton({
   title,
   icon,
-  size = "sm",
+  size = "normal",
   kind = "primary",
   isLoading = false,
   ...rest
@@ -53,7 +53,7 @@ export default function NButton({
   return (
     <button
       {...rest}
-      className={`${sizes[size].padding} ${sizes[size].text} flex gap-2 items-center outline-none justify-center ${colors[kind]} ${rest.className}`}
+      className={`${sizes[size].padding} ${sizes[size].text} group text-surface-900 flex gap-2 items-center outline-none justify-center ${colors[kind]} ${rest.className}`}
     >
       {isLoading ? (
         <LoadingIcon className="text-surface-900" size={16} />

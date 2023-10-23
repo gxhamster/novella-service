@@ -7,6 +7,8 @@ import {
 } from "@/supabase/schema";
 import { TRPCError } from "@trpc/server";
 import { NDataTableFixedConvertToSupabaseFilters } from "@/components/NDataTableFixed";
+import { error } from "console";
+import { IHistory, IHistoryInsert } from "@/supabase/types/supabase";
 
 export const IssueRouter = router({
   getIssuedBookById: publicProcedure.input(z.number()).query(async (opts) => {
@@ -134,5 +136,72 @@ export const IssueRouter = router({
           code: "BAD_REQUEST",
           cause: error.details,
         });
+    }),
+
+  getTotalIssuedBooks: publicProcedure.query(async (opts) => {
+    const { supabase } = opts.ctx;
+
+    const { count } = await supabase
+      .from("issued")
+      .select("*", { count: "exact", head: true });
+
+    return { count };
+  }),
+
+  returnIssuedBook: publicProcedure
+    .input(z.object({ id: z.number(), returned_date: z.string() }))
+    .mutation(async (opts) => {
+      const { input } = opts;
+      const { supabase } = opts.ctx;
+
+      const { data: issuedBook, error: issuedBookError } = await supabase
+        .from("issued")
+        .select("book_id, student_id, due_date, created_at")
+        .eq("id", input.id);
+
+      if (issuedBookError)
+        throw new TRPCError({
+          message: issuedBookError.message,
+          cause: issuedBookError.details,
+          code: "INTERNAL_SERVER_ERROR",
+        });
+
+      if (issuedBook) {
+        // Remove from issue table
+        const { error: deleteError } = await supabase
+          .from("issued")
+          .delete()
+          .eq("id", input.id);
+
+        if (deleteError)
+          throw new TRPCError({
+            message: deleteError.message,
+            cause: deleteError.details,
+            code: "INTERNAL_SERVER_ERROR",
+          });
+
+        const returnedBook: IHistoryInsert = {
+          book_id: issuedBook[0].book_id,
+          student_id: issuedBook[0].student_id,
+          issued_date: issuedBook[0].created_at,
+          due_date: issuedBook[0].due_date,
+          returned_date: input.returned_date,
+        };
+
+        // Add to history table
+        const { data: historyData, error: historyError } = await supabase
+          .from("history")
+          .insert(returnedBook);
+
+        if (historyError) {
+          throw new TRPCError({
+            message: historyError.message,
+            cause: historyError.details,
+            code: "INTERNAL_SERVER_ERROR",
+          });
+        }
+
+        return { data: historyData };
+      }
     }),
 });

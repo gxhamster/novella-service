@@ -11,7 +11,7 @@ import UnreturnedBookIcon from "./icons/UnreturnedBookIcon";
 import UserIcon from "./icons/UserIcon";
 import SignoutIcon from "./icons/SignoutIcon";
 import { trpc } from "@/app/_trpc/client";
-import { toast } from "react-toastify";
+import NToast from "./NToast";
 
 type NovellaSidebarLinkProps = {
   href: string;
@@ -82,17 +82,17 @@ const links = [
     links: [
       {
         title: "Add book",
-        href: "/dashboard/books",
+        href: "/books",
         icon: <BookIcon size={20} />,
       },
       {
         title: "Issue book",
-        href: "/dashboard/issued",
+        href: "/issued",
         icon: <IssueBookIcon size={20} />,
       },
       {
         title: "History",
-        href: "/dashboard/issued/history",
+        href: "/issued/history",
         icon: <UnreturnedBookIcon size={20} />,
       },
     ],
@@ -102,7 +102,7 @@ const links = [
     links: [
       {
         title: "Students",
-        href: "/dashboard/students",
+        href: "/students",
         icon: <UserIcon size={20} />,
       },
     ],
@@ -114,7 +114,7 @@ export default function NovellaSidebar() {
   const nextRouter = useRouter();
   const signOut = trpc.auth.signOut.useMutation({
     onError: (_error) => {
-      toast.error(`Cannot signout user: ${_error.message}`);
+      NToast.error("Cannot signout user", `${_error.message}`);
       throw new Error(_error.message);
     },
     onSuccess: () => {

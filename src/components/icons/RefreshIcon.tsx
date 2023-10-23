@@ -1,8 +1,8 @@
-type RefreshIconProps = {
+interface RefreshIconProps extends React.ComponentPropsWithoutRef<"svg"> {
   size?: number;
-};
+}
 
-export default function RefreshIcon({ size = 24 }: RefreshIconProps) {
+export default function RefreshIcon({ size = 24, ...rest }: RefreshIconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -14,6 +14,7 @@ export default function RefreshIcon({ size = 24 }: RefreshIconProps) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      {...rest}
     >
       <polyline points="1 4 1 10 7 10" />
       <polyline points="23 20 23 14 17 14" />

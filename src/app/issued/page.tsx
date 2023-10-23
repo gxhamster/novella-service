@@ -54,9 +54,9 @@ export default function Issued() {
   const issuedBooksTableCols: Array<IssuedBooksTableColumnDef> = [
     { id: "id", header: "ID" },
     { id: "created_at", header: "Issued Date", isDate: true },
-    { id: "book_id", header: "Book ID", baseHref: "/dashboard/books" },
+    { id: "book_id", header: "Book ID", baseHref: "/books" },
     { id: "title", header: "Title" },
-    { id: "student_id", header: "Student ID", baseHref: "/dashboard/students" },
+    { id: "student_id", header: "Student ID", baseHref: "/students" },
     { id: "name", header: "Student Name" },
     { id: "due_date", header: "Due Date", isDate: true },
     { id: "action", header: "Recieve", isDisplayColumn: true },

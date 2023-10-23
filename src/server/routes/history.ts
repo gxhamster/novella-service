@@ -1,10 +1,6 @@
 import { z } from "zod";
 import { publicProcedure, router } from "../trpc";
-import {
-  ZHistory,
-  ZHistoryInsert,
-  ZTableFetchFunctionOptions,
-} from "@/supabase/schema";
+import { ZHistory, ZTableFetchFunctionOptions } from "@/supabase/schema";
 import { TRPCError } from "@trpc/server";
 import { NDataTableFixedConvertToSupabaseFilters } from "@/components/NDataTableFixed";
 
@@ -93,4 +89,14 @@ export const HistoryRouter = router({
           cause: error.details,
         });
     }),
+
+  getTotalHistoryCount: publicProcedure.query(async (opts) => {
+    const { supabase } = opts.ctx;
+
+    const { count } = await supabase
+      .from("history")
+      .select("*", { count: "exact", head: true });
+
+    return { count };
+  }),
 });

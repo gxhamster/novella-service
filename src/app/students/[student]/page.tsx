@@ -7,7 +7,7 @@ import NovellaInput from "@/components/NovellaInput";
 import NCategoryCard from "@/components/NCategoryCard";
 import { trpc } from "@/app/_trpc/client";
 import NButton from "@/components/NButton";
-import { toast } from "react-toastify";
+import NToast from "@/components/NToast";
 
 type StudentFieldsCategories<T> = {
   title: string;
@@ -131,13 +131,13 @@ export default function Student({ params }: StudentProps) {
   const updateStudentByIdMutation = trpc.students.updateStudentById.useMutation(
     {
       onError: (_error) => {
-        toast.error(`Could not update student: ${_error.message}`);
+        NToast.error("Could not update student", `${_error.message}`);
         throw new Error(_error.message, {
           cause: _error.data,
         });
       },
       onSuccess: () => {
-        toast.success(`Successfully updated student`);
+        NToast.success("Successful", `Updated the student`);
         getStudentByIdQuery.refetch();
         if (getStudentByIdQuery.data?.data)
           reset(getStudentByIdQuery.data?.data);

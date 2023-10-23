@@ -24,8 +24,8 @@ import {
 import NButton from "../NButton";
 import TrashIcon from "../icons/TrashIcon";
 import CloseIcon from "../icons/CloseIcon";
-import EmptyTableIllustration from "../illustrations/EmptyTable";
 import NButtonLink from "../NButtonLink";
+import BoxIcon from "../icons/BoxIcon";
 
 type TableCheckboxProps = {
   indeterminate?: boolean;
@@ -275,14 +275,14 @@ export default function NDataTableFixed<TableType>({
         </div>
       ) : (
         <div className="flex justify-center items-center h-full bg-surface-200/5">
-          <div className="flex flex-col justify-center gap-8 ">
-            <EmptyTableIllustration size={120} />
-            <div className="flex flex-col gap-2">
-              <span className="text-3xl font-light text-surface-800">
+          <div className="flex flex-col justify-center items-center gap-8 ">
+            <BoxIcon size={120} className="text-surface-800" strokeWidth={1} />
+            <div className="flex flex-col items-center  gap-2">
+              <span className="text-3xl font-light text-surface-900">
                 Empty table
               </span>
-              <span className="text-lg font-[200] text-surface-700">
-                To create a new book, click Create
+              <span className="text-lg font-[300] text-surface-700">
+                To create a new entry, click Create
               </span>
               <NButtonLink
                 href="/dashboard"

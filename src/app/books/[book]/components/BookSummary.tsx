@@ -9,7 +9,7 @@ import BookDeleteCard from "./BookDeleteCard";
 import { trpc } from "@/app/_trpc/client";
 import NButton from "@/components/NButton";
 import NDeleteModal from "@/components/NDeleteModal";
-import { toast } from "react-toastify";
+import NToast from "@/components/NToast";
 
 export default function BookSummary({ data }: { data: IBook }) {
   let defaultInputValues = {};
@@ -31,26 +31,26 @@ export default function BookSummary({ data }: { data: IBook }) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const updateBookByIdMutation = trpc.books.updateBookById.useMutation({
     onError: (_error) => {
-      toast.error(`Cannot update book: ${_error.message}`);
+      NToast.error("Cannot update book", `${_error.message}`);
       throw new Error(_error.message, {
         cause: `Error occured when trying to update book with ID: ${data.id}`,
       });
     },
     onSuccess: () => {
-      toast.success("Succesfully updated book fields");
+      NToast.success("Successful", "Updated book fields");
       router.refresh();
       setFormValuesChangedFromDefault(false);
     },
   });
   const deleteBookByIdMutation = trpc.books.deleteBookById.useMutation({
     onError: (_error) => {
-      toast.error(`Cannot delete book: ${_error.message}`);
+      NToast.error("Cannot delete book", `${_error.message}`);
       throw new Error(_error.message);
     },
     onSuccess: () => {
       router.back();
       setIsDeleteModalOpen(false);
-      toast.success("Succesfully deleted the book");
+      NToast.success("Successful", "Deleted the book from library");
     },
   });
 
