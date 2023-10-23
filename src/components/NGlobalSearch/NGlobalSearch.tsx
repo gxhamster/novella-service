@@ -102,7 +102,7 @@ export default function NGlobalSearch() {
             type: "book",
             title: book.title ? book.title : "",
             subtitle: book.author ? book.author : "",
-            baseHref: "/dashboard/books/",
+            baseHref: "/books/",
           })
         );
         setQueryResults([...newBookSearchResult]);
@@ -123,7 +123,7 @@ export default function NGlobalSearch() {
             type: "student",
             title: student.name ? student.name : "",
             subtitle: student.index ? String(student.index) : "",
-            baseHref: "/dashboard/students/",
+            baseHref: "/students/",
           }));
         setQueryResults((oldValue) => [
           ...oldValue,

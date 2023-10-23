@@ -128,7 +128,7 @@ export default function NovellaSidebar() {
         <Image src={NovellaLogo} width={48} height={48} alt="Novella logo" />
       </div>
       <div className="flex flex-col justify-between flex-grow">
-        <div className="flex flex-col gap-2 items-center">
+        <div className="flex flex-col gap-2 items-center mt-3">
           {links.map((linkGroup, groupIdx) => (
             <div key={linkGroup.groupTitle} className="flex flex-col gap-2">
               <div className="flex flex-col gap-2">

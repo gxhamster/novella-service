@@ -2,8 +2,6 @@ import BookSummary from "./components/BookSummary";
 import BookCreate from "./components/BookCreate";
 import { serverClient } from "@/app/_trpc/serverClient";
 
-// export const dynamic = "force-dynamic";
-
 export default async function Book({ params }: { params: { book: string } }) {
   const { data } = await serverClient.books.getBookById(Number(params.book));
 

@@ -96,9 +96,10 @@ export default function NovellaDataTable<T>({
           ) : (
             <tr>
               <td colSpan={12} className="">
-                <div className=" text-surface-800  w-full text-center p-4 flex items-center justify-center gap-2">
-                  <BoxIcon size={20} />
-                  <span className="font-light text-lg">Empty table</span>
+                <div className=" text-surface-800  w-full text-center p-4 flex flex-col items-center justify-center gap-2">
+                  <span className="font-light text-base text-surface-700">
+                    There are currently no records in the table
+                  </span>
                 </div>
               </td>
             </tr>
