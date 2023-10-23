@@ -7,6 +7,35 @@ import {
 } from "@/supabase/schema";
 import { TRPCError } from "@trpc/server";
 import { NDataTableFixedConvertToSupabaseFilters } from "@/components/NDataTableFixed";
+import { getShape } from "postgrest-js-tools";
+import { IStudent } from "@/supabase/types/supabase";
+
+const getStudentByIdShape = getShape<IStudent>()({
+  id: true,
+  created_at: true,
+  name: true,
+  island: true,
+  address: true,
+  phone: true,
+  grade: true,
+  index: true,
+  user_id: true,
+});
+
+export type getStudentByIdType = typeof getStudentByIdShape;
+
+const getStudentsByPageShape = getShape<IStudent>()({
+  id: true,
+  created_at: true,
+  name: true,
+  island: true,
+  address: true,
+  phone: true,
+  grade: true,
+  index: true,
+});
+
+export type getStudentsByPageType = typeof getStudentsByPageShape;
 
 export const StudentRouter = router({
   getStudentById: publicProcedure.input(z.number()).query(async (opts) => {
@@ -18,7 +47,6 @@ export const StudentRouter = router({
       .select("*")
       .eq("id", input);
 
-    console.log(data);
     const resultStudent = data ? data[0] : null;
 
     if (error)

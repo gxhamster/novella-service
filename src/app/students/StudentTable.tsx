@@ -11,16 +11,19 @@ import NDataTableFixed from "@/components/NDataTableFixed";
 import NDeleteModal from "@/components/NDeleteModal";
 import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
 import { trpc } from "@/app/_trpc/client";
+import { getStudentsByPageType } from "@/server/routes/student";
 
 export default function StudentsTable() {
-  const columnHelper = createColumnHelper<IStudent>();
+  const columnHelper = createColumnHelper<getStudentsByPageType>();
   const [isAddBookDrawerOpen, setIsAddBookDrawerOpen] = useState(false);
   const [isDeleteStudentModalOpen, setIsDeleteStudentModalOpen] =
     useState(false);
-  const [deletedStudentsRows, setDeletedStudentRows] = useState<IStudent[]>([]);
+  const [deletedStudentsRows, setDeletedStudentRows] = useState<
+    getStudentsByPageType[]
+  >([]);
   const [saveButtonLoading, setSaveButtonLoading] = useState(false);
   const [fetchFunctionOpts, setFetchFunctionOpts] = useState<
-    NDataTableFixedFetchFunctionProps<IStudent>
+    NDataTableFixedFetchFunctionProps<getStudentsByPageType>
   >({
     pageIndex: 0,
     pageSize: 10,
@@ -54,17 +57,18 @@ export default function StudentsTable() {
     },
   });
 
-  const addStudentToSupabase = async (formData: IStudent) => {
+  const addStudentToSupabase = async (formData: getStudentsByPageType) => {
     setSaveButtonLoading(true);
     addStudentMutation.mutate(formData);
   };
 
   const columnsObj: Array<{
-    id: keyof IStudent;
+    id: keyof getStudentsByPageType;
     header: string;
     isLink?: boolean;
   }> = [
     { id: "id", header: "ID", isLink: true },
+    { id: "created_at", header: "Created At" },
     { id: "name", header: "Name" },
     { id: "island", header: "Island" },
     { id: "address", header: "Address" },
@@ -163,7 +167,7 @@ export default function StudentsTable() {
         }}
       />
 
-      <NDataTableFixed<IStudent>
+      <NDataTableFixed<getStudentsByPageType>
         columns={columnsObj}
         tanStackColumns={tanstackColumns}
         onCreateRowButtonPressed={() => setIsAddBookDrawerOpen(true)}

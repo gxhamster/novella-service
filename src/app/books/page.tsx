@@ -11,12 +11,13 @@ import { IBook } from "@/supabase/types/supabase";
 import { trpc } from "@/app/_trpc/client";
 import BookAddDrawer from "./components/BookAddDrawer";
 import NToast from "@/components/NToast";
+import { getBooksByPageType } from "@/server/routes/books";
 
 export default function Books() {
-  const columnHelper = createColumnHelper<IBook>();
+  const columnHelper = createColumnHelper<getBooksByPageType>();
   const router = useRouter();
   const [isDeleteBookModalOpen, setIsDeleteBookModalOpen] = useState(false);
-  const [deletedBooks, setDeletedBooks] = useState<IBook[]>([]);
+  const [deletedBooks, setDeletedBooks] = useState<getBooksByPageType[]>([]);
   const [isAddBookDrawerOpen, setIsAddBookDrawerOpen] = useState(false);
   const [fetchFunctionOpts, setFetchFunctionOpts] = useState<
     NDataTableFixedFetchFunctionProps<IBook>
@@ -55,7 +56,7 @@ export default function Books() {
   };
 
   const columnsObj: Array<{
-    id: keyof IBook;
+    id: keyof getBooksByPageType;
     header: string;
     isLink?: boolean;
   }> = [
@@ -70,8 +71,9 @@ export default function Books() {
     { id: "language", header: "Language" },
     { id: "year", header: "Year" },
     { id: "pages", header: "Pages" },
+    { id: "times_issued", header: "Times Issued" },
+    { id: "times_returned", header: "Times Returned" },
   ];
-
   const tanstackColumns = columnsObj.map((column) =>
     columnHelper.accessor(column.id, {
       cell: (info) =>
@@ -91,7 +93,7 @@ export default function Books() {
 
   return (
     <div className="w-full h-full flex flex-col text-surface-900 gap-y-3 m-0">
-      <NDataTableFixed<IBook>
+      <NDataTableFixed<getBooksByPageType>
         columns={columnsObj}
         tanStackColumns={tanstackColumns}
         onCreateRowButtonPressed={() => setIsAddBookDrawerOpen(true)}

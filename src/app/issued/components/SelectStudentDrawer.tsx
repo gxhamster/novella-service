@@ -7,8 +7,9 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { UseFormSetValue } from "react-hook-form";
 import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
 import { trpc } from "@/app/_trpc/client";
+import { getStudentsByPageType } from "@/server/routes/student";
 
-const studentsColHelper = createColumnHelper<IStudent>();
+const studentsColHelper = createColumnHelper<getStudentsByPageType>();
 const studentsTableCols: Array<StudentsTableColumnDef> = [
   { id: "id", header: "ID" },
   { id: "name", header: "Name" },
@@ -29,7 +30,7 @@ const studentsTableColsTanstack = studentsTableCols.map((column) =>
 type SelectStudentDrawerProps = {
   isAddStudentDrawerOpen: boolean;
   setIsAddStudentDrawerOpen: Dispatch<SetStateAction<boolean>>;
-  setSelectedStudent: Dispatch<SetStateAction<IStudent | null>>;
+  setSelectedStudent: Dispatch<SetStateAction<getStudentsByPageType | null>>;
   formSetValue: UseFormSetValue<IIssuedBook>;
 };
 
@@ -59,7 +60,7 @@ export default function SelectStudentDrawer({
       isOpen={isAddStudentDrawerOpen}
       closeDrawer={() => setIsAddStudentDrawerOpen(false)}
     >
-      <NDataTableFixedSmall<IStudent>
+      <NDataTableFixedSmall<getStudentsByPageType>
         columns={studentsTableCols}
         tanStackColumns={studentsTableColsTanstack}
         isDataLoading={

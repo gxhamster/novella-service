@@ -3,6 +3,47 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { ZBook, ZTableFetchFunctionOptions } from "@/supabase/schema";
 import { NDataTableFixedConvertToSupabaseFilters } from "@/components/NDataTableFixed";
+import { getShape } from "postgrest-js-tools";
+import { IBook } from "@/supabase/types/supabase";
+
+const getBookByIdShape = getShape<IBook>()({
+  id: true,
+  created_at: true,
+  title: true,
+  author: true,
+  genre: true,
+  publisher: true,
+  ddc: true,
+  edition: true,
+  language: true,
+  year: true,
+  pages: true,
+  isbn: true,
+  times_issued: true,
+  times_returned: true,
+  user_id: true,
+});
+
+export type getBookByIdType = typeof getBookByIdShape;
+
+const getBooksByPageShape = getShape<IBook>()({
+  id: true,
+  created_at: true,
+  title: true,
+  author: true,
+  genre: true,
+  publisher: true,
+  ddc: true,
+  edition: true,
+  language: true,
+  year: true,
+  pages: true,
+  isbn: true,
+  times_issued: true,
+  times_returned: true,
+});
+
+export type getBooksByPageType = typeof getBooksByPageShape;
 
 export const BooksRouter = router({
   getBookById: publicProcedure.input(z.number()).query(async (opts) => {
@@ -11,7 +52,9 @@ export const BooksRouter = router({
 
     const { data, error } = await supabase
       .from("books")
-      .select("*")
+      .select(
+        "id,created_at,title,author,genre, publisher,ddc,edition,language,year,pages,isbn,times_issued,times_returned, user_id"
+      )
       .eq("id", input);
 
     const resultBook = data ? data[0] : null;
@@ -25,10 +68,16 @@ export const BooksRouter = router({
       const { supabase } = opts.ctx;
       const supabaseFilters = NDataTableFixedConvertToSupabaseFilters(filters);
 
-      let query = supabase.from("books").select("*", { count: "estimated" });
+      let query = supabase
+        .from("books")
+        .select(
+          "id,created_at,title,author,genre, publisher,ddc,edition,language,year,pages,isbn,times_issued,times_returned",
+          { count: "estimated" }
+        );
       if (filters.length > 0) query = query.or(supabaseFilters);
       if (sorts)
         query = query.order(sorts.field, { ascending: sorts.ascending });
+
       query = query.range(pageIndex * pageSize, pageSize * (pageIndex + 1));
       const { data, count, error } = await query;
 

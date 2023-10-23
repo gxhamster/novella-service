@@ -7,10 +7,12 @@ import { IBook, IIssuedBook } from "@/supabase/types/supabase";
 import { UseFormSetValue } from "react-hook-form";
 import { trpc } from "@/app/_trpc/client";
 import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
+import { getBooksByPageType } from "@/server/routes/books";
 
-const booksColHelper = createColumnHelper<IBook>();
+const booksColHelper = createColumnHelper<getBooksByPageType>();
 const booksTableCols: Array<BooksTableColumnDef> = [
   { id: "id", header: "ID" },
+  { id: "created_at", header: "Created At" },
   { id: "title", header: "Tilte" },
   { id: "author", header: "Author" },
   { id: "isbn", header: "ISBN" },
@@ -21,6 +23,8 @@ const booksTableCols: Array<BooksTableColumnDef> = [
   { id: "language", header: "Language" },
   { id: "year", header: "Year" },
   { id: "pages", header: "Pages" },
+  { id: "times_issued", header: "Times Issued" },
+  { id: "times_returned", header: "Times Returned" },
 ];
 
 const booksTableColsTanstack = booksTableCols.map((column) =>
@@ -33,7 +37,7 @@ const booksTableColsTanstack = booksTableCols.map((column) =>
 type SelectBookDrawerProps = {
   isAddBookDrawerOpen: boolean;
   setIsAddBookDrawerOpen: Dispatch<SetStateAction<boolean>>;
-  setSelectedBook: Dispatch<SetStateAction<IBook | null>>;
+  setSelectedBook: Dispatch<SetStateAction<getBooksByPageType | null>>;
   formSetValue: UseFormSetValue<IIssuedBook>;
 };
 
@@ -44,7 +48,7 @@ export default function SelectBookDrawer({
   formSetValue,
 }: SelectBookDrawerProps) {
   const [fetchFunctionOpts, setFetchFunctionOpts] = useState<
-    NDataTableFixedFetchFunctionProps<IBook>
+    NDataTableFixedFetchFunctionProps<getBooksByPageType>
   >({
     pageIndex: 0,
     pageSize: 100,
@@ -62,7 +66,7 @@ export default function SelectBookDrawer({
       isOpen={isAddBookDrawerOpen}
       closeDrawer={() => setIsAddBookDrawerOpen(false)}
     >
-      <NDataTableFixedSmall<IBook>
+      <NDataTableFixedSmall<getBooksByPageType>
         columns={booksTableCols}
         tanStackColumns={booksTableColsTanstack}
         isDataLoading={

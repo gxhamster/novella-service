@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import NDrawer from "@/components/NDrawer";
-import { IIssuedBook, IBook, IStudent } from "@/supabase/types/supabase";
+import { IIssuedBook } from "@/supabase/types/supabase";
 import NovellaInput from "@/components/NovellaInput";
 import NButton from "@/components/NButton";
 import LeftArrowIcon from "@/components/icons/LeftArrowIcon";
@@ -9,6 +9,8 @@ import SelectBookDrawer from "./SelectBookDrawer";
 import SelectStudentDrawer from "./SelectStudentDrawer";
 import { trpc } from "@/app/_trpc/client";
 import NToast from "@/components/NToast";
+import { getBooksByPageType } from "@/server/routes/books";
+import { getStudentsByPageType } from "@/server/routes/student";
 
 type IssueBookDrawerProps = {
   isIssueBookDrawerOpen: boolean;
@@ -21,8 +23,11 @@ export default function IssueBookDrawer({
   setIsIssueBookDrawerOpen,
   onBookIssued,
 }: IssueBookDrawerProps) {
-  const [selectedBook, setSelectedBook] = useState<IBook | null>(null);
-  const [selectedStudent, setSelectedStudent] = useState<IStudent | null>(null);
+  const [selectedBook, setSelectedBook] = useState<getBooksByPageType | null>(
+    null
+  );
+  const [selectedStudent, setSelectedStudent] =
+    useState<getStudentsByPageType | null>(null);
   const [isAddBookDrawerOpen, setIsAddBookDrawerOpen] = useState(false);
   const [isAddStudentDrawerOpen, setIsAddStudentDrawerOpen] = useState(false);
   const createIssuedBookMutation = trpc.issued.createIssuedBook.useMutation({

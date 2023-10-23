@@ -1,4 +1,6 @@
-import { IBook, ITables } from "@/supabase/types/supabase";
+import { getBooksByPageType } from "@/server/routes/books";
+import { getStudentsByPageType } from "@/server/routes/student";
+import { IBook } from "@/supabase/types/supabase";
 import { IStudent } from "@/supabase/types/supabase";
 import { IIssuedBook } from "@/supabase/types/supabase";
 
@@ -15,11 +17,11 @@ export type IssuedBooksTableColumnDef = {
 };
 
 export type BooksTableColumnDef = {
-  id: keyof IBook;
+  id: keyof getBooksByPageType;
   header: string;
 };
 
 export type StudentsTableColumnDef = {
-  id: keyof IStudent;
+  id: keyof getStudentsByPageType;
   header: string;
 };

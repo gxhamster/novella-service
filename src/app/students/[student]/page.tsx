@@ -2,12 +2,12 @@
 "use client";
 import { useForm, useWatch } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { IStudent } from "@/supabase/types/supabase";
 import NovellaInput from "@/components/NovellaInput";
 import NCategoryCard from "@/components/NCategoryCard";
 import { trpc } from "@/app/_trpc/client";
 import NButton from "@/components/NButton";
 import NToast from "@/components/NToast";
+import { getStudentByIdType } from "@/server/routes/student";
 
 type StudentFieldsCategories<T> = {
   title: string;
@@ -19,7 +19,7 @@ type StudentFieldsCategories<T> = {
     isNumber?: boolean;
   }>;
 };
-const categories: StudentFieldsCategories<IStudent>[] = [
+const categories: StudentFieldsCategories<getStudentByIdType>[] = [
   {
     title: "General Information",
     description: "Edit the general information about the student",
@@ -120,7 +120,7 @@ export default function Student({ params }: StudentProps) {
     reset,
     control,
     formState: { errors },
-  } = useForm<IStudent>();
+  } = useForm<getStudentByIdType>();
 
   const watchedFormValues = useWatch({ control });
 
@@ -150,8 +150,8 @@ export default function Student({ params }: StudentProps) {
     currentFormValues: watchedFormValues,
   });
 
-  function studentFormSubmitHandler(formData: IStudent) {
-    const keys = Object.keys(formData) as Array<keyof IStudent>;
+  function studentFormSubmitHandler(formData: getStudentByIdType) {
+    const keys = Object.keys(formData) as Array<keyof getStudentByIdType>;
     let filteredFormData = { ...formData };
     for (const key of keys) {
       if (filteredFormData[key] == undefined) delete filteredFormData[key];

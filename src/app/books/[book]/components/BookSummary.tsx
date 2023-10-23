@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { SubmitHandler, useForm, useWatch } from "react-hook-form";
+import { FieldError, SubmitHandler, useForm, useWatch } from "react-hook-form";
 import NovellaInput from "@/components/NovellaInput";
 import { IBook, IBookUpdate } from "@/supabase/types/supabase";
 import BookCategoryCard from "./BookCatergoryCard";
@@ -10,8 +10,9 @@ import { trpc } from "@/app/_trpc/client";
 import NButton from "@/components/NButton";
 import NDeleteModal from "@/components/NDeleteModal";
 import NToast from "@/components/NToast";
+import { getBookByIdType } from "@/server/routes/books";
 
-export default function BookSummary({ data }: { data: IBook }) {
+export default function BookSummary({ data }: { data: getBookByIdType }) {
   let defaultInputValues = {};
   Object.assign(defaultInputValues, data);
   const {
@@ -20,7 +21,7 @@ export default function BookSummary({ data }: { data: IBook }) {
     reset,
     control,
     formState: { errors },
-  } = useForm<IBook>({
+  } = useForm<getBookByIdType>({
     defaultValues: defaultInputValues,
   });
 
@@ -78,7 +79,7 @@ export default function BookSummary({ data }: { data: IBook }) {
 
   type BookField = {
     title: string;
-    field: keyof IBook;
+    field: keyof getBookByIdType;
     disabled: boolean;
   };
 
@@ -167,6 +168,16 @@ export default function BookSummary({ data }: { data: IBook }) {
           disabled: false,
         },
         {
+          title: "Times Issued",
+          field: "times_issued",
+          disabled: true,
+        },
+        {
+          title: "Times Returned",
+          field: "times_returned",
+          disabled: true,
+        },
+        {
           title: "Pages",
           field: "pages",
           disabled: false,
@@ -247,7 +258,10 @@ export default function BookSummary({ data }: { data: IBook }) {
                   reactHookRegister={register(field.field, {
                     disabled: field.disabled,
                   })}
-                  reactHookErrorMessage={errors[field.field]}
+                  // FIXME: Properly type this
+                  reactHookErrorMessage={
+                    errors[field.field] as FieldError | undefined
+                  }
                 ></NovellaInput>
               ))}
             </BookCategoryCard>

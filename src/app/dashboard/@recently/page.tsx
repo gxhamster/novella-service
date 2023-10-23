@@ -1,7 +1,5 @@
 import DashboardIssuedTable from "../components/DashboardIssuedTable";
 
-export const dynamic = "force-dynamic";
-
 export default async function RecentlyIssued() {
   return (
     <div className="mt-10">
