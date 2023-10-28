@@ -10,7 +10,6 @@ import { useEffect, useMemo, useState } from "react";
 import RightArrowIcon from "./icons/RightArrowIcon";
 import LeftArrowIcon from "./icons/LeftArrowIcon";
 import LoadingIcon from "./icons/LoadingIcon";
-import BoxIcon from "./icons/BoxIcon";
 
 type NovellaDataTableProps<T> = {
   data: T[] | undefined;
