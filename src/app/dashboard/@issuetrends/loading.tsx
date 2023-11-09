@@ -5,7 +5,12 @@ export default function Loading() {
   return (
     <>
       {[0, 1].map((_) => (
-        <Skeleton count={1} height={280} containerClassName="col-span-2" />
+        <Skeleton
+          key={_}
+          count={1}
+          height={280}
+          containerClassName="col-span-2"
+        />
       ))}
     </>
   );
