@@ -7,8 +7,7 @@ import {
 } from "@/supabase/schema";
 import { TRPCError } from "@trpc/server";
 import { NDataTableFixedConvertToSupabaseFilters } from "@/components/NDataTableFixed";
-import { error } from "console";
-import { IHistory, IHistoryInsert } from "@/supabase/types/supabase";
+import { IHistoryInsert } from "@/supabase/types/supabase";
 
 export const IssueRouter = router({
   getIssuedBookById: publicProcedure.input(z.number()).query(async (opts) => {

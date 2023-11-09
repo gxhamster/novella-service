@@ -1,9 +1,13 @@
-import LoadingIcon from "@/components/icons/LoadingIcon";
+import Skeleton from "react-loading-skeleton";
+import { SkeletonTheme } from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 export default function Loading() {
   return (
-    <div className="flex items-center justify-center w-full h-full">
-      <LoadingIcon size={40} className="text-primary-500" />
-    </div>
+    <>
+      {[0, 1, 2, 3].map((_) => (
+        <Skeleton key={_} count={1} height={280} />
+      ))}
+    </>
   );
 }

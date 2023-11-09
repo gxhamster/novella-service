@@ -3,6 +3,16 @@ import { publicProcedure, router } from "../trpc";
 import { ZHistory, ZTableFetchFunctionOptions } from "@/supabase/schema";
 import { TRPCError } from "@trpc/server";
 import { NDataTableFixedConvertToSupabaseFilters } from "@/components/NDataTableFixed";
+import { getShape } from "postgrest-js-tools";
+import { IHistory } from "@/supabase/types/supabase";
+import { format } from "date-fns";
+
+const getHistoryByDateShape = getShape<IHistory>()({
+  id: true,
+  created_at: true,
+});
+
+export type getHistoryByDateType = typeof getHistoryByDateShape;
 
 export const HistoryRouter = router({
   getHistoryById: publicProcedure.input(z.number()).query(async (opts) => {
@@ -98,5 +108,43 @@ export const HistoryRouter = router({
       .select("*", { count: "exact", head: true });
 
     return { count };
+  }),
+
+  getHistoryByDate: publicProcedure.query(async (opts) => {
+    const { supabase } = opts.ctx;
+
+    const { data, error } = await supabase
+      .from("history")
+      .select("id, created_at");
+
+    if (error)
+      throw new TRPCError({
+        message: error.message,
+        code: "INTERNAL_SERVER_ERROR",
+        cause: error.details,
+      });
+
+    if (data) {
+      const filteredData = new Map();
+      const result = {
+        dates: new Array(),
+        issues: new Array(),
+      };
+
+      for (const history of data) {
+        const day = new Date(
+          format(new Date(history.created_at), "dd-MMM-yyy")
+        ).toISOString();
+        if (!filteredData.has(day)) {
+          filteredData.set(day, 1);
+        } else {
+          filteredData.set(day, filteredData.get(day) + 1);
+        }
+      }
+      result.dates = Array.from(filteredData, ([key, value]) => key);
+      result.issues = Array.from(filteredData, ([key, value]) => value);
+
+      return { data: result };
+    }
   }),
 });
