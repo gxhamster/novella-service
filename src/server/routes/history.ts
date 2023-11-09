@@ -110,12 +110,16 @@ export const HistoryRouter = router({
     return { count };
   }),
 
-  getHistoryByDate: publicProcedure.query(async (opts) => {
+  getIssueHistoryCurrentMonth: publicProcedure.query(async (opts) => {
     const { supabase } = opts.ctx;
+
+    const dateLowerBound = new Date();
+    dateLowerBound.setDate(1);
 
     const { data, error } = await supabase
       .from("history")
-      .select("id, created_at");
+      .select("id, issued_date")
+      .gt("issued_date", dateLowerBound.toISOString());
 
     if (error)
       throw new TRPCError({
@@ -132,8 +136,14 @@ export const HistoryRouter = router({
       };
 
       for (const history of data) {
+        if (!history.issued_date) {
+          throw new TRPCError({
+            message: "Issued date is null",
+            code: "INTERNAL_SERVER_ERROR",
+          });
+        }
         const day = new Date(
-          format(new Date(history.created_at), "dd-MMM-yyy")
+          format(new Date(history.issued_date), "dd-MMM-yyy")
         ).toISOString();
         if (!filteredData.has(day)) {
           filteredData.set(day, 1);
@@ -141,8 +151,56 @@ export const HistoryRouter = router({
           filteredData.set(day, filteredData.get(day) + 1);
         }
       }
-      result.dates = Array.from(filteredData, ([key, value]) => key);
-      result.issues = Array.from(filteredData, ([key, value]) => value);
+      result.dates = Array.from(filteredData, ([key, _]) => key);
+      result.issues = Array.from(filteredData, ([_, value]) => value);
+
+      return { data: result };
+    }
+  }),
+
+  getReturnHistoryCurrentMonth: publicProcedure.query(async (opts) => {
+    const { supabase } = opts.ctx;
+
+    const dateLowerBound = new Date();
+    dateLowerBound.setDate(1);
+
+    const { data, error } = await supabase
+      .from("history")
+      .select("id, returned_date")
+      .gt("issued_date", dateLowerBound.toISOString());
+
+    if (error)
+      throw new TRPCError({
+        message: error.message,
+        code: "INTERNAL_SERVER_ERROR",
+        cause: error.details,
+      });
+
+    if (data) {
+      const filteredData = new Map();
+      const result = {
+        dates: new Array(),
+        returns: new Array(),
+      };
+
+      for (const history of data) {
+        if (!history.returned_date) {
+          throw new TRPCError({
+            message: "Issued date is null",
+            code: "INTERNAL_SERVER_ERROR",
+          });
+        }
+        const day = new Date(
+          format(new Date(history.returned_date), "dd-MMM-yyy")
+        ).toISOString();
+        if (!filteredData.has(day)) {
+          filteredData.set(day, 1);
+        } else {
+          filteredData.set(day, filteredData.get(day) + 1);
+        }
+      }
+      result.dates = Array.from(filteredData, ([key, _]) => key);
+      result.returns = Array.from(filteredData, ([_, value]) => value);
 
       return { data: result };
     }

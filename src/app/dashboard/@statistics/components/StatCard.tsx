@@ -1,6 +1,6 @@
 import NButtonLink from "@/components/NButtonLink";
 import LeftArrowIcon from "@/components/icons/LeftArrowIcon";
-import DashboardCard from "./DashboardCard";
+import DashboardCard from "../../components/DashboardCard";
 
 type StatCardProps = {
   title: string;

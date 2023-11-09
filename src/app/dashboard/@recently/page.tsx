@@ -1,4 +1,4 @@
-import DashboardIssuedTable from "../components/DashboardIssuedTable";
+import DashboardIssuedTable from "./components/DashboardIssuedTable";
 
 export default async function RecentlyIssued() {
   return (

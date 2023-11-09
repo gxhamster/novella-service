@@ -72,8 +72,8 @@ export default function DashboardLayout({
 
                 <div className="mt-10 grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-4 lg:grid-cols-4 lg:gap-8">
                   {statistics}
-                  {popular}
                   {issuetrends}
+                  {popular}
                 </div>
                 {recently}
                 {children}

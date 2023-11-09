@@ -2,7 +2,7 @@
 import NovellaDataTable from "@/components/NovellaDataTable";
 import { IIssuedBook } from "@/supabase/types/supabase";
 import { createColumnHelper } from "@tanstack/react-table";
-import { trpc } from "../../_trpc/client";
+import { trpc } from "../../../_trpc/client";
 import { format } from "date-fns";
 
 type TableCols = {

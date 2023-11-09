@@ -2,7 +2,7 @@ import BookIcon from "@/components/icons/BookIcon";
 import IssueBookIcon from "@/components/icons/IssueBookIcon";
 import UnreturnedBookIcon from "@/components/icons/UnreturnedBookIcon";
 import UserIcon from "@/components/icons/UserIcon";
-import StatCard from "../components/StatCard";
+import StatCard from "./components/StatCard";
 import { serverClient } from "@/app/_trpc/serverClient";
 
 export default async function Statistics() {

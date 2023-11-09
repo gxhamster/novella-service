@@ -5,14 +5,14 @@ import { Chart } from "chart.js/auto";
 import { CategoryScale } from "chart.js";
 import "chartjs-adapter-date-fns";
 
-type IssueStatChartProps = {
+type ReturnStatChartProps = {
   data: {
     dates: any[];
-    issues: any[];
+    returns: any[];
   };
 };
 
-export default function IssueStatChart({ data }: IssueStatChartProps) {
+export default function ReturnStatChart({ data }: ReturnStatChartProps) {
   Chart.register(CategoryScale);
 
   console.log(data);
@@ -21,8 +21,8 @@ export default function IssueStatChart({ data }: IssueStatChartProps) {
     labels: data.dates,
     datasets: [
       {
-        label: "Number of books issued",
-        data: data.issues,
+        label: "Number of books returned",
+        data: data.returns,
         borderColor: "#4589ff",
         backgroundColor: "#4589ff",
       },
@@ -56,14 +56,14 @@ export default function IssueStatChart({ data }: IssueStatChartProps) {
               },
               title: {
                 display: true,
-                text: "Number of books issued",
+                text: "Number of books returned",
               },
             },
           },
           plugins: {
             title: {
               display: true,
-              text: "Books Issued",
+              text: "Books Returned",
             },
             tooltip: {
               backgroundColor: "#393939",
