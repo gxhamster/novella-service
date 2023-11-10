@@ -11,6 +11,7 @@ import { trpc } from "@/app/_trpc/client";
 import NToast from "@/components/NToast";
 import { getBooksByPageType } from "@/server/routes/books";
 import { getStudentsByPageType } from "@/server/routes/student";
+import { formatISO } from "date-fns";
 
 type IssueBookDrawerProps = {
   isIssueBookDrawerOpen: boolean;
@@ -49,7 +50,7 @@ export default function IssueBookDrawer({
     formState: { errors, isDirty, isValid },
   } = useForm<IIssuedBook>({
     defaultValues: {
-      created_at: new Date().toISOString(),
+      created_at: formatISO(new Date()),
       student_id: useMemo(
         () => (selectedStudent ? selectedStudent.id : 0),
         [selectedStudent]
@@ -62,7 +63,7 @@ export default function IssueBookDrawer({
         const days = 5;
         const date = new Date();
         date.setDate(date.getDate() + days);
-        return date.toISOString();
+        return formatISO(date);
       }, []),
     },
   });

@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { NDataTableFixedConvertToSupabaseFilters } from "@/components/NDataTableFixed";
 import { getShape } from "postgrest-js-tools";
 import { IHistory } from "@/supabase/types/supabase";
-import { format } from "date-fns";
+import { format, formatISO } from "date-fns";
 
 const getHistoryByDateShape = getShape<IHistory>()({
   id: true,
@@ -142,6 +142,7 @@ export const HistoryRouter = router({
             code: "INTERNAL_SERVER_ERROR",
           });
         }
+        // FIXME: Timezone difference when in production
         const day = new Date(
           format(new Date(history.issued_date), "dd-MMM-yyy")
         ).toISOString();
@@ -190,9 +191,10 @@ export const HistoryRouter = router({
             code: "INTERNAL_SERVER_ERROR",
           });
         }
-        const day = new Date(
-          format(new Date(history.returned_date), "dd-MMM-yyy")
-        ).toISOString();
+        // FIXME: Timezone difference when in production
+        const day = formatISO(
+          new Date(format(new Date(history.returned_date), "dd-MMM-yyy"))
+        );
         if (!filteredData.has(day)) {
           filteredData.set(day, 1);
         } else {

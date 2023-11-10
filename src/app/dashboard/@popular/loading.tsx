@@ -1,5 +1,7 @@
 import Skeleton from "react-loading-skeleton";
 
 export default function Loading() {
-  return <Skeleton count={1} height={280} className="col-span-2" />;
+  return [0, 1].map((_) => (
+    <Skeleton key={_} count={1} height={280} containerClassName="col-span-2" />
+  ));
 }

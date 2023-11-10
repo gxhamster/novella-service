@@ -4,7 +4,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { Dispatch, SetStateAction } from "react";
 import { trpc } from "@/app/_trpc/client";
 import NovellaInput from "@/components/NovellaInput";
-import { format } from "date-fns";
+import { format, formatISO } from "date-fns";
 import NToast from "@/components/NToast";
 
 type ReturnBookModalProps = {
@@ -53,7 +53,7 @@ export default function ReturnBookModal({
     if (returnBookID) {
       returnBookMutation.mutate({
         id: returnBookID,
-        returned_date: new Date(formData.returned_date).toISOString(),
+        returned_date: formatISO(new Date(formData.returned_date)),
       });
     }
   };

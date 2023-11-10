@@ -2,7 +2,7 @@ import { useEffect, useState, Fragment } from "react";
 import { useDebounce } from "usehooks-ts";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import SearchIcon from "../icons/SearchIcon";
-import { Database } from "@/supabase/types/supabase";
+import { Database } from "@/supabase/types/types";
 import { NGlobalSearchModal } from ".";
 import LeftArrowIcon from "../icons/LeftArrowIcon";
 import Link from "next/link";

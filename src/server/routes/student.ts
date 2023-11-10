@@ -165,4 +165,23 @@ export const StudentRouter = router({
 
     return { count };
   }),
+
+  getMostPopular: publicProcedure.query(async (opts) => {
+    const { supabase } = opts.ctx;
+
+    const { data, error } = await supabase
+      .from("get_most_popular_student")
+      .select("*")
+      .order("count", { ascending: false })
+      .limit(1);
+
+    if (error)
+      throw new TRPCError({
+        message: error.message,
+        code: "INTERNAL_SERVER_ERROR",
+        cause: error.details,
+      });
+
+    return { data: data[0] };
+  }),
 });
