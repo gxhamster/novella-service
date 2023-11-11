@@ -8,18 +8,12 @@ type ProviderProps = {
 };
 
 function getBaseUrl() {
-  if (
-    process.env.NEXT_PUBLIC_VERCEL_ENV === "production" &&
-    process.env.PROD_DOMAIN
-  ) {
-    return `https://${process.env.PROD_DOMAIN}`;
-  }
+  if (process.env.NEXT_PUBLIC_VERCEL_ENV === "production") {
+    if (process.env.PROD_DOMAIN) {
+      return `https://${process.env.PROD_DOMAIN}`;
+    }
 
-  if (
-    process.env.NEXT_PUBLIC_VERCEL_ENV === "production" &&
-    process.env.NEXT_PUBLIC_VERCEL_URL
-  ) {
-    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
+    throw new Error("Cannot find PROD_DOMAIN env variable");
   }
 
   return `http://localhost:${process.env.PORT ?? 3000}`;
