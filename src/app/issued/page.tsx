@@ -3,7 +3,6 @@ import { useState } from "react";
 import NDataTableFixed, {
   NDataTableFixedFetchFunctionProps,
 } from "@/components/NDataTableFixed";
-import NButton from "@/components/NButton";
 import { IIssuedBookV2 } from "./lib/types";
 import { createColumnHelper } from "@tanstack/react-table";
 import { IssuedBooksTableColumnDef } from "./lib/types";
@@ -107,6 +106,7 @@ export default function Issued() {
   return (
     <>
       <NDataTableFixed<IIssuedBookV2>
+        primaryButtonTitle="Issue Book"
         columns={issuedBooksTableCols}
         tanStackColumns={issuedBooksTableColsTanstack}
         onCreateRowButtonPressed={() => setIsIssueBookDrawerOpen(true)}

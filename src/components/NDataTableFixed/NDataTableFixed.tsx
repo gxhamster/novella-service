@@ -57,6 +57,7 @@ type NovellaDataTableProps<TableType> = {
   onCreateRowButtonPressed?: () => void;
   onRowSelectionChanged?: (state: Array<any>) => void;
   onRowDeleted?: (deletedRows: Array<TableType>) => void;
+  primaryButtonTitle?: string;
 };
 
 export default function NDataTableFixed<TableType>({
@@ -66,6 +67,7 @@ export default function NDataTableFixed<TableType>({
   onRefresh,
   tanStackColumns,
   columns,
+  primaryButtonTitle = "Create",
   isDataLoading = false,
   onCreateRowButtonPressed,
   onRowSelectionChanged = () => null,
@@ -216,7 +218,7 @@ export default function NDataTableFixed<TableType>({
             />
             {showCreateButton && (
               <ButtonPrimary
-                title="Create"
+                title={primaryButtonTitle}
                 icon={<AddIcon size={18} />}
                 onClick={() =>
                   onCreateRowButtonPressed && onCreateRowButtonPressed()

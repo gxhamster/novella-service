@@ -11,7 +11,7 @@ import { trpc } from "@/app/_trpc/client";
 import NToast from "@/components/NToast";
 import { getBooksByPageType } from "@/server/routes/books";
 import { getStudentsByPageType } from "@/server/routes/student";
-import { formatISO } from "date-fns";
+import { format, formatISO } from "date-fns";
 
 type IssueBookDrawerProps = {
   isIssueBookDrawerOpen: boolean;
@@ -50,7 +50,7 @@ export default function IssueBookDrawer({
     formState: { errors, isDirty, isValid },
   } = useForm<IIssuedBook>({
     defaultValues: {
-      created_at: formatISO(new Date()),
+      created_at: format(new Date(), "yyyy-MM-dd'T'hh:mm"),
       student_id: useMemo(
         () => (selectedStudent ? selectedStudent.id : 0),
         [selectedStudent]
@@ -63,14 +63,20 @@ export default function IssueBookDrawer({
         const days = 5;
         const date = new Date();
         date.setDate(date.getDate() + days);
-        return formatISO(date);
+        return format(date, "yyyy-MM-dd'T'hh:mm");
       }, []),
     },
   });
 
   function issueBookFormSubmitHandler(formData: IIssuedBook) {
-    createIssuedBookMutation.mutate(formData);
-    onBookIssued();
+    if (formData.created_at && formData.due_date) {
+      formData.created_at = formatISO(new Date(formData.created_at));
+      formData.due_date = formatISO(new Date(formData.due_date));
+      createIssuedBookMutation.mutate(formData);
+      onBookIssued();
+    } else {
+      throw new Error("Created at and Due Date cannot be null");
+    }
   }
 
   return (
@@ -98,6 +104,7 @@ export default function IssueBookDrawer({
               reactHookErrorMessage={errors["id"]}
             />
             <NovellaInput
+              type="datetime-local"
               title="Issued Date"
               helpText="The current time will be used if not date is given"
               labelDirection="horizontal"
@@ -107,6 +114,7 @@ export default function IssueBookDrawer({
               reactHookErrorMessage={errors["created_at"]}
             />
             <NovellaInput
+              type="datetime-local"
               title="Due Date"
               helpText="The date 5 days from now will be used by default"
               labelDirection="horizontal"
@@ -120,7 +128,10 @@ export default function IssueBookDrawer({
             <h3 className="text-md text-surface-800">Book Fields</h3>
             <NovellaInput
               title="Book ID"
-              helpText="This will be the book that is issued. Select from the table"
+              helpText={
+                selectedBook?.title ||
+                "This will be the book that is issued. Select from the table"
+              }
               labelDirection="horizontal"
               reactHookRegister={register("book_id", {
                 valueAsNumber: true,
@@ -145,7 +156,10 @@ export default function IssueBookDrawer({
             <h3 className="text-md text-surface-800">Student Fields</h3>
             <NovellaInput
               title="Student ID"
-              helpText="This will be the student the book is issued to. Select from the table"
+              helpText={
+                selectedStudent?.name ||
+                "This will be the student the book is issued to. Select from the table"
+              }
               labelDirection="horizontal"
               reactHookRegister={register("student_id", {
                 valueAsNumber: true,

@@ -119,7 +119,7 @@ export const HistoryRouter = router({
     const { data, error } = await supabase
       .from("history")
       .select("id, issued_date")
-      .gt("issued_date", dateLowerBound.toISOString());
+      .gte("issued_date", formatISO(dateLowerBound));
 
     if (error)
       throw new TRPCError({
@@ -143,9 +143,9 @@ export const HistoryRouter = router({
           });
         }
         // FIXME: Timezone difference when in production
-        const day = new Date(
-          format(new Date(history.issued_date), "dd-MMM-yyy")
-        ).toISOString();
+        const day = formatISO(
+          new Date(format(new Date(history.issued_date), "dd-MMM-yyy"))
+        );
         if (!filteredData.has(day)) {
           filteredData.set(day, 1);
         } else {
@@ -168,7 +168,7 @@ export const HistoryRouter = router({
     const { data, error } = await supabase
       .from("history")
       .select("id, returned_date")
-      .gt("issued_date", dateLowerBound.toISOString());
+      .gte("returned_date", formatISO(dateLowerBound));
 
     if (error)
       throw new TRPCError({

@@ -43,7 +43,7 @@ export default function ReturnStatChart({ data }: ReturnStatChartProps) {
                   size: 14,
                 },
               },
-              type: "time",
+              type: "timeseries",
               time: {
                 tooltipFormat: "dd MMM yyyy",
                 unit: "day",

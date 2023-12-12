@@ -12,6 +12,8 @@ import UserIcon from "./icons/UserIcon";
 import SignoutIcon from "./icons/SignoutIcon";
 import { trpc } from "@/app/_trpc/client";
 import NToast from "./NToast";
+import NModal from "./NModal";
+import NButton from "./NButton";
 
 type NovellaSidebarLinkProps = {
   href: string;
@@ -81,14 +83,14 @@ const links = [
     groupTitle: "Books",
     links: [
       {
-        title: "Add book",
-        href: "/books",
-        icon: <BookIcon size={20} />,
-      },
-      {
         title: "Issue book",
         href: "/issued",
         icon: <IssueBookIcon size={20} />,
+      },
+      {
+        title: "Add book",
+        href: "/books",
+        icon: <BookIcon size={20} />,
       },
       {
         title: "History",
@@ -112,6 +114,7 @@ const links = [
 export default function NovellaSidebar() {
   const pathname = usePathname();
   const nextRouter = useRouter();
+  const [showSignoutModal, setShowSignoutModal] = useState(false);
   const signOut = trpc.auth.signOut.useMutation({
     onError: (_error) => {
       NToast.error("Cannot signout user", `${_error.message}`);
@@ -125,7 +128,9 @@ export default function NovellaSidebar() {
   return (
     <div className="overflow-y-hidden bg-surface-100 w-[64px] border-r-[1px] border-surface-200 flex flex-col p-2 pb-5">
       <div className="bg-surface-100 h-12 w-12 flex justify-center items-center text-primary-500">
-        <Image src={NovellaLogo} width={48} height={48} alt="Novella logo" />
+        <Link href="/dashboard">
+          <Image src={NovellaLogo} width={48} height={48} alt="Novella logo" />
+        </Link>
       </div>
       <div className="flex flex-col justify-between flex-grow">
         <div className="flex flex-col gap-2 items-center mt-3">
@@ -150,9 +155,37 @@ export default function NovellaSidebar() {
             </div>
           ))}
         </div>
-        <SignoutButtonLink onClick={() => signOut.mutate()}>
+        <SignoutButtonLink onClick={() => setShowSignoutModal(true)}>
           <SignoutIcon size={20} />
         </SignoutButtonLink>
+        <NModal
+          title="Signout from Novella"
+          isOpen={showSignoutModal}
+          onModalClose={() => setShowSignoutModal(false)}
+        >
+          <section className="p-4">
+            <p className="text-sm text-surface-700">
+              Are you sure you want to signout from Novella?
+            </p>
+          </section>
+          <section className="flex gap-2 justify-end py-3 border-t-[1px] border-surface-300 px-3">
+            <NButton
+              size="normal"
+              kind="secondary"
+              title="Cancel"
+              onClick={() => setShowSignoutModal(false)}
+            />
+            <NButton
+              size="normal"
+              kind="primary"
+              title="Signout"
+              isLoading={signOut.isLoading}
+              onClick={() => {
+                signOut.mutate();
+              }}
+            />
+          </section>
+        </NModal>
       </div>
     </div>
   );
