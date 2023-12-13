@@ -89,23 +89,23 @@ export const ZIssuedV2 = z.object({
 export const ZStudent = z.object({
   address: z.string().nullable(),
   created_at: z.string(),
-  grade: z.string().nullable(),
+  grade: z.number().nullable(),
   id: z.number(),
   index: z.number(),
   island: z.string().nullable(),
   name: z.string().nullable(),
-  phone: z.number().nullable(),
+  phone: z.string().nullable(),
   user_id: z.string(),
 });
 
 export const ZStudentInsert = z.object({
   address: z.string().nullable().optional(),
   created_at: z.string().optional(),
-  grade: z.string().nullable().optional(),
+  grade: z.number().nullable().optional(),
   id: z.number().optional(),
   index: z.number(),
   island: z.string().nullable().optional(),
   name: z.string().nullable().optional(),
-  phone: z.number().nullable().optional(),
+  phone: z.string().nullable().optional(),
   user_id: z.string().optional(),
 });

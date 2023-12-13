@@ -157,10 +157,15 @@ export default function Student({ params }: StudentProps) {
       if (filteredFormData[key] == undefined) delete filteredFormData[key];
     }
 
-    updateStudentByIdMutation.mutate({
-      ...formData,
-      id: Number(params.student),
-    });
+    if (filteredFormData.grade) {
+      const grade = parseInt(`${filteredFormData.grade}`);
+      filteredFormData = { ...filteredFormData, grade: grade };
+
+      updateStudentByIdMutation.mutate({
+        ...filteredFormData,
+        id: Number(params.student),
+      });
+    }
   }
 
   useEffect(() => {

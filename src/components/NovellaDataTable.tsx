@@ -75,7 +75,7 @@ export default function NovellaDataTable<T>({
             </tr>
           ))}
         </thead>
-        <tbody>
+        <tbody className="bg-surface-200">
           {data && data.length !== 0 ? (
             table.getRowModel().rows.map((row) => (
               <tr

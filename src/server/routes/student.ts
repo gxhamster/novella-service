@@ -37,7 +37,30 @@ const getStudentsByPageShape = getShape<IStudent>()({
 
 export type getStudentsByPageType = typeof getStudentsByPageShape;
 
+const getAllStudentsShape = getShape<IStudent>()({
+  id: true,
+  name: true,
+  grade: true,
+  index: true,
+});
+
+export type getAllStudentsType = typeof getAllStudentsShape;
+
 export const StudentRouter = router({
+  getAllStudents: publicProcedure.query(async (opts) => {
+    const { supabase } = opts.ctx;
+
+    const { data, error } = await supabase
+      .from("students")
+      .select("id, name, index, grade");
+
+    if (error)
+      throw new Error(error.message, {
+        cause: error.details,
+      });
+
+    return { data };
+  }),
   getStudentById: publicProcedure.input(z.number()).query(async (opts) => {
     const { input } = opts;
     const { supabase } = opts.ctx;
@@ -97,6 +120,8 @@ export const StudentRouter = router({
         .select();
 
       if (!error) return updatedStudent;
+
+      console.log(input);
 
       throw new TRPCError({
         message: error.message,

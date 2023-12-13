@@ -167,7 +167,7 @@ export default function StudentsTable() {
         defaultValues={{
           created_at: new Date().toISOString(),
           index: 0,
-          phone: 0,
+          phone: "",
         }}
       />
 

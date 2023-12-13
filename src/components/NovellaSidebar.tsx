@@ -14,6 +14,7 @@ import { trpc } from "@/app/_trpc/client";
 import NToast from "./NToast";
 import NModal from "./NModal";
 import NButton from "./NButton";
+import SchoolIcon from "./icons/SchoolIcon";
 
 type NovellaSidebarLinkProps = {
   href: string;
@@ -106,6 +107,11 @@ const links = [
         title: "Students",
         href: "/students",
         icon: <UserIcon size={20} />,
+      },
+      {
+        title: "Start Academic Year",
+        href: "/students/nextyear",
+        icon: <SchoolIcon size={20} />,
       },
     ],
   },
