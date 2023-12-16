@@ -5,6 +5,7 @@ import { useState } from "react";
 import { trpc } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
 import { NDrawerCreateFormFieldsType } from "@/components/NDrawer";
+import { format } from "date-fns";
 import NToast from "@/components/NToast";
 
 const bookFieldCategories: NDrawerCreateFormFieldsType<IBook>[] = [
@@ -21,7 +22,7 @@ const bookFieldCategories: NDrawerCreateFormFieldsType<IBook>[] = [
       {
         field: "created_at",
         title: "Created At",
-        fieldType: "string",
+        fieldType: "date",
         help: `Default value will be the time as of now ${new Date().toDateString()}`,
       },
       {
@@ -139,7 +140,7 @@ export default function BookAddDrawer({
         year: new Date().getFullYear(),
         isbn: 0,
         pages: 0,
-        created_at: String(new Date().toISOString()),
+        created_at: format(new Date(), "yyyy-MM-dd'T'hh:mm"),
       }}
     />
   );

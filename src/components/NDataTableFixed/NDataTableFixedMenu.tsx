@@ -15,7 +15,7 @@ export default function NDataTableFixedMenu({
     <Popover as="div" className="relative">
       {({ open }) => (
         <>
-          <Popover.Button className="py-2 px-3 inline-flex text-sm gap-2 justify-center items-center text-surface-700 bg-surface-200 hover:bg-surface-300 transition-all border-[1px] border-surface-200 focus:border-surface-900 disabled:bg-surface-200 disabled:opacity-60 outline-none">
+          <Popover.Button className="h-full py-2 px-3 inline-flex text-sm gap-2 justify-center items-center text-surface-700 bg-surface-200 hover:bg-surface-300 transition-all border-[1px] border-surface-200 focus:border-surface-900 disabled:bg-surface-200 disabled:opacity-60 outline-none">
             {buttonContent}
           </Popover.Button>
           <Transition

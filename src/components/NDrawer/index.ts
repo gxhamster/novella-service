@@ -10,7 +10,7 @@ export type NDrawerCreateFormFieldsType<TableType> = {
     field: Path<TableType>;
     title: string;
     help?: string;
-    fieldType: "number" | "string";
+    fieldType: "number" | "string" | "date";
     disabled?: boolean;
   }>;
 };

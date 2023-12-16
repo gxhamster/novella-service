@@ -19,7 +19,7 @@ const sizes = {
   },
   normal: {
     padding: "px-4 py-2",
-    text: "text-base",
+    text: "text-sm",
   },
   lg: {
     padding: "px-5 py-3",

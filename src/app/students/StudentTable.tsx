@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
 import Link from "next/link";
 import { IStudent } from "@/supabase/types/supabase";
@@ -12,6 +12,7 @@ import NDeleteModal from "@/components/NDeleteModal";
 import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
 import { trpc } from "@/app/_trpc/client";
 import { getStudentsByPageType } from "@/server/routes/student";
+import { format } from "date-fns";
 import NToast from "@/components/NToast";
 
 export default function StudentsTable() {
@@ -113,7 +114,7 @@ export default function StudentsTable() {
           field: "created_at",
           title: "Created At",
           help: "If not assigned the current date will be used",
-          fieldType: "string",
+          fieldType: "date",
         },
         {
           field: "name",
@@ -165,7 +166,7 @@ export default function StudentsTable() {
         closeDrawer={() => setIsAddBookDrawerOpen(false)}
         formFieldsCategories={studentCategories}
         defaultValues={{
-          created_at: new Date().toISOString(),
+          created_at: format(new Date(), "yyyy-MM-dd'T'hh:mm"),
           index: 0,
           phone: "",
         }}

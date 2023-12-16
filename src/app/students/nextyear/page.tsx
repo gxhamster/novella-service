@@ -7,6 +7,8 @@ import { getAllStudentsType } from "@/server/routes/student";
 import NovellaDataTable from "@/components/NovellaDataTable";
 import { createColumnHelper } from "@tanstack/react-table";
 import NBadge from "@/components/NBadge";
+import CheckIcon from "@/components/icons/CheckIcon";
+import { Popover, Listbox } from "@headlessui/react";
 
 interface getAllStudentsTypeDef extends getAllStudentsType {
   new_grade: number | null;
@@ -15,6 +17,7 @@ interface getAllStudentsTypeDef extends getAllStudentsType {
 
 export default function Nextyear() {
   const [showStudents, setShowStudents] = useState<boolean>(false);
+  const [selectedGrade, setSelectedGrade] = useState<number>();
   const getStudentQuery = trpc.students.getAllStudents.useQuery(undefined, {
     enabled: false,
   });
@@ -75,6 +78,7 @@ export default function Nextyear() {
             disabled={showStudents}
             title="Review Changes"
             size="normal"
+            kind="secondary"
             onClick={() => {
               setShowStudents(true);
               getStudentQuery.refetch();
@@ -92,12 +96,36 @@ export default function Nextyear() {
               information
             </span>
           </div>
-          <NovellaDataTable<getAllStudentsTypeDef>
-            columns={tanstackCols}
-            isDataLoading={getStudentQuery.isLoading}
-            isDataRefetching={getStudentQuery.isRefetching}
-            data={getStudentQueryWithStatus}
-          />
+          <div className="flex flex-col">
+            <div className="flex justify-end">
+              <Listbox value={selectedGrade} onChange={setSelectedGrade}>
+                <Listbox.Button className="h-full py-2 px-3 inline-flex text-sm gap-2 justify-center items-center text-surface-700 bg-surface-200 hover:bg-surface-300 transition-all border-[1px] border-surface-200 focus:border-surface-900 disabled:bg-surface-200 disabled:opacity-60 outline-none">
+                  {selectedGrade} Hello
+                </Listbox.Button>
+                <Listbox.Options>
+                  {getStudentQueryWithStatus
+                    ?.map((record) => record.grade)
+                    .filter((grade, idx, array) => idx === array.indexOf(grade))
+                    .map((grade) => (
+                      <Listbox.Option key={grade} value={grade}>
+                        {grade}
+                      </Listbox.Option>
+                    ))}
+                </Listbox.Options>
+              </Listbox>
+              <NButton
+                size="normal"
+                title="Save Changes"
+                icon={<CheckIcon size={10} />}
+              ></NButton>
+            </div>
+            <NovellaDataTable<getAllStudentsTypeDef>
+              columns={tanstackCols}
+              isDataLoading={getStudentQuery.isLoading}
+              isDataRefetching={getStudentQuery.isRefetching}
+              data={getStudentQueryWithStatus}
+            />
+          </div>
         </section>
       )}
     </div>

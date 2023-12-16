@@ -45,6 +45,19 @@ export default function NDrawerCreateForm<TableType extends FieldValues>({
     defaultValues: defaultValues,
   });
 
+  function selectInputType(type: "number" | "string" | "date") {
+    switch (type) {
+      case "string":
+        return "text";
+      case "number":
+        return "number";
+      case "date":
+        return "datetime-local";
+      default:
+        return "text";
+    }
+  }
+
   return (
     <NDrawer isOpen={isOpen} closeDrawer={closeDrawer} title={title}>
       <div className="flex flex-col justify-between h-[calc(100vh-57px)] overflow-y-auto">
@@ -65,7 +78,7 @@ export default function NDrawerCreateForm<TableType extends FieldValues>({
               {category.fields.map((field) => (
                 <NovellaInput<typeof field.field>
                   key={field.field}
-                  type="text"
+                  type={selectInputType(field.fieldType)}
                   fontSize="xs"
                   helpText={field.help}
                   reactHookErrorMessage={errors[field.field] as FieldError}
