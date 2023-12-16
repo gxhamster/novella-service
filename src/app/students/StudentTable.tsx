@@ -14,6 +14,7 @@ import { trpc } from "@/app/_trpc/client";
 import { getStudentsByPageType } from "@/server/routes/student";
 import { format } from "date-fns";
 import NToast from "@/components/NToast";
+import { format } from "date-fns";
 
 export default function StudentsTable() {
   const columnHelper = createColumnHelper<getStudentsByPageType>();
@@ -67,13 +68,15 @@ export default function StudentsTable() {
     addStudentMutation.mutate(formData);
   };
 
-  const columnsObj: Array<{
+  type StudentTableColsDef = {
     id: keyof getStudentsByPageType;
     header: string;
-    isLink?: boolean;
-  }> = [
-    { id: "id", header: "ID", isLink: true },
-    { id: "created_at", header: "Created At" },
+    type?: "date" | "link";
+  };
+
+  const columnsObj: Array<StudentTableColsDef> = [
+    { id: "id", header: "ID", type: "link" },
+    { id: "created_at", header: "Created At", type: "date" },
     { id: "name", header: "Name" },
     { id: "island", header: "Island" },
     { id: "address", header: "Address" },
@@ -84,17 +87,24 @@ export default function StudentsTable() {
 
   const tanstackColumns = columnsObj.map((column) =>
     columnHelper.accessor(column.id, {
-      cell: (info) =>
-        column.isLink ? (
-          <Link
-            href={`/students/${info.getValue()}`}
-            className="hover:underline hover:text-primary-700"
-          >
-            {info.getValue()}
-          </Link>
-        ) : (
-          info.getValue()
-        ),
+      cell: (info) => {
+        switch (column.type) {
+          case "date":
+            return format(new Date(info.getValue() || 0), "dd-MM-yyyy hh:mm");
+          case "link":
+            return (
+              <Link
+                href={`/students/${info.getValue()}`}
+                className="hover:underline hover:text-primary-700"
+              >
+                {info.getValue()}
+              </Link>
+            );
+          default:
+            return info.getValue();
+        }
+      },
+
       header: column.header,
     })
   );
@@ -145,7 +155,7 @@ export default function StudentsTable() {
         {
           field: "grade",
           title: "Grade",
-          fieldType: "string",
+          fieldType: "number",
         },
         {
           field: "index",
@@ -166,7 +176,8 @@ export default function StudentsTable() {
         closeDrawer={() => setIsAddBookDrawerOpen(false)}
         formFieldsCategories={studentCategories}
         defaultValues={{
-          created_at: format(new Date(), "yyyy-MM-dd'T'hh:mm"),
+          created_at: new Date().toISOString(),
+          grade: 0,
           index: 0,
           phone: "",
         }}
