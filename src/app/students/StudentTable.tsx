@@ -12,9 +12,9 @@ import NDeleteModal from "@/components/NDeleteModal";
 import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
 import { trpc } from "@/app/_trpc/client";
 import { getStudentsByPageType } from "@/server/routes/student";
-import { format } from "date-fns";
 import NToast from "@/components/NToast";
 import { format } from "date-fns";
+import { ZStudentInsert } from "@/supabase/schema";
 
 export default function StudentsTable() {
   const columnHelper = createColumnHelper<getStudentsByPageType>();
@@ -150,7 +150,7 @@ export default function StudentsTable() {
         {
           field: "phone",
           title: "Phone",
-          fieldType: "number",
+          fieldType: "string",
         },
         {
           field: "grade",
@@ -170,15 +170,15 @@ export default function StudentsTable() {
     <>
       <NDrawerCreateForm<IStudent>
         title="Add new student to library"
+        schema={ZStudentInsert}
         saveButtonLoadingState={saveButtonLoading}
         isOpen={isAddBookDrawerOpen}
         onFormSubmit={addStudentToSupabase}
         closeDrawer={() => setIsAddBookDrawerOpen(false)}
         formFieldsCategories={studentCategories}
         defaultValues={{
-          created_at: new Date().toISOString(),
-          grade: 0,
-          index: 0,
+          created_at: format(new Date(), "yyyy-MM-dd'T'hh:mm"),
+          grade: 1,
           phone: "",
         }}
       />

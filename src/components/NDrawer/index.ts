@@ -11,6 +11,7 @@ export type NDrawerCreateFormFieldsType<TableType> = {
     title: string;
     help?: string;
     fieldType: "number" | "string" | "date";
+    required?: boolean;
     disabled?: boolean;
   }>;
 };

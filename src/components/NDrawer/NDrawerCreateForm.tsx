@@ -7,12 +7,11 @@ import {
 } from "react-hook-form";
 import NDrawer from "@/components/NDrawer/NDrawer";
 import NovellaInput from "@/components/NovellaInput";
-import ButtonGhost from "@/components/ButtonGhost";
-import ButtonPrimary from "@/components/ButtonPrimary";
-import LoadingIcon from "@/components/icons/LoadingIcon";
 import { NDrawerCreateFormFieldsType } from ".";
+import NButton from "../NButton";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-// Related to react-hook-form
+// Related to react-hook-for;
 type AsyncDefaultValues<TFieldValues> = (
   payload?: unknown
 ) => Promise<TFieldValues>;
@@ -22,6 +21,7 @@ type NDrawerCreateStudentProps<TableType> = {
   closeDrawer: () => void;
   title: string;
   onFormSubmit: (formData: TableType) => void;
+  schema: any;
   saveButtonLoadingState: boolean;
   formFieldsCategories: Array<NDrawerCreateFormFieldsType<TableType>>;
   defaultValues: DefaultValues<TableType> | AsyncDefaultValues<TableType>;
@@ -32,6 +32,7 @@ export default function NDrawerCreateForm<TableType extends FieldValues>({
   closeDrawer,
   title,
   onFormSubmit,
+  schema,
   saveButtonLoadingState,
   formFieldsCategories,
   defaultValues,
@@ -42,6 +43,7 @@ export default function NDrawerCreateForm<TableType extends FieldValues>({
     reset,
     formState: { errors },
   } = useForm<TableType>({
+    resolver: zodResolver(schema),
     defaultValues: defaultValues,
   });
 
@@ -83,6 +85,7 @@ export default function NDrawerCreateForm<TableType extends FieldValues>({
                   helpText={field.help}
                   reactHookErrorMessage={errors[field.field] as FieldError}
                   reactHookRegister={register(field.field, {
+                    required: field.required ? "This field is required" : false,
                     valueAsNumber: field.fieldType === "number" ? true : false,
                     disabled: saveButtonLoadingState ? true : field.disabled,
                   })}
@@ -93,7 +96,8 @@ export default function NDrawerCreateForm<TableType extends FieldValues>({
             </div>
           ))}
           <div className="flex justify-end p-3 gap-2">
-            <ButtonGhost
+            <NButton
+              kind="ghost"
               title="Cancel"
               onClick={(e) => {
                 e.preventDefault();
@@ -101,13 +105,9 @@ export default function NDrawerCreateForm<TableType extends FieldValues>({
                 closeDrawer();
               }}
             />
-            <ButtonPrimary
+            <NButton
               disabled={saveButtonLoadingState}
-              icon={
-                saveButtonLoadingState ? (
-                  <LoadingIcon className="text-surface-900" size={18} />
-                ) : null
-              }
+              isLoading={saveButtonLoadingState}
               title="Save"
             />
           </div>

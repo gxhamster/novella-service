@@ -31,10 +31,10 @@ export default function ToastProvider() {
       pauseOnFocusLoss
       draggable
       pauseOnHover
-      theme="light"
+      theme="dark"
       style={{ width: 400 }}
       toastClassName={(opts) => {
-        return `bg-surface-900 text-surface-200 text-sm border-l-4 ${
+        return `bg-surface-300 text-surface-900 text-sm border-l-4 ${
           stylesContext[opts?.type ? opts.type : "default"].borderColor
         } m-2 relative flex p-3 shadow-lg shadow-inset min-h-10 justify-between overflow-hidden cursor-pointer`;
       }}
