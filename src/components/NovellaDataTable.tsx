@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from "react";
 import RightArrowIcon from "./icons/RightArrowIcon";
 import LeftArrowIcon from "./icons/LeftArrowIcon";
 import LoadingIcon from "./icons/LoadingIcon";
+import { Table, Select, Text, ActionIcon } from "@mantine/core";
 
 type NovellaDataTableProps<T> = {
   data: T[] | undefined;
@@ -55,14 +56,19 @@ export default function NovellaDataTable<T>({
 
   return (
     <div>
-      <table className="w-full">
-        <thead className="text-surface-900 bg-surface-300">
+      <Table
+        verticalSpacing="sm"
+        horizontalSpacing="sm"
+        highlightOnHover
+        withTableBorder
+      >
+        <Table.Thead>
           {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
+            <Table.Tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <th
+                <Table.Th
                   key={header.id}
-                  className="text-start p-2 px-4 font-medium text-sm"
+                  className="text-start p-2 px-4 font-semibold text-sm bg-dark-6/[0.5]"
                 >
                   {header.isPlaceholder
                     ? null
@@ -70,57 +76,48 @@ export default function NovellaDataTable<T>({
                         header.column.columnDef.header,
                         header.getContext()
                       )}
-                </th>
+                </Table.Th>
               ))}
-            </tr>
+            </Table.Tr>
           ))}
-        </thead>
-        <tbody className="bg-surface-200">
+        </Table.Thead>
+        <Table.Tbody>
           {data && data.length !== 0 ? (
             table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                className={`${
-                  row.getIsSelected() ? "bg-surface-300/40" : "bg-surface-200"
-                } text-surface-800 font-[350] text-sm border-b-[0.7px] border-surface-400 transition-colors`}
-                onClick={() => row.toggleSelected()}
-              >
+              <Table.Tr key={row.id} onClick={() => row.toggleSelected()}>
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="p-2 px-4 text-ellipsis">
+                  <Table.Td key={cell.id} className="p-2 px-4 text-ellipsis">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
+                  </Table.Td>
                 ))}
-              </tr>
+              </Table.Tr>
             ))
           ) : (
-            <tr>
-              <td colSpan={12} className="">
+            <Table.Tr>
+              <Table.Td colSpan={12} className="">
                 <div className=" text-surface-800  w-full text-center p-4 flex flex-col items-center justify-center gap-2">
                   <span className="font-light text-base text-surface-700">
                     There are currently no records in the table
                   </span>
                 </div>
-              </td>
-            </tr>
+              </Table.Td>
+            </Table.Tr>
           )}
-        </tbody>
-      </table>
+        </Table.Tbody>
+      </Table>
 
       {/* Table Controls */}
-      <div className="flex justify-between items-center px-4 py-1 border-t-[1px] border-surface-300 bg-surface-200 text-surface-700 gap-2 text-sm">
+      <div className="flex justify-between items-center px-4 py-2 border-b-[1px] border-r-[1px] border-l-[1px] border-surface-300 bg-dark-7 text-dark-2 gap-2 text-sm">
         <div className="flex gap-6 items-center">
-          <p>Items per page</p>
-          <select
-            className="apperance-none bg-surface-200 outline-none p-2 focus:ring-1 focus:ring-surface-900 hover:bg-surface-300"
-            value={table.getState().pagination.pageSize}
-            onChange={(e) => table.setPageSize(Number(e.target.value))}
-          >
-            {[10, 20, 30, 40, 50].map((pageSize) => (
-              <option key={pageSize} value={pageSize}>
-                {pageSize}
-              </option>
-            ))}
-          </select>
+          <Text size="xs">Items per page</Text>
+          <Select
+            size="xs"
+            w="75"
+            placeholder="Pick a page"
+            data={["10", "20", "30", "40", "50"]}
+            value={table.getState().pagination.pageSize.toString()}
+            onChange={(e) => table.setPageSize(Number(e))}
+          />
           {isDataLoading || isDataRefetching ? (
             <div className="flex gap-2 text-xs items-center">
               {" "}
@@ -129,35 +126,39 @@ export default function NovellaDataTable<T>({
           ) : null}
         </div>
         <div className="flex gap-4 items-center">
-          <button
-            className="p-2 inline-flex justify-center items-center bg-surface-200 hover:bg-surface-300 transition-all focus:ring-1 focus:ring-surface-900 disabled:opacity-60 disabled:bg-surface-200"
+          <ActionIcon
+            variant="default"
+            size="lg"
+            aria-label="Previous Page"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
             <RightArrowIcon size={18} />
-          </button>
-          <button
-            className="p-2 inline-flex justify-center items-center bg-surface-200 hover:bg-surface-300 transition-all focus:ring-1 focus:ring-surface-900 disabled:bg-surface-200 disabled:opacity-60"
+          </ActionIcon>
+          <ActionIcon
+            variant="default"
+            size="lg"
+            aria-label="Next Page"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
             <LeftArrowIcon size={18} />
-          </button>
-          <select
-            className="apperance-none bg-surface-200 outline-none p-2 focus:ring-1 focus:ring-surface-900 hover:bg-surface-300"
-            defaultValue={table.getState().pagination.pageIndex + 1}
-            onChange={(e) => {
-              const page = e.target.value ? Number(e.target.value) - 1 : 0;
+          </ActionIcon>
+          <Select
+            size="xs"
+            w="100"
+            placeholder="Pick a page"
+            defaultValue={String(table.getState().pagination.pageIndex + 1)}
+            data={Array.from({ length: table.getPageCount() }, (value, index) =>
+              String(index + 1)
+            )}
+            value={table.getState().pagination.pageSize.toString()}
+            onChange={(value) => {
+              const page = value ? Number(value) - 1 : 0;
               table.setPageIndex(page);
             }}
-          >
-            {Array.from({ length: table.getPageCount() }, (v, i) => i + 1).map(
-              (v) => (
-                <option key={v}>{v}</option>
-              )
-            )}
-          </select>
-          <span>of {totalPageCount} pages</span>
+          />
+          <Text size="xs">of {totalPageCount} pages</Text>
         </div>
       </div>
     </div>

@@ -1,4 +1,3 @@
-"use client";
 import StudentsTable from "./StudentTable";
 
 export default async function Students() {

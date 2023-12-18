@@ -15,6 +15,18 @@ const config: Config = {
     colors: {
       // Primary Color: #01aaff
       // Refer: https://www.ibm.com/design/language/color
+      dark: {
+        0: "#C9C9C9",
+        1: "#B8B8B8",
+        2: "#828282",
+        3: "#696969",
+        4: "#424242",
+        5: "#3B3B3B",
+        6: "#2E2E2E",
+        7: "#242424",
+        8: "#1F1F1F",
+        9: "#141414",
+      },
       primary: {
         100: "#001141",
         200: "#001d6c",

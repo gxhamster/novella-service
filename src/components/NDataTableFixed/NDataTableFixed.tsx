@@ -26,19 +26,15 @@ import TrashIcon from "../icons/TrashIcon";
 import CloseIcon from "../icons/CloseIcon";
 import NButtonLink from "../NButtonLink";
 import BoxIcon from "../icons/BoxIcon";
-
-type TableCheckboxProps = {
-  indeterminate?: boolean;
-} & HTMLProps<HTMLInputElement>;
-
-function TableCheckbox({ indeterminate, ...rest }: TableCheckboxProps) {
-  const ref = useRef<HTMLInputElement>(null!);
-  useEffect(() => {
-    if (typeof indeterminate === "boolean")
-      ref.current.indeterminate = !rest.checked && indeterminate;
-  }, [ref, indeterminate]);
-  return <input ref={ref} type="checkbox" {...rest} />;
-}
+import {
+  Table,
+  Select,
+  Text,
+  ActionIcon,
+  Loader,
+  Checkbox,
+  Button,
+} from "@mantine/core";
 
 type NovellaDataTableProps<TableType> = {
   onRefresh: () => void;
@@ -109,22 +105,18 @@ export default function NDataTableFixed<TableType>({
       {
         id: "select",
         header: ({ table }) => (
-          <TableCheckbox
-            {...{
-              checked: table.getIsAllRowsSelected(),
-              indeterminate: table.getIsSomeRowsSelected(),
-              onChange: table.getToggleAllRowsSelectedHandler(),
-            }}
+          <Checkbox
+            checked={table.getIsAllRowsSelected()}
+            indeterminate={table.getIsSomeRowsSelected()}
+            onChange={table.getToggleAllRowsSelectedHandler()}
           />
         ),
         cell: ({ row }) => (
-          <TableCheckbox
-            {...{
-              checked: row.getIsSelected(),
-              disabled: !row.getCanSelect(),
-              indeterminate: row.getIsSomeSelected(),
-              onChange: row.getToggleSelectedHandler(),
-            }}
+          <Checkbox
+            checked={row.getIsSelected()}
+            disabled={!row.getCanSelect()}
+            indeterminate={row.getIsSomeSelected()}
+            onChange={row.getToggleSelectedHandler()}
           />
         ),
       },
@@ -168,32 +160,44 @@ export default function NDataTableFixed<TableType>({
   return (
     <div className="m-0 flex flex-col h-full">
       {/* Table Functions */}
-      <div className="flex justify-between bg-surface-200 border-b-[1px] border-surface-300">
-        <div className="flex">
-          <ButtonGhost
-            icon={refreshBtnIcon}
-            title="Refresh"
-            onClick={() => onRefresh()}
-          />
-        </div>
+      <div className="flex max-h-[45px] justify-between bg-dark-7 border-b-[1px] border-surface-300 p-1">
+        <Button
+          loading={isDataLoading}
+          variant="subtle"
+          radius="compact-xs"
+          color="gray"
+          leftSection={<RefreshIcon size={18} />}
+          onClick={onRefresh}
+        >
+          Refresh
+        </Button>
         {selectedData.length ? (
           <div className="flex items-center gap-2">
-            <NButton
-              kind="ghost"
-              icon={<CloseIcon size={18} />}
+            <ActionIcon
+              variant="default"
+              color="dark"
+              size="lg"
+              aria-label="Reset row selection"
               onClick={() => table.resetRowSelection()}
-            />
+            >
+              <CloseIcon size={16} />
+            </ActionIcon>
+            <Text
+              c="dark.1"
+              size="xs"
+            >{`${selectedData.length} rows selected`}</Text>
 
-            <span className="text-sm text-surface-700">{`${selectedData.length} rows selected`}</span>
-            <NButton
-              title="Delete"
-              kind="alert"
-              icon={<TrashIcon size={18} />}
+            <Button
+              variant="filled"
+              color="red.8"
+              leftSection={<TrashIcon size={18} />}
               onClick={() => {
                 onRowDeleted && onRowDeleted(selectedData);
                 table.resetRowSelection();
               }}
-            />
+            >
+              Delete
+            </Button>
           </div>
         ) : (
           <div className="flex">
@@ -217,30 +221,33 @@ export default function NDataTableFixed<TableType>({
               tableProps={columns.map((col) => col.id)}
             />
             {showCreateButton && (
-              <ButtonPrimary
-                title={primaryButtonTitle}
-                icon={<AddIcon size={18} />}
+              <Button
+                leftSection={<AddIcon size={18} />}
                 onClick={() =>
                   onCreateRowButtonPressed && onCreateRowButtonPressed()
                 }
-              />
+              >
+                {primaryButtonTitle}
+              </Button>
             )}
           </div>
         )}
       </div>
-      {/* FIXME: WTH need to cleaner solution */}
-
-      {/* <div className="h-[calc(100vh-(58px+45px+39px))] overflow-scroll bg-surface-100 m-0 relative"></div> */}
       {data.length !== 0 ? (
-        <div className="flex-grow overflow-scroll bg-surface-100 m-0 relative">
-          <table className="w-full table-auto">
-            <thead className="text-surface-900 bg-surface-200 sticky top-0 m-0">
+        <div className="flex-grow overflow-scroll bg-dark-8 m-0 relative">
+          <Table
+            verticalSpacing="xs"
+            horizontalSpacing="sm"
+            withColumnBorders
+            className="w-full table-auto"
+          >
+            <Table.Thead className="text-surface-900 bg-surface-200 sticky top-0 m-0">
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
+                <Table.Tr key={headerGroup.id}>
                   {headerGroup.headers.map((header, idx) => (
-                    <th
+                    <Table.Th
                       key={header.id}
-                      className={`text-start p-2 px-4 font-normal text-sm border-x-[0.7px] border-surface-400 whitespace-nowrap`}
+                      className={`text-start p-2 px-4 font-semibold text-sm border-x-[0.7px] border-surface-400 whitespace-nowrap`}
                     >
                       {header.isPlaceholder
                         ? null
@@ -248,19 +255,19 @@ export default function NDataTableFixed<TableType>({
                             header.column.columnDef.header,
                             header.getContext()
                           )}
-                    </th>
+                    </Table.Th>
                   ))}
-                </tr>
+                </Table.Tr>
               ))}
-            </thead>
-            <tbody>
+            </Table.Thead>
+            <Table.Tbody>
               {table.getRowModel().rows.map((row) => (
-                <tr
+                <Table.Tr
                   key={row.id}
-                  className="text-surface-700 bg-surface-100 border-b-[0.7px] border-surface-400"
+                  className="text-surface-700 border-b-[0.7px] border-surface-400"
                 >
                   {row.getVisibleCells().map((cell, idx) => (
-                    <td
+                    <Table.Td
                       key={cell.id}
                       className={`p-2 px-4 truncate border-[0.7px] border-surface-400/70 text-sm font-normal`}
                     >
@@ -268,15 +275,15 @@ export default function NDataTableFixed<TableType>({
                         cell.column.columnDef.cell,
                         cell.getContext()
                       )}
-                    </td>
+                    </Table.Td>
                   ))}
-                </tr>
+                </Table.Tr>
               ))}
-            </tbody>
-          </table>
+            </Table.Tbody>
+          </Table>
         </div>
       ) : (
-        <div className="flex justify-center items-center h-full bg-surface-200/5">
+        <div className="flex justify-center items-center h-full bg-dark-8">
           <div className="flex flex-col justify-center items-center gap-8 ">
             <BoxIcon size={120} className="text-surface-800" strokeWidth={1} />
             <div className="flex flex-col items-center  gap-2">
@@ -299,58 +306,60 @@ export default function NDataTableFixed<TableType>({
       )}
 
       {/* Table Controls */}
-      <div className="flex justify-between items-center px-4 py-1 text-surface-800 bg-surface-100 gap-2 text-sm border-t-[0.7px] border-surface-400/60">
+      <div className="flex justify-between items-center px-4 py-1 text-surface-800 bg-dark-7 gap-2 text-sm border-t-[0.7px] border-surface-400/60">
         <div className="flex gap-6 items-center">
-          <p>Items per page</p>
-          <select
-            className="apperance-none bg-surface-100 outline-none p-2 focus:ring-1 focus:ring-surface-900 hover:bg-surface-200"
-            value={table.getState().pagination.pageSize}
-            onChange={(e) => table.setPageSize(Number(e.target.value))}
-          >
-            {[10, 20, 30, 40, 50].map((pageSize) => (
-              <option key={pageSize} value={pageSize}>
-                {pageSize}
-              </option>
-            ))}
-          </select>
-          <p>{dataCount} records</p>
+          <Text size="xs">Items per page</Text>
+          <Select
+            size="xs"
+            w="75"
+            placeholder="Pick a page"
+            data={["10", "20", "30", "40", "50"]}
+            value={table.getState().pagination.pageSize.toString()}
+            onChange={(e) => table.setPageSize(Number(e))}
+          />
+          <Text size="xs">{dataCount} records</Text>
           {isDataLoading ? (
             <div className="flex gap-2 text-xxs items-center">
               {" "}
-              <LoadingIcon size={18} /> <span>Loading data...</span>
+              <Loader color="rgba(237, 237, 237, 0.18)" size="xs" />
+              <Text size="xs">Loading data...</Text>
             </div>
           ) : null}
         </div>
         <div className="flex gap-4 items-center">
-          <button
-            className="p-2 inline-flex justify-center items-center bg-surface-100 hover:bg-surface-200 transition-all focus:ring-1 focus:ring-surface-900 disabled:opacity-60 disabled:bg-surface-100"
+          <ActionIcon
+            variant="default"
+            size="lg"
+            aria-label="Previous Page"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            <RightArrowIcon size={18} />
-          </button>
-          <button
-            className="p-2 inline-flex justify-center items-center bg-surface-100 hover:bg-surface-200 transition-all focus:ring-1 focus:ring-surface-900 disabled:bg-surface-100 disabled:opacity-60"
+            <RightArrowIcon size={16} />
+          </ActionIcon>
+          <ActionIcon
+            variant="default"
+            size="lg"
+            aria-label="Next Page"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            <LeftArrowIcon size={18} />
-          </button>
-          <select
-            className="apperance-none bg-surface-100 outline-none p-2 focus:ring-1 focus:ring-surface-900 hover:bg-surface-200"
-            defaultValue={table.getState().pagination.pageIndex + 1}
-            onChange={(e) => {
-              const page = e.target.value ? Number(e.target.value) - 1 : 0;
+            <LeftArrowIcon size={16} />
+          </ActionIcon>
+          <Select
+            size="xs"
+            w="100"
+            placeholder="Pick a page"
+            defaultValue={String(table.getState().pagination.pageIndex + 1)}
+            data={Array.from({ length: table.getPageCount() }, (value, index) =>
+              String(index + 1)
+            )}
+            value={table.getState().pagination.pageSize.toString()}
+            onChange={(value) => {
+              const page = value ? Number(value) - 1 : 0;
               table.setPageIndex(page);
             }}
-          >
-            {Array.from({ length: table.getPageCount() }, (v, i) => i + 1).map(
-              (v) => (
-                <option key={v}>{v}</option>
-              )
-            )}
-          </select>
-          <span>of {totalPageCount} pages</span>
+          />
+          <Text size="xs">of {totalPageCount} pages</Text>
         </div>
       </div>
     </div>

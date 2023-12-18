@@ -1,6 +1,5 @@
-import { CSSProperties } from "react";
 import styles from "./PageLoading.module.css";
 
-export default function () {
+export default function PageLoading() {
   return <span className={styles.loader}></span>;
 }

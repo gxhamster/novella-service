@@ -1,12 +1,12 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm } from "@mantine/form";
 import Image from "next/image";
-import NovellaInput from "@/components/NovellaInput";
-import NButton from "@/components/NButton";
-import NovellaLogo from "@/../public/icon.png";
 import { trpc } from "../../_trpc/client";
-import NToast from "@/components/NToast";
+import { Button, TextInput, PasswordInput } from "@mantine/core";
+import LoadingIcon from "@/components/icons/LoadingIcon";
+import NovellaLogo from "@/../public/icon.png";
+import { Toast } from "@/components/Toast";
 
 type LoginPageInputs = {
   email: string;
@@ -14,29 +14,40 @@ type LoginPageInputs = {
 };
 
 export default function Login() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginPageInputs>();
+  const form = useForm({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validate: {
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
+    },
+  });
 
   const signInMutation = trpc.auth.login.useMutation({
     onError: (_error) => {
-      NToast.error("Could not login", `${_error.message}`);
+      Toast.Error({
+        title: "Could not login",
+        message: _error.message,
+      });
       throw new Error(_error.message, {
         cause: _error.data,
       });
     },
     onSuccess: () => {
-      NToast.success("Succesfully logged in to novella 👍");
+      Toast.Successful({
+        title: "Successful",
+        message: "Successfully logged in to novella",
+      });
       router.replace("/dashboard");
     },
   });
 
-  const router = useRouter();
-  const signInSupabase: SubmitHandler<LoginPageInputs> = async (formData) => {
+  function signIn(formData: LoginPageInputs) {
     signInMutation.mutate(formData);
-  };
+  }
+
+  const router = useRouter();
 
   return (
     <>
@@ -63,26 +74,26 @@ export default function Login() {
 
           <form
             className="flex flex-col gap-8"
-            onSubmit={handleSubmit(signInSupabase)}
+            onSubmit={form.onSubmit(signIn)}
           >
-            <NovellaInput<"email">
-              type="email"
-              title="Email"
+            <TextInput
+              withAsterisk
+              size="md"
+              required
+              label="Email"
               placeholder="example@gmail.com"
-              reactHookErrorMessage={errors.email}
-              reactHookRegister={register("email", {
-                required: "Email address is required",
-              })}
+              {...form.getInputProps("email")}
             />
-            <NovellaInput<"password">
+            <PasswordInput
               type="password"
-              title="Password"
-              placeholder="Enter a password"
-              reactHookErrorMessage={errors.password}
-              reactHookRegister={register("password", {
-                required: "Password is required",
-              })}
+              size="md"
+              required
+              placeholder="Your password"
+              withAsterisk
+              label="Password"
+              {...form.getInputProps("password")}
             />
+
             <div className="text-sm text-surface-600">
               <span>If you want to register to this service. </span>
               <a
@@ -92,13 +103,14 @@ export default function Login() {
                 Click Here
               </a>
             </div>
-            <NButton
-              kind="primary"
-              size="normal"
-              title="Sign in"
-              className="text-center"
-              isLoading={signInMutation.isLoading}
-            />
+            <Button
+              variant="filled"
+              type="submit"
+              size="md"
+              loading={signInMutation.isLoading}
+            >
+              Sign in
+            </Button>
           </form>
         </div>
       </section>

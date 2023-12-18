@@ -104,7 +104,10 @@ export default function Nextyear() {
                   ?.map((record) => record.grade)
                   .filter((grade, idx, array) => idx === array.indexOf(grade))
                   .map((grade) => (
-                    <div className="px-2 hover:bg-surface-300/[0.5]">
+                    <div
+                      key={grade}
+                      className="px-2 hover:bg-surface-300/[0.5]"
+                    >
                       <Listbox.Option
                         key={grade}
                         value={grade}

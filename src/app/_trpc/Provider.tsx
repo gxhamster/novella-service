@@ -4,7 +4,7 @@ import { httpBatchLink } from "@trpc/client";
 import { trpc } from "./client";
 
 type ProviderProps = {
-  children: React.ReactNode;
+  children: any;
 };
 
 function getBaseUrl() {

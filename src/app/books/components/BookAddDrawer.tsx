@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { NDrawerCreateFormFieldsType } from "@/components/NDrawer";
 import { format } from "date-fns";
 import NToast from "@/components/NToast";
+import { ZBook } from "@/supabase/schema";
 
 const bookFieldCategories: NDrawerCreateFormFieldsType<IBook>[] = [
   {
@@ -130,6 +131,7 @@ export default function BookAddDrawer({
 
   return (
     <NDrawerCreateForm<IBook>
+      schema={ZBook}
       title="Add new book to library"
       saveButtonLoadingState={saveButtonLoading}
       isOpen={isAddBookDrawerOpen}

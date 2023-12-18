@@ -1,13 +1,10 @@
 "use client";
 import NovellaHeader from "@/components/NovellaHeader";
 import NovellaSidebar from "@/components/NovellaSidebar";
-import ToastProvider from "@/components/NToast/ToastProvider";
-import NButtonLink from "@/components/NButtonLink";
 import AddIcon from "@/components/icons/AddIcon";
-import NButton from "@/components/NButton";
+import { Button } from "@mantine/core";
 import RefreshIcon from "@/components/icons/RefreshIcon";
 import { useRouter } from "next/navigation";
-import { SkeletonTheme } from "react-loading-skeleton";
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -28,23 +25,18 @@ function DashboardHeader() {
         </span>
       </div>
       <div className="flex gap-2">
-        <NButton
-          onClick={() => nextRouter.refresh()}
-          icon={
-            <RefreshIcon
-              className="text-surface-600 group-hover:text-surface-900"
-              size={18}
-            />
-          }
-          kind="ghost"
-        />
-        <NButtonLink
-          href="/issued"
-          kind="primary"
-          title="Issue book"
-          size="normal"
-          icon={<AddIcon size={20} />}
-        />
+        <Button variant="subtle" size="md" onClick={() => nextRouter.refresh()}>
+          <RefreshIcon size={20} className="text-dark-1" />
+        </Button>
+        <Button
+          variant="filled"
+          color="blue"
+          size="md"
+          rightSection={<AddIcon size={20} />}
+          onClick={() => nextRouter.push("/issued")}
+        >
+          Issue Book
+        </Button>
       </div>
     </section>
   );
@@ -59,26 +51,23 @@ export default function DashboardLayout({
 }: DashboardLayoutProps) {
   return (
     <>
-      <ToastProvider />
-      <div className="bg-surface-100 text-white flex overflow-y-hidden h-screen max-h-screen">
+      <div className="bg-dark-8 text-white flex overflow-y-hidden h-screen max-h-screen">
         <NovellaSidebar />
         <section className="flex flex-col flex-1 w-full overflow-x-hidden">
           <NovellaHeader />
           <main className="overflow-y-auto flex-1 max-h-screen">
             {/* Content Starts Here */}
-            <SkeletonTheme baseColor="#202020" highlightColor="#262626">
-              <div className="my-16 mx-auto px-16 w-full flex flex-col text-surface-900 gap-y-3">
-                <DashboardHeader />
+            <div className="my-16 mx-auto px-16 w-full flex flex-col text-surface-900 gap-y-3">
+              <DashboardHeader />
 
-                <div className="mt-10 grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-4 lg:grid-cols-4 lg:gap-8">
-                  {statistics}
-                  {issuetrends}
-                  {popular}
-                </div>
-                {recently}
-                {children}
+              <div className="mt-10 grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-4 lg:grid-cols-4 lg:gap-8">
+                {statistics}
+                {popular}
+                {issuetrends}
               </div>
-            </SkeletonTheme>
+              {recently}
+              {children}
+            </div>
           </main>
         </section>
       </div>

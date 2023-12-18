@@ -7,6 +7,7 @@ import {
   NDrawerCreateFormFieldsType,
 } from "@/components/NDrawer";
 import { trpc } from "@/app/_trpc/client";
+import { ZBook } from "@/supabase/schema";
 
 export default function BookCreate() {
   const [saveButtonLoading, setSaveButtonLoading] = useState(false);
@@ -109,6 +110,7 @@ export default function BookCreate() {
         onClick={() => setIsAddBookDrawerOpen(true)}
       />
       <NDrawerCreateForm<IBook>
+        schema={ZBook.partial()}
         title="Add new book to library"
         saveButtonLoadingState={saveButtonLoading}
         isOpen={isAddBookDrawerOpen}
