@@ -1,12 +1,8 @@
-import { Dispatch, SetStateAction, useState, Fragment } from "react";
-import ButtonGhost from "../ButtonGhost";
-import ButtonSecondary from "../ButtonSecondary";
-import CloseIcon from "../icons/CloseIcon";
+import { Dispatch, SetStateAction, useState } from "react";
 import SortIcon from "../icons/SortIcon";
-import Select from "../Select";
-import NovellaSwitch from "../NovellaSwitch";
 import { NDataTableFixedSort } from ".";
 import NDataTableFixedMenu from "./NDataTableFixedMenu";
+import { Text, Switch, CloseButton, Select, Button } from "@mantine/core";
 
 type NovellaDataTableFixedSortMenuProps<T> = {
   fields: Array<{ id: keyof T; header: string }>;
@@ -44,21 +40,22 @@ function DisplaySortingRules<T>({
         <div className="flex gap-3 items-center">
           <div className="flex gap-2 items-center">
             <label>ascending: </label>
-            <NovellaSwitch
-              defaultValue={sorts!.ascending}
-              onChange={(enabled) => {
+            <Switch
+              fz="xs"
+              defaultChecked
+              size="md"
+              onChange={(event) =>
                 setSorts({
                   field: sorts!.field,
-                  ascending: enabled,
-                });
-              }}
+                  ascending: event.target.checked,
+                })
+              }
             />
           </div>
-          <ButtonGhost
-            icon={<CloseIcon size={12} />}
-            onClick={() => {
-              setSorts(null);
-            }}
+          <CloseButton
+            variant="default"
+            size="xs"
+            onClick={() => setSorts(null)}
           />
         </div>
       </div>
@@ -79,27 +76,26 @@ function SortControls<T>({
   sortRulesChange,
 }: SortControlProps<T>) {
   return (
-    <div className="border-t-[1px] border-surface-300 pt-3 flex justify-between">
+    <div className="border-t-[1px] border-surface-300 pt-3 flex gap-2 justify-between mt-2">
       <Select
-        onChange={(e) => {
+        size="xs"
+        comboboxProps={{ withinPortal: false }}
+        placeholder="Pick a field"
+        data={fields.map((field) => String(field.id))}
+        onChange={(value) => {
           setSorts({
-            field: e.target.value as keyof T,
+            field: value as keyof T,
             ascending: true,
           });
         }}
-      >
-        <option disabled selected>
-          Pick a column to sort by
-        </option>
-        {fields.map((field) => (
-          <option key={Number(field.id)}>{String(field.id)}</option>
-        ))}
-      </Select>
-      <ButtonSecondary
-        title="Apply sorting"
-        fontSize="xs"
-        onClick={() => sortRulesChange(sorts)}
       />
+      <Button
+        variant="default"
+        size="xs"
+        onClick={() => sortRulesChange(sorts)}
+      >
+        Apply Sort
+      </Button>
     </div>
   );
 }
@@ -113,11 +109,11 @@ export default function NDataTableFixedSortMenu<T>({
   return (
     <NDataTableFixedMenu
       buttonContent={
-        <>
-          <SortIcon size={18} />
+        <Text size="sm" c="dark.1" fw={500}>
           {sorts ? `Sorted by ${String(sorts.field)}` : "Sort"}
-        </>
+        </Text>
       }
+      buttonIcon={<SortIcon size={18} />}
     >
       <>
         <div className="flex flex-col gap-2">

@@ -4,7 +4,6 @@ import { useForm } from "@mantine/form";
 import Image from "next/image";
 import { trpc } from "../../_trpc/client";
 import { Button, TextInput, PasswordInput } from "@mantine/core";
-import LoadingIcon from "@/components/icons/LoadingIcon";
 import NovellaLogo from "@/../public/icon.png";
 import { Toast } from "@/components/Toast";
 

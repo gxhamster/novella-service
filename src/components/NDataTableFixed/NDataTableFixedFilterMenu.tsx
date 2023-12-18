@@ -1,11 +1,9 @@
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import FilterIcon from "../icons/FilterIcon";
 import AddIcon from "../icons/AddIcon";
-import CloseIcon from "../icons/CloseIcon";
-import Select from "../Select";
 import { NDataTableFixedFilter } from ".";
 import NDataTableFixedMenu from "./NDataTableFixedMenu";
-import NButton from "../NButton";
+import { Text, Button, Select, TextInput, CloseButton } from "@mantine/core";
 
 function DisplayEmptyFilters() {
   return (
@@ -31,8 +29,40 @@ function FilterItem({
   tableProps,
 }: FilterItemProps) {
   return (
-    <div key={filter.id} className="w-full flex-grow flex">
+    <div key={filter.id} className="w-full flex-grow flex gap-2 items-center">
       <Select
+        size="xs"
+        comboboxProps={{ withinPortal: false }}
+        value={filter.prop}
+        placeholder="id"
+        data={tableProps}
+        onChange={(value) => {
+          filterItemChanged({ ...filter, prop: value || "" });
+        }}
+      />
+      <Select
+        size="xs"
+        w={100}
+        comboboxProps={{ withinPortal: false }}
+        value={filter.operator}
+        placeholder="id"
+        data={["eq", "gt", "lt", "ilike"]}
+        onChange={(value) => {
+          filterItemChanged({ ...filter, operator: value || "" });
+        }}
+      />
+      <TextInput
+        size="xs"
+        placeholder="Enter value here"
+        value={filter.value}
+        onChange={(event) => {
+          event.preventDefault();
+
+          filterItemChanged({ ...filter, value: event.target.value });
+        }}
+      />
+      <CloseButton variant="default" size="xs" onClick={filterItemRemoved} />
+      {/* <Select
         value={filter.prop}
         className="flex-grow"
         onChange={(e) => {
@@ -61,12 +91,12 @@ function FilterItem({
         }}
         className="py-1 px-2 block min-w-[5rem] bg-surface-200 appearance-none outline-none hover:bg-surface-300 border-[1px] border-surface-200 focus:border-surface-900 text-xs text-surface-900 placeholder:text-surface-500"
         placeholder="Enter your value here"
-      ></input>
-      <NButton
+      ></input> */}
+      {/* <NButton
         kind="ghost"
         icon={<CloseIcon size={12} />}
         onClick={filterItemRemoved}
-      />
+      /> */}
     </div>
   );
 }
@@ -112,7 +142,7 @@ type FilterControlsProps = {
 function FilterControls({ addFilter, applyFilters }: FilterControlsProps) {
   return (
     <div className="border-t-[1px] border-surface-300 pt-3 flex justify-between">
-      <NButton
+      {/* <NButton
         kind="ghost"
         className="px-2 py-2"
         size="xs"
@@ -122,14 +152,29 @@ function FilterControls({ addFilter, applyFilters }: FilterControlsProps) {
           addFilter();
         }}
         icon={<AddIcon size={16} />}
-      />
-      <NButton
+      /> */}
+      {/* <NButton
         kind="secondary"
         className="px-2 py-2"
         title="Apply filter"
         size="xs"
         onClick={applyFilters}
-      />
+      /> */}
+      <Button
+        variant="subtle"
+        color="gray"
+        size="xs"
+        leftSection={<AddIcon size={16} />}
+        onClick={(event) => {
+          event.preventDefault();
+          addFilter();
+        }}
+      >
+        Add filter
+      </Button>
+      <Button variant="default" size="xs" onClick={applyFilters}>
+        Apply filter
+      </Button>
     </div>
   );
 }
@@ -163,12 +208,13 @@ export default function NDataTableFixedFilterMenu({
 
   return (
     <NDataTableFixedMenu
+      width={400}
       buttonContent={
-        <>
-          <FilterIcon size={18} />
+        <Text size="sm" c="dark.1" fw={500}>
           {filters.length ? `Filtered by ${filters.length} rule` : "Filter"}
-        </>
+        </Text>
       }
+      buttonIcon={<FilterIcon size={18} />}
     >
       <div className="flex flex-col gap-2">
         {!filters.length ? (

@@ -6,12 +6,10 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useEffect, useMemo, useState, HTMLProps, useRef, use } from "react";
+import { useEffect, useMemo, useState } from "react";
 import RightArrowIcon from "../icons/RightArrowIcon";
 import LeftArrowIcon from "../icons/LeftArrowIcon";
 import LoadingIcon from "../icons/LoadingIcon";
-import ButtonPrimary from "../ButtonPrimary";
-import ButtonGhost from "../ButtonGhost";
 import AddIcon from "../icons/AddIcon";
 import RefreshIcon from "../icons/RefreshIcon";
 import NDataTableFixedFilterMenu from "./NDataTableFixedFilterMenu";
@@ -21,7 +19,6 @@ import {
   NDataTableFixedFilter,
   NDataTableFixedFetchFunctionProps,
 } from ".";
-import NButton from "../NButton";
 import TrashIcon from "../icons/TrashIcon";
 import CloseIcon from "../icons/CloseIcon";
 import NButtonLink from "../NButtonLink";
@@ -34,6 +31,7 @@ import {
   Loader,
   Checkbox,
   Button,
+  Flex,
 } from "@mantine/core";
 
 type NovellaDataTableProps<TableType> = {
@@ -153,7 +151,11 @@ export default function NDataTableFixed<TableType>({
 
   useEffect(() => {
     setRefreshBtnIcon(() =>
-      isDataLoading ? <LoadingIcon size={18} /> : <RefreshIcon size={18} />
+      isDataLoading ? (
+        <Loader size="xs" color="dark.1" />
+      ) : (
+        <RefreshIcon size={18} />
+      )
     );
   }, [isDataLoading]);
 
@@ -161,16 +163,21 @@ export default function NDataTableFixed<TableType>({
     <div className="m-0 flex flex-col h-full">
       {/* Table Functions */}
       <div className="flex max-h-[45px] justify-between bg-dark-7 border-b-[1px] border-surface-300 p-1">
-        <Button
-          loading={isDataLoading}
-          variant="subtle"
-          radius="compact-xs"
-          color="gray"
-          leftSection={<RefreshIcon size={18} />}
+        <ActionIcon
+          variant="light"
+          color="dark"
+          w={100}
+          size="lg"
+          aria-label="Refresh"
           onClick={onRefresh}
         >
-          Refresh
-        </Button>
+          <Flex gap={10} align="center">
+            {refreshBtnIcon}
+            <Text size="sm" c="dark.1">
+              Refresh
+            </Text>
+          </Flex>
+        </ActionIcon>
         {selectedData.length ? (
           <div className="flex items-center gap-2">
             <ActionIcon
@@ -200,7 +207,7 @@ export default function NDataTableFixed<TableType>({
             </Button>
           </div>
         ) : (
-          <div className="flex">
+          <div className="flex gap-3">
             {/* Sort Control */}
             <NDataTableFixedSortMenu<TableType>
               fields={columns}
