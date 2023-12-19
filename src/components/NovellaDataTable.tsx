@@ -10,7 +10,7 @@ import { useEffect, useMemo, useState } from "react";
 import RightArrowIcon from "./icons/RightArrowIcon";
 import LeftArrowIcon from "./icons/LeftArrowIcon";
 import LoadingIcon from "./icons/LoadingIcon";
-import { Table, Select, Text, ActionIcon } from "@mantine/core";
+import { Table, Select, Text, ActionIcon, Stack } from "@mantine/core";
 
 type NovellaDataTableProps<T> = {
   data: T[] | undefined;
@@ -95,11 +95,11 @@ export default function NovellaDataTable<T>({
           ) : (
             <Table.Tr>
               <Table.Td colSpan={12} className="">
-                <div className=" text-surface-800  w-full text-center p-4 flex flex-col items-center justify-center gap-2">
-                  <span className="font-light text-base text-surface-700">
+                <Stack justify="center" align="center">
+                  <Text c="dark.1" size="sm">
                     There are currently no records in the table
-                  </span>
-                </div>
+                  </Text>
+                </Stack>
               </Table.Td>
             </Table.Tr>
           )}

@@ -3,11 +3,12 @@ import NDataTableFixedSmall from "@/components/NDataTableFixed/NDataTableFixedSm
 import { Dispatch, SetStateAction, useState } from "react";
 import { BooksTableColumnDef } from "../lib/types";
 import { createColumnHelper } from "@tanstack/react-table";
-import { IBook, IIssuedBook } from "@/supabase/types/supabase";
+import { IIssuedBook } from "@/supabase/types/supabase";
 import { UseFormSetValue } from "react-hook-form";
 import { trpc } from "@/app/_trpc/client";
 import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
 import { getBooksByPageType } from "@/server/routes/books";
+import { Drawer } from "@mantine/core";
 
 const booksColHelper = createColumnHelper<getBooksByPageType>();
 const booksTableCols: Array<BooksTableColumnDef> = [
@@ -61,11 +62,23 @@ export default function SelectBookDrawer({
   );
 
   return (
-    <NDrawer
+    <Drawer
+      title="Select a book to issue"
+      styles={{
+        body: { padding: 0 },
+      }}
+      position="right"
+      size="xl"
+      opened={isAddBookDrawerOpen}
+      onClose={() => {
+        setIsAddBookDrawerOpen(false);
+      }}
+    >
+      {/* <NDrawer
       title="Select a book to issue"
       isOpen={isAddBookDrawerOpen}
       closeDrawer={() => setIsAddBookDrawerOpen(false)}
-    >
+    > */}
       <NDataTableFixedSmall<getBooksByPageType>
         columns={booksTableCols}
         tanStackColumns={booksTableColsTanstack}
@@ -88,6 +101,6 @@ export default function SelectBookDrawer({
         }}
         onRefresh={() => getBooksByPageQuery.refetch()}
       />
-    </NDrawer>
+    </Drawer>
   );
 }

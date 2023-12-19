@@ -1,16 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FieldError, SubmitHandler, useForm, useWatch } from "react-hook-form";
-import NovellaInput from "@/components/NovellaInput";
-import { IBook, IBookUpdate } from "@/supabase/types/supabase";
+import { SubmitHandler, useForm, useWatch } from "react-hook-form";
+import { IBookUpdate } from "@/supabase/types/supabase";
 import BookCategoryCard from "./BookCatergoryCard";
 import BookDeleteCard from "./BookDeleteCard";
 import { trpc } from "@/app/_trpc/client";
-import NButton from "@/components/NButton";
-import NDeleteModal from "@/components/NDeleteModal";
-import NToast from "@/components/NToast";
 import { getBookByIdType } from "@/server/routes/books";
+import { TextInput, Modal, Group, Button, Stack, Text } from "@mantine/core";
+import { Toast } from "@/components/Toast";
 
 export default function BookSummary({ data }: { data: getBookByIdType }) {
   let defaultInputValues = {};
@@ -32,26 +30,32 @@ export default function BookSummary({ data }: { data: getBookByIdType }) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const updateBookByIdMutation = trpc.books.updateBookById.useMutation({
     onError: (_error) => {
-      NToast.error("Cannot update book", `${_error.message}`);
+      Toast.Error({ title: "Cannot update book", message: _error.message });
       throw new Error(_error.message, {
         cause: `Error occured when trying to update book with ID: ${data.id}`,
       });
     },
     onSuccess: () => {
-      NToast.success("Successful", "Updated book fields");
+      Toast.Successful({
+        title: "Successful",
+        message: "Updated book fields",
+      });
       router.refresh();
       setFormValuesChangedFromDefault(false);
     },
   });
   const deleteBookByIdMutation = trpc.books.deleteBookById.useMutation({
     onError: (_error) => {
-      NToast.error("Cannot delete book", `${_error.message}`);
+      Toast.Error({ title: "Cannot delete book", message: _error.message });
       throw new Error(_error.message);
     },
     onSuccess: () => {
       router.back();
       setIsDeleteModalOpen(false);
-      NToast.success("Successful", "Deleted the book from library");
+      Toast.Successful({
+        title: "Successful",
+        message: "Deleted book from library",
+      });
     },
   });
 
@@ -227,21 +231,25 @@ export default function BookSummary({ data }: { data: getBookByIdType }) {
               </h3>
             </div>
             <div className="flex gap-2">
-              <NButton
-                kind="secondary"
-                onClick={(e) => {
-                  e.preventDefault();
+              <Button
+                color="gray"
+                size="md"
+                disabled={!formValuesChangedFromDefault}
+                onClick={(event) => {
+                  event.preventDefault();
                   reset(data);
                 }}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="md"
                 disabled={!formValuesChangedFromDefault}
-                title="Cancel"
-              />
-              <NButton
-                kind="primary"
-                isLoading={updateBookByIdMutation.isLoading}
-                disabled={!formValuesChangedFromDefault}
-                title="Update"
-              />
+                loading={updateBookByIdMutation.isLoading}
+                type="submit"
+              >
+                Update
+              </Button>
             </div>
           </div>
           {categories.map((category) => (
@@ -251,30 +259,54 @@ export default function BookSummary({ data }: { data: getBookByIdType }) {
               subtitle={category.description}
             >
               {category.fields.map((field) => (
-                <NovellaInput
+                <TextInput
+                  styles={{
+                    label: {
+                      color: "var(--mantine-color-dark-1)",
+                      fontSize: "var(--mantine-font-size-sm)",
+                    },
+                  }}
+                  size="md"
                   key={field.field}
-                  type="text"
-                  title={field.title}
-                  reactHookRegister={register(field.field, {
-                    disabled: field.disabled,
-                  })}
-                  // FIXME: Properly type this
-                  reactHookErrorMessage={
-                    errors[field.field] as FieldError | undefined
-                  }
-                ></NovellaInput>
+                  label={field.title}
+                  {...register(field.field, { disabled: field.disabled })}
+                />
               ))}
             </BookCategoryCard>
           ))}
         </form>
         <BookDeleteCard onClick={() => setIsDeleteModalOpen(true)} />
-        <NDeleteModal
-          isOpen={isDeleteModalOpen}
-          description="This will permanently delete the book from the database and cannot be recovered"
-          isDeleting={deleteBookByIdMutation.isLoading}
-          closeModal={() => setIsDeleteModalOpen(false)}
-          onDelete={deleteModalCloseHandler}
-        />
+        <Modal
+          opened={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          title="Delete book from library"
+          centered
+        >
+          <Stack gap={20}>
+            <Text size="md" c="dark.2">
+              This will permanently delete the book from the database and cannot
+              be recovered
+            </Text>
+            <Group gap={15} justify="end">
+              <Button
+                variant="default"
+                size="md"
+                onClick={() => setIsDeleteModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="filled"
+                color="red"
+                size="md"
+                loading={deleteBookByIdMutation.isLoading}
+                onClick={() => deleteModalCloseHandler}
+              >
+                Delete
+              </Button>
+            </Group>
+          </Stack>
+        </Modal>
       </div>
     </div>
   );

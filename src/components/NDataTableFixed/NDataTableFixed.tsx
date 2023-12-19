@@ -6,10 +6,10 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import RightArrowIcon from "../icons/RightArrowIcon";
 import LeftArrowIcon from "../icons/LeftArrowIcon";
-import LoadingIcon from "../icons/LoadingIcon";
 import AddIcon from "../icons/AddIcon";
 import RefreshIcon from "../icons/RefreshIcon";
 import NDataTableFixedFilterMenu from "./NDataTableFixedFilterMenu";
@@ -32,6 +32,7 @@ import {
   Checkbox,
   Button,
   Flex,
+  Stack,
 } from "@mantine/core";
 
 type NovellaDataTableProps<TableType> = {
@@ -243,6 +244,7 @@ export default function NDataTableFixed<TableType>({
       {data.length !== 0 ? (
         <div className="flex-grow overflow-scroll bg-dark-8 m-0 relative">
           <Table
+            stickyHeader
             verticalSpacing="xs"
             horizontalSpacing="sm"
             withColumnBorders
@@ -291,24 +293,24 @@ export default function NDataTableFixed<TableType>({
         </div>
       ) : (
         <div className="flex justify-center items-center h-full bg-dark-8">
-          <div className="flex flex-col justify-center items-center gap-8 ">
-            <BoxIcon size={120} className="text-surface-800" strokeWidth={1} />
-            <div className="flex flex-col items-center  gap-2">
-              <span className="text-3xl font-light text-surface-900">
+          <Stack gap={10}>
+            <BoxIcon size={120} className="text-dark-2" strokeWidth={1} />
+            <Stack gap={5}>
+              <Text size="xl" c="dark.1">
                 Empty table
-              </span>
-              <span className="text-lg font-[300] text-surface-700">
+              </Text>
+              <Text size="md" c="dark.2">
                 To create a new entry, click Create
-              </span>
-              <NButtonLink
-                href="/dashboard"
-                kind="secondary"
-                title="Goto dashboard"
-                className="mt-5 max-w-[200px]"
-                icon={<RightArrowIcon size={18} />}
-              />
-            </div>
-          </div>
+              </Text>
+              <Button
+                mt={20}
+                variant="outline"
+                leftSection={<RightArrowIcon size={18} />}
+              >
+                <Link href="/dashboard">Go to dashboard</Link>
+              </Button>
+            </Stack>
+          </Stack>
         </div>
       )}
 

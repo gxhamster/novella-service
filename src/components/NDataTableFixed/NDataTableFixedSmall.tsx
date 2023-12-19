@@ -9,8 +9,6 @@ import {
 import { useEffect, useMemo, useState, HTMLProps, useRef, use } from "react";
 import RightArrowIcon from "../icons/RightArrowIcon";
 import LeftArrowIcon from "../icons/LeftArrowIcon";
-import LoadingIcon from "../icons/LoadingIcon";
-import ButtonGhost from "../ButtonGhost";
 import RefreshIcon from "../icons/RefreshIcon";
 import NDataTableFixedFilterMenu from "./NDataTableFixedFilterMenu";
 import NDataTableFixedSortMenu from "./NDataTableFixedSortMenu";
@@ -19,6 +17,7 @@ import {
   NDataTableFixedSort,
   NDataTableFixedFilter,
 } from ".";
+import { Text, Flex, ActionIcon, Table, Loader } from "@mantine/core";
 
 type NovellaDataTableProps<TableType> = {
   data: Array<TableType>;
@@ -104,20 +103,39 @@ export default function NDataTableFixedSmall<TableType>({
 
   useEffect(() => {
     setRefreshBtnIcon(() =>
-      isDataLoading ? <LoadingIcon size={18} /> : <RefreshIcon size={18} />
+      isDataLoading ? (
+        <Loader size="xs" color="dark.1" />
+      ) : (
+        <RefreshIcon size={18} />
+      )
     );
   }, [isDataLoading]);
 
   return (
-    <div className="h-full flex flex-col justify-between w-[42rem]">
+    <div className="h-full flex flex-col justify-between">
       {/* Table Functions */}
-      <div className="flex justify-between bg-surface-200 border-b-[1px] border-surface-300">
+      <div className="flex justify-between bg-dark-7 border-b-[1px] border-surface-300">
         <div className="flex items-center">
-          <ButtonGhost
+          <ActionIcon
+            variant="light"
+            color="dark"
+            w={100}
+            size="lg"
+            aria-label="Refresh"
+            onClick={onRefresh}
+          >
+            <Flex gap={10} align="center">
+              {refreshBtnIcon}
+              <Text size="sm" c="dark.1">
+                Refresh
+              </Text>
+            </Flex>
+          </ActionIcon>
+          {/* <ButtonGhost
             icon={refreshBtnIcon}
             title="Refresh"
             onClick={() => onRefresh()}
-          />
+          /> */}
           {/* Sort Control */}
           <NDataTableFixedSortMenu<TableType>
             position="left"
@@ -141,7 +159,25 @@ export default function NDataTableFixedSmall<TableType>({
           />
         </div>
         <div className="flex gap-2 p-1">
-          <button
+          <ActionIcon
+            variant="default"
+            size="lg"
+            aria-label="Previous Page"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            <RightArrowIcon size={16} />
+          </ActionIcon>
+          <ActionIcon
+            variant="default"
+            size="lg"
+            aria-label="Next Page"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            <LeftArrowIcon size={16} />
+          </ActionIcon>
+          {/* <button
             className="p-2 inline-flex justify-center items-center bg-surface-200 hover:bg-surface-300 transition-all focus:ring-1 focus:ring-surface-900 disabled:opacity-60 disabled:bg-surface-200"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
@@ -154,51 +190,53 @@ export default function NDataTableFixedSmall<TableType>({
             disabled={!table.getCanNextPage()}
           >
             <LeftArrowIcon size={18} />
-          </button>
+          </button> */}
         </div>
       </div>
-      <div className="h-[calc(100vh-43px-57px)] overflow-y-auto bg-surface-100 relative">
-        <table className="w-full">
-          <thead className="text-surface-900 bg-surface-200 sticky top-0">
+      <div className="h-[calc(100vh-43px-57px)] overflow-y-auto bg-dark-8 relative">
+        <Table
+          stickyHeader
+          verticalSpacing="xs"
+          horizontalSpacing="xs"
+          highlightOnHover
+          withColumnBorders
+          className="w-full"
+        >
+          <Table.Thead>
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
+              <Table.Tr key={headerGroup.id}>
                 {headerGroup.headers.map((header, idx) => (
-                  <th
-                    key={header.id}
-                    className={`text-start p-2 px-4 font-normal text-sm border-x-[0.7px] border-surface-300`}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </th>
+                  <Table.Th key={header.id}>
+                    <Text size="sm" c="gray.4" fw="bold" truncate>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </Text>
+                  </Table.Th>
                 ))}
-              </tr>
+              </Table.Tr>
             ))}
-          </thead>
-          <tbody>
+          </Table.Thead>
+          <Table.Tbody>
             {table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                className={`${
-                  row.getIsSelected() ? "bg-surface-200/40" : "bg-surface-100"
-                } text-surface-800 font-light text-sm border-b-[0.7px] border-surface-400 cursor-pointer hover:bg-surface-200/40 transition-colors`}
-                onClick={() => row.toggleSelected()}
-              >
-                {row.getVisibleCells().map((cell, idx) => (
-                  <td
-                    key={cell.id}
-                    className={`p-2 px-4 truncate border-[0.7px] border-surface-400/70 text-xs font-normal`}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
+              <Table.Tr key={row.id} onClick={() => row.toggleSelected()}>
+                {row.getVisibleCells().map((cell, _idx) => (
+                  <Table.Td key={cell.id}>
+                    <Text c="dark.1" size="xs" truncate>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </Text>
+                  </Table.Td>
                 ))}
-              </tr>
+              </Table.Tr>
             ))}
-          </tbody>
-        </table>
+          </Table.Tbody>
+        </Table>
       </div>
     </div>
   );

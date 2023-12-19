@@ -1,9 +1,6 @@
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import NDrawer from "@/components/NDrawer";
 import { IIssuedBook } from "@/supabase/types/supabase";
-import NovellaInput from "@/components/NovellaInput";
-import NButton from "@/components/NButton";
 import LeftArrowIcon from "@/components/icons/LeftArrowIcon";
 import SelectBookDrawer from "./SelectBookDrawer";
 import SelectStudentDrawer from "./SelectStudentDrawer";
@@ -12,6 +9,8 @@ import NToast from "@/components/NToast";
 import { getBooksByPageType } from "@/server/routes/books";
 import { getStudentsByPageType } from "@/server/routes/student";
 import { format, formatISO } from "date-fns";
+import { Button, Drawer, TextInput, Text, ActionIcon } from "@mantine/core";
+import { Toast } from "@/components/Toast";
 
 type IssueBookDrawerProps = {
   isIssueBookDrawerOpen: boolean;
@@ -33,11 +32,17 @@ export default function IssueBookDrawer({
   const [isAddStudentDrawerOpen, setIsAddStudentDrawerOpen] = useState(false);
   const createIssuedBookMutation = trpc.issued.createIssuedBook.useMutation({
     onError: (_error) => {
-      NToast.error("Cannot Issue Book", `${_error.message}`);
+      Toast.Error({
+        title: "Cannot Issue Book",
+        message: _error.message,
+      });
       throw new Error(_error.message);
     },
     onSuccess: () => {
-      NToast.success("Successful", `Issued a new book`);
+      Toast.Successful({
+        title: "Successful",
+        message: "Issued a new book",
+      });
       onBookIssued();
     },
   });
@@ -81,7 +86,7 @@ export default function IssueBookDrawer({
 
   return (
     <>
-      <NDrawer
+      {/* <NDrawer
         title="Issue book to student"
         isOpen={isIssueBookDrawerOpen}
         closeDrawer={() =>
@@ -89,13 +94,47 @@ export default function IssueBookDrawer({
           !isAddStudentDrawerOpen &&
           setIsIssueBookDrawerOpen(false)
         }
+      > */}
+      <Drawer
+        title="Issue book to student"
+        position="right"
+        size="lg"
+        opened={isIssueBookDrawerOpen}
+        onClose={() => {
+          !isAddBookDrawerOpen &&
+            !isAddStudentDrawerOpen &&
+            setIsIssueBookDrawerOpen(false);
+        }}
       >
         <form
           onSubmit={handleSubmit(issueBookFormSubmitHandler)}
           className="h-full flex flex-col items-center overflow-y-auto"
         >
-          <section className="flex flex-col p-6 w-full gap-4 border-b-[1px] border-surface-300">
-            <NovellaInput
+          <section className="flex flex-col p-6 w-full gap-7 border-b-[1px] border-surface-300">
+            <TextInput
+              disabled
+              size="md"
+              placeholder="325"
+              label="Issue ID"
+              description="Issue ID will be assigned by the system"
+              {...register("id")}
+            />
+            <TextInput
+              type="datetime-local"
+              size="md"
+              label="Issued Date"
+              description="Issue ID will be assigned by the system"
+              {...register("created_at")}
+            />
+            <TextInput
+              type="datetime-local"
+              size="md"
+              label="Due Date"
+              description="The date 5 days from now will be used by default"
+              {...register("due_date")}
+            />
+
+            {/* <NovellaInput
               title="ID"
               disabled
               helpText="Issue ID will be assigned by the system"
@@ -122,11 +161,33 @@ export default function IssueBookDrawer({
                 required: "Due date is required",
               })}
               reactHookErrorMessage={errors["due_date"]}
-            />
+            /> */}
           </section>
           <section className="flex flex-col p-6 w-full gap-4 border-b-[1px] border-surface-300">
-            <h3 className="text-md text-surface-800">Book Fields</h3>
-            <NovellaInput
+            <Text size="lg" c="dark.1">
+              Book Fields
+            </Text>
+            <TextInput
+              size="md"
+              label="Book ID"
+              description="This will be the book that is issued. Select from the table"
+              rightSection={
+                <ActionIcon
+                  color="dark.5"
+                  size={32}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setIsAddBookDrawerOpen(true);
+                  }}
+                >
+                  <LeftArrowIcon size={18} />
+                </ActionIcon>
+              }
+              {...register("book_id", {
+                valueAsNumber: true,
+              })}
+            />
+            {/* <NovellaInput
               title="Book ID"
               helpText={
                 selectedBook?.title ||
@@ -150,11 +211,33 @@ export default function IssueBookDrawer({
                   }}
                 />
               }
-            />
+            /> */}
           </section>
           <section className="flex flex-col p-6 w-full gap-4 border-b-[1px] border-surface-300">
-            <h3 className="text-md text-surface-800">Student Fields</h3>
-            <NovellaInput
+            <Text size="lg" c="dark.1">
+              Student Fields
+            </Text>
+            <TextInput
+              size="md"
+              label="Student ID"
+              description="This will be the student that book will issued to. Select from the table"
+              rightSection={
+                <ActionIcon
+                  color="dark.5"
+                  size={32}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setIsAddStudentDrawerOpen(true);
+                  }}
+                >
+                  <LeftArrowIcon size={18} />
+                </ActionIcon>
+              }
+              {...register("student_id", {
+                valueAsNumber: true,
+              })}
+            />
+            {/* <NovellaInput
               title="Student ID"
               helpText={
                 selectedStudent?.name ||
@@ -178,28 +261,34 @@ export default function IssueBookDrawer({
                   }}
                 />
               }
-            />
+            /> */}
           </section>
-          <section className="flex justify-end gap-3 p-3 w-full border-b-[1px] border-surface-300">
-            <NButton
-              title="Cancel"
-              kind="secondary"
-              onClick={(e) => {
-                e.preventDefault();
+          <section className="flex justify-end gap-3 p-3 w-full ">
+            <Button
+              variant="light"
+              size="md"
+              color="gray"
+              onClick={(event) => {
+                event.preventDefault();
                 reset();
               }}
-            />
-            <NButton
-              title="Issue Book"
-              kind="primary"
-              isLoading={createIssuedBookMutation.isLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="filled"
+              size="md"
+              loading={createIssuedBookMutation.isLoading}
+              type="submit"
               disabled={
                 !isDirty && !isValid && createIssuedBookMutation.isLoading
               }
-            />
+            >
+              Issue Book
+            </Button>
           </section>
         </form>
-      </NDrawer>
+      </Drawer>
       <SelectBookDrawer
         setSelectedBook={setSelectedBook}
         isAddBookDrawerOpen={isAddBookDrawerOpen}

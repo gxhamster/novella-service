@@ -12,6 +12,7 @@ import NDeleteModal from "@/components/NDeleteModal";
 import { trpc } from "@/app/_trpc/client";
 import ReturnBookModal from "./components/ReturnBookModal";
 import { format } from "date-fns";
+import { Anchor, Button } from "@mantine/core";
 
 export default function Issued() {
   const [isIssueBookDrawerOpen, setIsIssueBookDrawerOpen] = useState(false);
@@ -66,27 +67,26 @@ export default function Issued() {
       return issuedBooksColHelper.display({
         id: column.id,
         cell: (cell) => (
-          <button
-            title="Return"
-            className="text-sm appearance-none  text-primary-600 hover:text-primary-700 hover:underline"
+          <Button
+            variant="transparent"
+            size="xs"
             onClick={() => {
               setReturnBookID(cell.row.getAllCells()[1].getValue() as number);
               setIsReturnBookModalOpen(true);
             }}
           >
             Return
-          </button>
+          </Button>
         ),
         header: "Return",
       });
     else if (column.baseHref)
       return issuedBooksColHelper.accessor(column.id, {
         cell: (cell) => (
-          <Link
-            className="hover:text-primary-700 hover:underline"
-            href={`${column.baseHref}/${cell.getValue()}`}
-          >
-            {cell.getValue()}
+          <Link href={`${column.baseHref}/${cell.getValue()}`}>
+            <Anchor c="dark.1" href={`${column.baseHref}/${cell.getValue()}`}>
+              {cell.getValue()}
+            </Anchor>
           </Link>
         ),
         header: column.header,

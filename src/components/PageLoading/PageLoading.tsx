@@ -1,5 +1,5 @@
-import styles from "./PageLoading.module.css";
+import { Loader } from "@mantine/core";
 
 export default function PageLoading() {
-  return <span className={styles.loader}></span>;
+  return <Loader size="lg" />;
 }

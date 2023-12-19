@@ -13,7 +13,7 @@ export default async function Book({ params }: { params: { book: string } }) {
         <BookSummary data={resultBook} />
       ) : (
         <div className="flex justify-center items-center flex-grow">
-          <div className="flex flex-col bg-surface-200 w-[20rem] p-5 gap-5">
+          <div className="flex flex-col bg-dark-8 w-[20rem] p-5 gap-5">
             <span className="text-surface-900">Book does not exist</span>
             <span className="text-surface-700 text-sm">
               Please select a valid book on the database or create a new one

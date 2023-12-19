@@ -1,4 +1,3 @@
-import NDrawer from "@/components/NDrawer";
 import NDataTableFixedSmall from "@/components/NDataTableFixed/NDataTableFixedSmall";
 import { StudentsTableColumnDef } from "../lib/types";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -8,6 +7,7 @@ import { UseFormSetValue } from "react-hook-form";
 import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
 import { trpc } from "@/app/_trpc/client";
 import { getStudentsByPageType } from "@/server/routes/student";
+import { Drawer } from "@mantine/core";
 
 const studentsColHelper = createColumnHelper<getStudentsByPageType>();
 const studentsTableCols: Array<StudentsTableColumnDef> = [
@@ -55,10 +55,17 @@ export default function SelectStudentDrawer({
   );
 
   return (
-    <NDrawer
+    <Drawer
       title="Select a student to issue to"
-      isOpen={isAddStudentDrawerOpen}
-      closeDrawer={() => setIsAddStudentDrawerOpen(false)}
+      styles={{
+        body: { padding: 0 },
+      }}
+      position="right"
+      size="xl"
+      opened={isAddStudentDrawerOpen}
+      onClose={() => {
+        setIsAddStudentDrawerOpen(false);
+      }}
     >
       <NDataTableFixedSmall<getStudentsByPageType>
         columns={studentsTableCols}
@@ -83,6 +90,6 @@ export default function SelectStudentDrawer({
           }
         }}
       />
-    </NDrawer>
+    </Drawer>
   );
 }

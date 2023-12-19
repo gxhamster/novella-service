@@ -6,8 +6,8 @@ import { Database } from "@/supabase/types/types";
 import BookIcon from "../icons/BookIcon";
 import UserIcon from "../icons/UserIcon";
 import { useRouter } from "next/navigation";
-import { UnstyledButton, Flex, Text } from "@mantine/core";
 import { Spotlight, SpotlightActionData, spotlight } from "@mantine/spotlight";
+import { UnstyledButton, Flex, Text, Kbd, Group } from "@mantine/core";
 import classes from "./NGlobalSearch.module.css";
 import HomeIcon from "../icons/HomeIcon";
 import IssueBookIcon from "../icons/IssueBookIcon";
@@ -118,10 +118,13 @@ export default function NGlobalSearch() {
         className={classes.button}
         onClick={spotlight.open}
       >
-        <Flex gap={10}>
-          <SearchIcon size={20} className="" />
-          <Text size="sm">Search</Text>
-        </Flex>
+        <Group justify="space-between" w="100%">
+          <Group gap={10}>
+            <SearchIcon size={20} className="" />
+            <Text size="sm">Search</Text>
+          </Group>
+          <Kbd size="xs">Ctrl+K</Kbd>
+        </Group>
       </UnstyledButton>
       <Spotlight
         actions={actionsWithQueryResults}
