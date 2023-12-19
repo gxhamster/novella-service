@@ -7,7 +7,7 @@ import BookIcon from "../icons/BookIcon";
 import UserIcon from "../icons/UserIcon";
 import { useRouter } from "next/navigation";
 import { Spotlight, SpotlightActionData, spotlight } from "@mantine/spotlight";
-import { UnstyledButton, Flex, Text, Kbd, Group } from "@mantine/core";
+import { UnstyledButton, Flex, Text, Badge, Group } from "@mantine/core";
 import classes from "./NGlobalSearch.module.css";
 import HomeIcon from "../icons/HomeIcon";
 import IssueBookIcon from "../icons/IssueBookIcon";
@@ -123,7 +123,9 @@ export default function NGlobalSearch() {
             <SearchIcon size={20} className="" />
             <Text size="sm">Search</Text>
           </Group>
-          <Kbd size="xs">Ctrl+K</Kbd>
+          <Badge color="dark.5" radius="sm">
+            Ctrl+K
+          </Badge>
         </Group>
       </UnstyledButton>
       <Spotlight

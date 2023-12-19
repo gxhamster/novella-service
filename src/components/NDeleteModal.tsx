@@ -1,7 +1,4 @@
-import { useState } from "react";
-import NModal from "./NModal";
-import NButton from "./NButton";
-import LoadingIcon from "./icons/LoadingIcon";
+import { Modal, Stack, Group, Button, Text } from "@mantine/core";
 
 type NDeleteModalProps = {
   isOpen: boolean;
@@ -21,25 +18,26 @@ export default function NDeleteModal({
   onDelete,
 }: NDeleteModalProps) {
   return (
-    <NModal isOpen={isOpen} title={title} onModalClose={closeModal}>
-      <section className="p-4">
-        <p className="text-sm text-surface-700">{description}</p>
-      </section>
-      <section className="flex gap-2 justify-end py-3 border-t-[1px] border-surface-300 px-3">
-        <NButton kind="secondary" title="Cancel" onClick={closeModal} />
-        <NButton
-          kind="alert"
-          title="Delete"
-          icon={
-            isDeleting ? (
-              <LoadingIcon size={16} className="text-surface-900" />
-            ) : null
-          }
-          onClick={() => {
-            onDelete();
-          }}
-        />
-      </section>
-    </NModal>
+    <Modal opened={isOpen} onClose={closeModal} title={title} centered>
+      <Stack gap={20}>
+        <Text size="md" c="dark.2">
+          {description}
+        </Text>
+        <Group gap={15} justify="end">
+          <Button variant="default" size="md" onClick={closeModal}>
+            Cancel
+          </Button>
+          <Button
+            variant="filled"
+            color="red"
+            size="md"
+            loading={isDeleting}
+            onClick={onDelete}
+          >
+            Delete
+          </Button>
+        </Group>
+      </Stack>
+    </Modal>
   );
 }

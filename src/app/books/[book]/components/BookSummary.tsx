@@ -7,8 +7,9 @@ import BookCategoryCard from "./BookCatergoryCard";
 import BookDeleteCard from "./BookDeleteCard";
 import { trpc } from "@/app/_trpc/client";
 import { getBookByIdType } from "@/server/routes/books";
-import { TextInput, Modal, Group, Button, Stack, Text } from "@mantine/core";
+import { TextInput, Button, Title } from "@mantine/core";
 import { Toast } from "@/components/Toast";
+import NDeleteModal from "@/components/NDeleteModal";
 
 export default function BookSummary({ data }: { data: getBookByIdType }) {
   let defaultInputValues = {};
@@ -225,10 +226,9 @@ export default function BookSummary({ data }: { data: getBookByIdType }) {
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
           <div className="flex justify-between items-center">
             <div>
-              <h3 className="text-2xl text-surface-700 font-light">
-                Books / Ref:{" "}
-                <span className="text-surface-900 text-3xl"> {data.id}</span>
-              </h3>
+              <Title order={2} fw="normal" c="dark.1">
+                Books / Ref: <Title order={3}> {data.id}</Title>
+              </Title>
             </div>
             <div className="flex gap-2">
               <Button
@@ -276,37 +276,15 @@ export default function BookSummary({ data }: { data: getBookByIdType }) {
           ))}
         </form>
         <BookDeleteCard onClick={() => setIsDeleteModalOpen(true)} />
-        <Modal
-          opened={isDeleteModalOpen}
-          onClose={() => setIsDeleteModalOpen(false)}
+        <NDeleteModal
           title="Delete book from library"
-          centered
-        >
-          <Stack gap={20}>
-            <Text size="md" c="dark.2">
+          description="
               This will permanently delete the book from the database and cannot
-              be recovered
-            </Text>
-            <Group gap={15} justify="end">
-              <Button
-                variant="default"
-                size="md"
-                onClick={() => setIsDeleteModalOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="filled"
-                color="red"
-                size="md"
-                loading={deleteBookByIdMutation.isLoading}
-                onClick={() => deleteModalCloseHandler}
-              >
-                Delete
-              </Button>
-            </Group>
-          </Stack>
-        </Modal>
+              be recovered"
+          isOpen={isDeleteModalOpen}
+          closeModal={() => setIsDeleteModalOpen(false)}
+          onDelete={deleteModalCloseHandler}
+        />
       </div>
     </div>
   );

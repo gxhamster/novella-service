@@ -12,9 +12,9 @@ import NDeleteModal from "@/components/NDeleteModal";
 import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
 import { trpc } from "@/app/_trpc/client";
 import { getStudentsByPageType } from "@/server/routes/student";
-import NToast from "@/components/NToast";
 import { format } from "date-fns";
 import { ZStudentInsert } from "@/supabase/schema";
+import { Toast } from "@/components/Toast";
 
 export default function StudentsTable() {
   const columnHelper = createColumnHelper<getStudentsByPageType>();
@@ -39,13 +39,18 @@ export default function StudentsTable() {
 
   const addStudentMutation = trpc.students.createStudent.useMutation({
     onError: (_error) => {
-      NToast.error("Could not create student due to", _error.message);
+      Toast.Error({
+        title: "Could not create student",
+        message: _error.message,
+      });
       setSaveButtonLoading(false);
       throw new Error(_error.message);
     },
-    onSettled: () => {
-      NToast.success("Succesfully created new student");
-      setSaveButtonLoading(false);
+    onSuccess: () => {
+      Toast.Successful({
+        title: "Successful",
+        message: "New student created",
+      });
       setSaveButtonLoading(false);
       getStudentsByPageQuery.refetch();
     },

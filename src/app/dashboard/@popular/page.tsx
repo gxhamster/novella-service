@@ -3,6 +3,7 @@ import DashboardCard from "../components/DashboardCard";
 import Link from "next/link";
 import LeftArrowIcon from "@/components/icons/LeftArrowIcon";
 import NButtonLink from "@/components/NButtonLink";
+import { Anchor } from "@mantine/core";
 
 export default async function PopularBook() {
   const { data: book } = await serverClient.books.getMostPopular();
@@ -17,12 +18,9 @@ export default async function PopularBook() {
               <span className="text-surface-800 group-hover:text-surface-900">
                 Most popular book
               </span>
-              <Link
-                href="/books"
-                className="text-sm text-primary-700 group-hover:text-surface-900 hover:underline"
-              >
-                View all
-              </Link>
+              <Anchor size="sm">
+                <Link href="/books">View all</Link>
+              </Anchor>
             </div>
             <span className="text-5xl font-light mt-2">
               {book.times_issued ? book.times_issued : 0}
@@ -60,12 +58,9 @@ export default async function PopularBook() {
           <span className="text-surface-800 group-hover:text-surface-900">
             Most popular student
           </span>
-          <Link
-            href="/students"
-            className="text-sm text-primary-700 group-hover:text-surface-900 hover:underline"
-          >
-            View all
-          </Link>
+          <Anchor size="sm">
+            <Link href="/students">View all</Link>
+          </Anchor>
         </div>
         <span className="text-5xl font-light mt-2">{student.count}</span>
         <span className="text-surface-600 text-sm gap- group-hover:text-surface-900">

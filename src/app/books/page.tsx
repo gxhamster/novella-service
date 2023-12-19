@@ -10,7 +10,7 @@ import NDeleteModal from "@/components/NDeleteModal";
 import { IBook } from "@/supabase/types/supabase";
 import { trpc } from "@/app/_trpc/client";
 import BookAddDrawer from "./components/BookAddDrawer";
-import NToast from "@/components/NToast";
+import { Toast } from "@/components/Toast";
 import { getBooksByPageType } from "@/server/routes/books";
 
 export default function Books() {
@@ -34,7 +34,10 @@ export default function Books() {
 
   const booksDeleteMutation = trpc.books.deleteBooksById.useMutation({
     onError: (_error) => {
-      NToast.error("Could not delete book", `${_error.message}`);
+      Toast.Error({
+        title: "Could not delete book",
+        message: _error.message,
+      });
       throw new Error(_error.message, {
         cause: _error.shape?.data,
       });
@@ -43,7 +46,10 @@ export default function Books() {
       setIsDeleteBookModalOpen(false);
     },
     onSuccess: () => {
-      NToast.success("Successful", `Deleted book from library`);
+      Toast.Successful({
+        title: "Succcessful",
+        message: "Deleted book from library",
+      });
       router.refresh();
       getBooksByPageQuery.refetch();
     },

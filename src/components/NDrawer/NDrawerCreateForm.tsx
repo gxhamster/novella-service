@@ -1,15 +1,15 @@
 "use client";
-import {
-  FieldValues,
-  useForm,
-  DefaultValues,
-  FieldError,
-} from "react-hook-form";
-import NDrawer from "@/components/NDrawer/NDrawer";
-import NovellaInput from "@/components/NovellaInput";
+import { FieldValues, useForm, DefaultValues } from "react-hook-form";
 import { NDrawerCreateFormFieldsType } from ".";
-import NButton from "../NButton";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Button,
+  Drawer,
+  TextInput,
+  Text,
+  ActionIcon,
+  Title,
+} from "@mantine/core";
 
 // Related to react-hook-for;
 type AsyncDefaultValues<TFieldValues> = (
@@ -21,7 +21,7 @@ type NDrawerCreateStudentProps<TableType> = {
   closeDrawer: () => void;
   title: string;
   onFormSubmit: (formData: TableType) => void;
-  schema: any;
+  schema?: any;
   saveButtonLoadingState: boolean;
   formFieldsCategories: Array<NDrawerCreateFormFieldsType<TableType>>;
   defaultValues: DefaultValues<TableType> | AsyncDefaultValues<TableType>;
@@ -32,7 +32,7 @@ export default function NDrawerCreateForm<TableType extends FieldValues>({
   closeDrawer,
   title,
   onFormSubmit,
-  schema,
+  schema = undefined,
   saveButtonLoadingState,
   formFieldsCategories,
   defaultValues,
@@ -43,7 +43,7 @@ export default function NDrawerCreateForm<TableType extends FieldValues>({
     reset,
     formState: { errors },
   } = useForm<TableType>({
-    resolver: zodResolver(schema),
+    resolver: schema ? zodResolver(schema) : undefined,
     defaultValues: defaultValues,
   });
 
@@ -61,58 +61,96 @@ export default function NDrawerCreateForm<TableType extends FieldValues>({
   }
 
   return (
-    <NDrawer isOpen={isOpen} closeDrawer={closeDrawer} title={title}>
-      <div className="flex flex-col justify-between h-[calc(100vh-57px)] overflow-y-auto">
-        <form onSubmit={handleSubmit(onFormSubmit)} className="flex flex-col">
-          {formFieldsCategories.map((category) => (
-            <div
-              key={category.title}
-              className="flex flex-col gap-7 border-b-[1px] border-surface-300 p-6"
-            >
-              {category.title || category.description ? (
-                <section className="flex flex-col gap-2">
-                  <h3 className="text-md text-surface-800">{category.title}</h3>
-                  <span className="text-sm text-surface-500">
-                    {category.description}
-                  </span>
-                </section>
-              ) : null}
-              {category.fields.map((field) => (
-                <NovellaInput<typeof field.field>
-                  key={field.field}
-                  type={selectInputType(field.fieldType)}
-                  fontSize="xs"
-                  helpText={field.help}
-                  reactHookErrorMessage={errors[field.field] as FieldError}
-                  reactHookRegister={register(field.field, {
-                    required: field.required ? "This field is required" : false,
-                    valueAsNumber: field.fieldType === "number" ? true : false,
-                    disabled: saveButtonLoadingState ? true : field.disabled,
-                  })}
-                  labelDirection="horizontal"
-                  title={field.title}
-                />
-              ))}
-            </div>
-          ))}
-          <div className="flex justify-end p-3 gap-2">
-            <NButton
-              kind="ghost"
-              title="Cancel"
-              onClick={(e) => {
-                e.preventDefault();
-                reset();
-                closeDrawer();
-              }}
-            />
-            <NButton
-              disabled={saveButtonLoadingState}
-              isLoading={saveButtonLoadingState}
-              title="Save"
-            />
+    <Drawer
+      title={title}
+      position="right"
+      size="lg"
+      opened={isOpen}
+      onClose={closeDrawer}
+    >
+      {/* <NDrawer isOpen={isOpen} closeDrawer={closeDrawer} title={title}> */}
+      <form onSubmit={handleSubmit(onFormSubmit)} className="flex flex-col">
+        {formFieldsCategories.map((category) => (
+          <div
+            key={category.title}
+            className="flex flex-col gap-7 border-b-[1px] border-surface-300 p-6"
+          >
+            {category.title || category.description ? (
+              <section className="flex flex-col gap-2">
+                <Title order={5} c="dark.1">
+                  {category.title}
+                </Title>
+                <Text size="sm" c="dark.2">
+                  {category.description}
+                </Text>
+              </section>
+            ) : null}
+            {category.fields.map((field) => (
+              <TextInput
+                type={selectInputType(field.fieldType)}
+                key={field.field}
+                size="md"
+                label={field.title}
+                description={field.help}
+                {...register(field.field, {
+                  required: field.required ? "This field is required" : false,
+                  valueAsNumber: field.fieldType === "number" ? true : false,
+                  disabled: saveButtonLoadingState ? true : field.disabled,
+                })}
+              />
+              // <NovellaInput<typeof field.field>
+              //   key={field.field}
+              //   type={selectInputType(field.fieldType)}
+              //   fontSize="xs"
+              //   helpText={field.help}
+              //   reactHookErrorMessage={errors[field.field] as FieldError}
+              //   reactHookRegister={register(field.field, {
+              //     required: field.required ? "This field is required" : false,
+              //     valueAsNumber: field.fieldType === "number" ? true : false,
+              //     disabled: saveButtonLoadingState ? true : field.disabled,
+              //   })}
+              //   labelDirection="horizontal"
+              //   title={field.title}
+              // />
+            ))}
           </div>
-        </form>
-      </div>
-    </NDrawer>
+        ))}
+        <div className="flex justify-end p-3 gap-2">
+          <Button
+            size="md"
+            color="gray"
+            onClick={(event) => {
+              event.preventDefault();
+              reset();
+              closeDrawer();
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            size="md"
+            disabled={saveButtonLoadingState}
+            loading={saveButtonLoadingState}
+            type="submit"
+          >
+            Save
+          </Button>
+          {/* <NButton
+            kind="ghost"
+            title="Cancel"
+            onClick={(e) => {
+              e.preventDefault();
+              reset();
+              closeDrawer();
+            }}
+          />
+          <NButton
+            disabled={saveButtonLoadingState}
+            isLoading={saveButtonLoadingState}
+            title="Save"
+          /> */}
+        </div>
+      </form>
+    </Drawer>
   );
 }

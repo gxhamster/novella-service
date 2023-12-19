@@ -86,15 +86,6 @@ export default function IssueBookDrawer({
 
   return (
     <>
-      {/* <NDrawer
-        title="Issue book to student"
-        isOpen={isIssueBookDrawerOpen}
-        closeDrawer={() =>
-          !isAddBookDrawerOpen &&
-          !isAddStudentDrawerOpen &&
-          setIsIssueBookDrawerOpen(false)
-        }
-      > */}
       <Drawer
         title="Issue book to student"
         position="right"
@@ -133,35 +124,6 @@ export default function IssueBookDrawer({
               description="The date 5 days from now will be used by default"
               {...register("due_date")}
             />
-
-            {/* <NovellaInput
-              title="ID"
-              disabled
-              helpText="Issue ID will be assigned by the system"
-              labelDirection="horizontal"
-              reactHookRegister={register("id")}
-              reactHookErrorMessage={errors["id"]}
-            />
-            <NovellaInput
-              type="datetime-local"
-              title="Issued Date"
-              helpText="The current time will be used if not date is given"
-              labelDirection="horizontal"
-              reactHookRegister={register("created_at", {
-                required: "Issue date is required",
-              })}
-              reactHookErrorMessage={errors["created_at"]}
-            />
-            <NovellaInput
-              type="datetime-local"
-              title="Due Date"
-              helpText="The date 5 days from now will be used by default"
-              labelDirection="horizontal"
-              reactHookRegister={register("due_date", {
-                required: "Due date is required",
-              })}
-              reactHookErrorMessage={errors["due_date"]}
-            /> */}
           </section>
           <section className="flex flex-col p-6 w-full gap-4 border-b-[1px] border-surface-300">
             <Text size="lg" c="dark.1">
@@ -187,31 +149,6 @@ export default function IssueBookDrawer({
                 valueAsNumber: true,
               })}
             />
-            {/* <NovellaInput
-              title="Book ID"
-              helpText={
-                selectedBook?.title ||
-                "This will be the book that is issued. Select from the table"
-              }
-              labelDirection="horizontal"
-              reactHookRegister={register("book_id", {
-                valueAsNumber: true,
-                required: "A book needs to be selected",
-              })}
-              reactHookErrorMessage={errors["book_id"]}
-              suffixContent={
-                <NButton
-                  kind="secondary"
-                  size="xs"
-                  title="Select book"
-                  icon={<LeftArrowIcon size={10} />}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setIsAddBookDrawerOpen(true);
-                  }}
-                />
-              }
-            /> */}
           </section>
           <section className="flex flex-col p-6 w-full gap-4 border-b-[1px] border-surface-300">
             <Text size="lg" c="dark.1">
@@ -237,31 +174,6 @@ export default function IssueBookDrawer({
                 valueAsNumber: true,
               })}
             />
-            {/* <NovellaInput
-              title="Student ID"
-              helpText={
-                selectedStudent?.name ||
-                "This will be the student the book is issued to. Select from the table"
-              }
-              labelDirection="horizontal"
-              reactHookRegister={register("student_id", {
-                valueAsNumber: true,
-                required: "A student needs to be selected",
-              })}
-              reactHookErrorMessage={errors["student_id"]}
-              suffixContent={
-                <NButton
-                  kind="secondary"
-                  size="xs"
-                  title="Select student"
-                  icon={<LeftArrowIcon size={10} />}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setIsAddStudentDrawerOpen(true);
-                  }}
-                />
-              }
-            /> */}
           </section>
           <section className="flex justify-end gap-3 p-3 w-full ">
             <Button

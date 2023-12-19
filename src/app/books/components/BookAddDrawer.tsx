@@ -125,13 +125,13 @@ export default function BookAddDrawer({
   });
 
   const addBookToSupabase = async (formData: IBook) => {
+    console.log(formData);
     setSaveButtonLoading(true);
     bookAddMutation.mutate(formData);
   };
 
   return (
     <NDrawerCreateForm<IBook>
-      schema={ZBook}
       title="Add new book to library"
       saveButtonLoadingState={saveButtonLoading}
       isOpen={isAddBookDrawerOpen}

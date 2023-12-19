@@ -23,8 +23,8 @@ export default function IssueStatChart({ data }: IssueStatChartProps) {
       {
         label: "Number of books issued",
         data: data.issues,
-        borderColor: "#4589ff",
-        backgroundColor: "#4589ff",
+        borderColor: "#228BE6",
+        backgroundColor: "#228BE6",
       },
     ],
   });

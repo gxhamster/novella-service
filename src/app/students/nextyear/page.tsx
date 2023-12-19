@@ -6,10 +6,8 @@ import { useMemo, useState } from "react";
 import { getAllStudentsType } from "@/server/routes/student";
 import NovellaDataTable from "@/components/NovellaDataTable";
 import { createColumnHelper } from "@tanstack/react-table";
-import NBadge from "@/components/NBadge";
 import CheckIcon from "@/components/icons/CheckIcon";
-import DropDown from "@/components/DropDown";
-import { Listbox } from "@headlessui/react";
+import { Badge, Button, Title, Text, Select } from "@mantine/core";
 
 interface getAllStudentsTypeDef extends getAllStudentsType {
   new_grade: number | null;
@@ -18,13 +16,17 @@ interface getAllStudentsTypeDef extends getAllStudentsType {
 
 export default function Nextyear() {
   const [showStudents, setShowStudents] = useState<boolean>(false);
-  const selectedGrade = useState<number>();
+  const [selectedGrade, setSelectedGrade] = useState<number>();
   const getStudentQuery = trpc.students.getAllStudents.useQuery(undefined, {
     enabled: false,
   });
   const getStudentQueryWithStatus = useMemo(() => {
     const n = getStudentQuery.data?.data.map((student) => {
-      if (student.grade && student.grade < 12) {
+      if (
+        student.grade &&
+        student.grade < 12 &&
+        student.grade === selectedGrade
+      ) {
         return { ...student, status: "Changed", new_grade: student.grade + 1 };
       } else {
         return { ...student, status: "No Change", new_grade: null };
@@ -53,9 +55,9 @@ export default function Nextyear() {
     columnHelper.accessor("status", {
       header: "Status",
       cell: (props) => (
-        <NBadge type={props.getValue() === "Changed" ? "success" : "secondary"}>
+        <Badge color={props.getValue() === "Changed" ? "green" : "dark.6"}>
           {props.getValue()}
-        </NBadge>
+        </Badge>
       ),
     }),
     columnHelper.accessor("new_grade", {
@@ -66,40 +68,57 @@ export default function Nextyear() {
   return (
     <div className="flex flex-col text-surface-900 gap-y-3 relative max-h-full overflow-y-auto flex-grow px-20 ">
       <section className="flex flex-col justify-center items-center">
-        <section className="flex flex-col mt-10">
-          <span className="text-3xl">Academic year</span>
-          <span className="text-md text-surface-600 font-light mt-2a">
+        <section className="flex flex-col justify-center items-center mt-10">
+          <Title order={1} fw="bold" c="dark.1">
+            Academic year
+          </Title>
+          <Title c="dark.2" order={4} fw="normal">
             Allows to transfer all registered library students to the next
             academic year
-          </span>
+          </Title>
         </section>
         <section className="flex flex-col justify-center">
           <AcademicIllustration size={300} />
-          <NButton
+          <Button
+            color="gray"
             disabled={showStudents}
-            title="Review Changes"
-            size="normal"
-            kind="secondary"
+            size="md"
             onClick={() => {
               setShowStudents(true);
               getStudentQuery.refetch();
             }}
-          />
+          >
+            Review changes
+          </Button>
         </section>
       </section>
 
       {showStudents && (
         <section className="m-10 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <span className="text-2xl">Review changes</span>
-            <span className="text-md text-surface-600 font-light my-2">
+            <Text size="xl" c="dark.1">
+              Review changes
+            </Text>
+            <Text size="md" c="dark.2">
               Review the proposed changes that will be made to the students
               information
-            </span>
+            </Text>
           </div>
           <div className="flex flex-col">
-            <div className="flex justify-end">
-              <DropDown title="Grade" selected={selectedGrade}>
+            <div className="flex justify-end mb-5 gap-3">
+              <Select
+                size="sm"
+                placeholder="Pick grade"
+                onChange={(value) => setSelectedGrade(Number(value))}
+                data={getStudentQueryWithStatus
+                  ?.map((record) => record.grade)
+                  .filter((grade, idx, array) => idx === array.indexOf(grade))
+                  .map((grade) => String(grade))}
+              />
+              <Button size="sm" leftSection={<CheckIcon size={10} />}>
+                Save changes
+              </Button>
+              {/* <DropDown title="Grade" selected={selectedGrade}>
                 {getStudentQueryWithStatus
                   ?.map((record) => record.grade)
                   .filter((grade, idx, array) => idx === array.indexOf(grade))
@@ -123,12 +142,12 @@ export default function Nextyear() {
                       </Listbox.Option>
                     </div>
                   ))}
-              </DropDown>
-              <NButton
+              </DropDown> */}
+              {/* <NButton
                 size="normal"
                 title="Save Changes"
                 icon={<CheckIcon size={10} />}
-              ></NButton>
+              ></NButton> */}
             </div>
             <NovellaDataTable<getAllStudentsTypeDef>
               columns={tanstackCols}

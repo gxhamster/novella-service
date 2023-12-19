@@ -362,7 +362,6 @@ export default function NDataTableFixed<TableType>({
             data={Array.from({ length: table.getPageCount() }, (value, index) =>
               String(index + 1)
             )}
-            value={table.getState().pagination.pageSize.toString()}
             onChange={(value) => {
               const page = value ? Number(value) - 1 : 0;
               table.setPageIndex(page);

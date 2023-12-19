@@ -1,13 +1,13 @@
-// FIXME: Fetch initial data on server and pass to a client component
 "use client";
 import { useForm, useWatch } from "react-hook-form";
 import { useEffect, useState } from "react";
-import NovellaInput from "@/components/NovellaInput";
 import NCategoryCard from "@/components/NCategoryCard";
 import { trpc } from "@/app/_trpc/client";
-import NButton from "@/components/NButton";
-import NToast from "@/components/NToast";
 import { getStudentByIdType } from "@/server/routes/student";
+import { Title, Button, TextInput, Alert, Stack, Text } from "@mantine/core";
+import AlertIcon from "@/components/icons/AlertIcon";
+import { Toast } from "@/components/Toast";
+import NDeleteModal from "@/components/NDeleteModal";
 
 type StudentFieldsCategories<T> = {
   title: string;
@@ -122,22 +122,52 @@ export default function Student({ params }: StudentProps) {
     formState: { errors },
   } = useForm<getStudentByIdType>();
 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const watchedFormValues = useWatch({ control });
 
   const getStudentByIdQuery = trpc.students.getStudentById.useQuery(
     Number(params.student)
   );
 
-  const updateStudentByIdMutation = trpc.students.updateStudentById.useMutation(
+  const deleteStudentByIdMutation = trpc.students.deleteStudentById.useMutation(
     {
       onError: (_error) => {
-        NToast.error("Could not update student", `${_error.message}`);
+        Toast.Error({
+          title: "Could not delete student",
+          message: _error.message,
+        });
         throw new Error(_error.message, {
           cause: _error.data,
         });
       },
       onSuccess: () => {
-        NToast.success("Successful", `Updated the student`);
+        Toast.Successful({
+          title: "Successful",
+          message: "Deleted the student",
+        });
+        getStudentByIdQuery.refetch();
+        if (getStudentByIdQuery.data?.data)
+          reset(getStudentByIdQuery.data?.data);
+      },
+    }
+  );
+
+  const updateStudentByIdMutation = trpc.students.updateStudentById.useMutation(
+    {
+      onError: (_error) => {
+        Toast.Error({
+          title: "Could not update student",
+          message: _error.message,
+        });
+        throw new Error(_error.message, {
+          cause: _error.data,
+        });
+      },
+      onSuccess: () => {
+        Toast.Successful({
+          title: "Successful",
+          message: "Updated the student",
+        });
         getStudentByIdQuery.refetch();
         if (getStudentByIdQuery.data?.data)
           reset(getStudentByIdQuery.data?.data);
@@ -173,60 +203,130 @@ export default function Student({ params }: StudentProps) {
   }, [getStudentByIdQuery.data?.data]);
 
   return (
-    <div className="flex text-surface-900 gap-y-3 relative max-h-full overflow-hidden justify-center">
-      {/* <NTableOfContents links={categoryLinks} /> */}
-      <section className="max-h-full overflow-y-auto flex-grow px-10">
-        <section className="flex-grow flex-1 flex-col gap-8 m-16">
-          {/* Student Information Update Form */}
-          <form
-            className="flex flex-col gap-8"
-            onSubmit={handleSubmit(studentFormSubmitHandler)}
-          >
-            {/* Title Section */}
-            <div className="flex justify-between items-center">
-              <h3 className="text-2xl text-surface-700 font-light">{`Student Ref: ${params.student}`}</h3>
-              <div className="flex gap-2">
-                <NButton
-                  kind="secondary"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (getStudentByIdQuery.data?.data)
-                      reset(getStudentByIdQuery.data?.data);
-                  }}
-                  disabled={!formValuesChanged}
-                  title="Cancel"
-                />
-                <NButton
-                  kind="primary"
-                  disabled={!formValuesChanged}
-                  title="Update"
-                  isLoading={updateStudentByIdMutation.isLoading}
-                />
-              </div>
-            </div>
-            {categories.map((category) => (
-              <NCategoryCard
-                key={category.title}
-                title={category.title}
-                subtitle={category.description}
+    <section className="relative">
+      <section className="flex-grow flex flex-col gap-8 m-16">
+        {/* Student Information Update Form */}
+        <form
+          className="flex flex-col gap-8"
+          onSubmit={handleSubmit(studentFormSubmitHandler)}
+        >
+          {/* Title Section */}
+          <div className="flex justify-between items-center">
+            <Title
+              fw="normal"
+              order={2}
+              c="dark.1"
+            >{`Student Ref: ${params.student}`}</Title>
+            <div className="flex gap-2">
+              <Button
+                color="gray"
+                size="md"
+                disabled={!formValuesChanged}
+                onClick={(event) => {
+                  event.preventDefault();
+                  if (getStudentByIdQuery.data?.data)
+                    reset(getStudentByIdQuery.data?.data);
+                }}
               >
-                {category.fields.map((field) => (
-                  <NovellaInput
-                    key={field.field}
-                    type="text"
-                    title={field.title}
-                    reactHookRegister={register(field.field, {
-                      valueAsNumber: field.isNumber,
-                      disabled: field.disabled,
-                    })}
-                    reactHookErrorMessage={errors[field.field]}
-                  />
-                ))}
-              </NCategoryCard>
-            ))}
-          </form>
-        </section>
+                Cancel
+              </Button>
+              <Button
+                size="md"
+                disabled={!formValuesChanged}
+                loading={updateStudentByIdMutation.isLoading}
+                type="submit"
+              >
+                Update
+              </Button>
+              {/* <NButton
+                kind="secondary"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (getStudentByIdQuery.data?.data)
+                    reset(getStudentByIdQuery.data?.data);
+                }}
+                disabled={!formValuesChanged}
+                title="Cancel"
+              />
+              <NButton
+                kind="primary"
+                disabled={!formValuesChanged}
+                title="Update"
+                isLoading={updateStudentByIdMutation.isLoading}
+              /> */}
+            </div>
+          </div>
+          {categories.map((category) => (
+            <NCategoryCard
+              key={category.title}
+              title={category.title}
+              subtitle={category.description}
+            >
+              {category.fields.map((field) => (
+                <TextInput
+                  styles={{
+                    label: {
+                      color: "var(--mantine-color-dark-1)",
+                      fontSize: "var(--mantine-font-size-sm)",
+                    },
+                  }}
+                  size="md"
+                  key={field.field}
+                  label={field.title}
+                  {...register(field.field, {
+                    disabled: field.disabled,
+                    valueAsNumber: field.isNumber,
+                  })}
+                />
+                // <NovellaInput
+                //   key={field.field}
+                //   type="text"
+                //   title={field.title}
+                //   reactHookRegister={register(field.field, {
+                //     valueAsNumber: field.isNumber,
+                //     disabled: field.disabled,
+                //   })}
+                //   reactHookErrorMessage={errors[field.field]}
+                // />
+              ))}
+            </NCategoryCard>
+          ))}
+        </form>
+
+        <Alert
+          variant="light"
+          color="red"
+          title="Delete student from library"
+          icon={<AlertIcon size={20} className="" />}
+        >
+          <Stack justify="flex-start" align="flex-start">
+            <Text size="sm" c="red">
+              Deleting this student remove it from the database. Please note
+              that the student cannot be recovered if deleted.
+            </Text>
+            <Button
+              variant="filled"
+              miw={100}
+              onClick={() => setIsDeleteModalOpen(true)}
+              color="red"
+            >
+              Delete student
+            </Button>
+          </Stack>
+        </Alert>
+        <NDeleteModal
+          title="Delete student from library"
+          description="
+              This will permanently delete the student from the database and cannot
+              be recovered"
+          isOpen={isDeleteModalOpen}
+          isDeleting={deleteStudentByIdMutation.isLoading}
+          closeModal={() => setIsDeleteModalOpen(false)}
+          onDelete={() =>
+            deleteStudentByIdMutation.mutate(Number(params.student))
+          }
+        />
       </section>
-    </div>
+    </section>
   );
 }

@@ -11,7 +11,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <>
       <ToastProvider />
-      <div className="bg-surface-100 text-white flex overflow-y-hidden h-screen max-h-screen">
+      <div className="bg-dark-8 text-white flex overflow-y-hidden h-screen max-h-screen">
         <NovellaSidebar />
         <section className="flex flex-col flex-1 w-full overflow-x-hidden">
           <NovellaHeader />

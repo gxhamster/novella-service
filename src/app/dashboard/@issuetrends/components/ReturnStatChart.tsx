@@ -23,8 +23,8 @@ export default function ReturnStatChart({ data }: ReturnStatChartProps) {
       {
         label: "Number of books returned",
         data: data.returns,
-        borderColor: "#4589ff",
-        backgroundColor: "#4589ff",
+        borderColor: "#228BE6",
+        backgroundColor: "#228BE6",
       },
     ],
   });
