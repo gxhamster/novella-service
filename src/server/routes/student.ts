@@ -130,6 +130,49 @@ export const StudentRouter = router({
       });
     }),
 
+  changeAcademic: publicProcedure
+    .input(z.array(ZStudentInsert))
+    .mutation(async (opts) => {
+      const { input } = opts;
+      const { supabase } = opts.ctx;
+
+      const idMissingData = input.filter((student) => !student.id);
+      if (idMissingData.length) {
+        throw new TRPCError({
+          message: "ID of the book is not given",
+          code: "BAD_REQUEST",
+        });
+      }
+
+      const nullGrades = input.filter((student) => !student.grade);
+      if (nullGrades.length) {
+        throw new TRPCError({
+          message: "Grades cannot be changed to empty",
+          code: "BAD_REQUEST",
+        });
+      }
+
+      const transformedInput = input.map((student) => ({
+        id: student.id,
+        grade: student.grade,
+        index: student.index,
+      }));
+
+      const { data: updatedStudents, error } = await supabase
+        .from("students")
+        .upsert(transformedInput)
+        .select();
+
+      if (error)
+        throw new TRPCError({
+          message: error.message,
+          code: "INTERNAL_SERVER_ERROR",
+          cause: error.details,
+        });
+
+      return updatedStudents;
+    }),
+
   deleteStudentById: publicProcedure
     .input(z.number())
     .mutation(async (opts) => {

@@ -2,6 +2,7 @@
 import {
   ColumnDef,
   PaginationState,
+  TableMeta,
   flexRender,
   getCoreRowModel,
   useReactTable,
