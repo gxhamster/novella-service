@@ -18,9 +18,7 @@ export default async function PopularBook() {
               <span className="text-surface-800 group-hover:text-surface-900">
                 Most popular book
               </span>
-              <Anchor size="sm">
-                <Link href="/books">View all</Link>
-              </Anchor>
+              <Anchor href="/books" size="sm" />
             </div>
             <span className="text-5xl font-light mt-2">
               {book.times_issued ? book.times_issued : 0}
@@ -58,9 +56,7 @@ export default async function PopularBook() {
           <span className="text-surface-800 group-hover:text-surface-900">
             Most popular student
           </span>
-          <Anchor size="sm">
-            <Link href="/students">View all</Link>
-          </Anchor>
+          <Anchor href="/students" size="sm" />
         </div>
         <span className="text-5xl font-light mt-2">{student.count}</span>
         <span className="text-surface-600 text-sm gap- group-hover:text-surface-900">

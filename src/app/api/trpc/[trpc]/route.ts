@@ -2,25 +2,7 @@ import { appRouter } from "@/server";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { createContext } from "@/server/trpc";
 
-// export async function createInnerTRPCContext() {
-//   const supabase = await supabaseRouterHandlerClient();
-//   return {
-//     supabase,
-//   };
-// }
-
-// export async function createContext() {
-//   const contextInner = await createInnerTRPCContext();
-
-//   return {
-//     ...contextInner,
-//   };
-// }
-
-// export async function createContext() {
-//   const supabase = await supabaseRouterHandlerClient();
-//   return { supabase };
-// }
+// https://github.com/vercel/next.js/issues/45371
 
 const handler = async (req: Request) => {
   return fetchRequestHandler({
