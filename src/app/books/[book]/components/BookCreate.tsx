@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import ButtonPrimary from "@/components/ButtonPrimary";
 import { IBook } from "@/supabase/types/supabase";
 import {
   NDrawerCreateForm,
@@ -8,6 +7,7 @@ import {
 } from "@/components/NDrawer";
 import { trpc } from "@/app/_trpc/client";
 import { ZBook } from "@/supabase/schema";
+import { Button } from "@mantine/core";
 
 export default function BookCreate() {
   const [saveButtonLoading, setSaveButtonLoading] = useState(false);
@@ -105,10 +105,9 @@ export default function BookCreate() {
   ];
   return (
     <>
-      <ButtonPrimary
-        title="Create a new book"
-        onClick={() => setIsAddBookDrawerOpen(true)}
-      />
+      <Button variant="filled" onClick={() => setIsAddBookDrawerOpen(true)}>
+        Create a new book
+      </Button>
       <NDrawerCreateForm<IBook>
         schema={ZBook.partial()}
         title="Add new book to library"

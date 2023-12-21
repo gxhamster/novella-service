@@ -278,16 +278,6 @@ export default function Student({ params }: StudentProps) {
                     valueAsNumber: field.isNumber,
                   })}
                 />
-                // <NovellaInput
-                //   key={field.field}
-                //   type="text"
-                //   title={field.title}
-                //   reactHookRegister={register(field.field, {
-                //     valueAsNumber: field.isNumber,
-                //     disabled: field.disabled,
-                //   })}
-                //   reactHookErrorMessage={errors[field.field]}
-                // />
               ))}
             </NCategoryCard>
           ))}
