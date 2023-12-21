@@ -131,11 +131,6 @@ export default function NDataTableFixedSmall<TableType>({
               </Text>
             </Flex>
           </ActionIcon>
-          {/* <ButtonGhost
-            icon={refreshBtnIcon}
-            title="Refresh"
-            onClick={() => onRefresh()}
-          /> */}
           {/* Sort Control */}
           <NDataTableFixedSortMenu<TableType>
             position="left"
@@ -177,24 +172,11 @@ export default function NDataTableFixedSmall<TableType>({
           >
             <LeftArrowIcon size={16} />
           </ActionIcon>
-          {/* <button
-            className="p-2 inline-flex justify-center items-center bg-surface-200 hover:bg-surface-300 transition-all focus:ring-1 focus:ring-surface-900 disabled:opacity-60 disabled:bg-surface-200"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <RightArrowIcon size={18} />
-          </button>
-          <button
-            className="p-2 inline-flex justify-center items-center bg-surface-200 hover:bg-surface-300 transition-all focus:ring-1 focus:ring-surface-900 disabled:bg-surface-200 disabled:opacity-60"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <LeftArrowIcon size={18} />
-          </button> */}
         </div>
       </div>
       <div className="h-[calc(100vh-43px-57px)] overflow-y-auto bg-dark-8 relative">
         <Table
+          layout="auto"
           stickyHeader
           verticalSpacing="xs"
           horizontalSpacing="xs"
@@ -224,7 +206,7 @@ export default function NDataTableFixedSmall<TableType>({
             {table.getRowModel().rows.map((row) => (
               <Table.Tr key={row.id} onClick={() => row.toggleSelected()}>
                 {row.getVisibleCells().map((cell, _idx) => (
-                  <Table.Td key={cell.id}>
+                  <Table.Td maw={350} key={cell.id}>
                     <Text c="dark.1" size="xs" truncate>
                       {flexRender(
                         cell.column.columnDef.cell,

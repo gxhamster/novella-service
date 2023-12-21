@@ -27,6 +27,7 @@ import MinusIcon from "@/components/icons/MinusIcon";
 import { Toast } from "@/components/Toast";
 import TrashIcon from "@/components/icons/TrashIcon";
 import NDeleteModal from "@/components/NDeleteModal";
+import CloseIcon from "@/components/icons/CloseIcon";
 
 interface getAllStudentsTypeDef extends getAllStudentsType {
   new_grade: number | null;
@@ -353,7 +354,61 @@ export default function Nextyear() {
             </Text>
           </div>
           <div className="flex flex-col">
-            <Group justify="space-between" align="start">
+            <Group justify="flex-start" align="start" mb={15}>
+              <Tooltip label="Decrement current grade">
+                <ActionIcon
+                  size="lg"
+                  color="dark"
+                  disabled={!selectedGrade}
+                  variant="default"
+                  onClick={() => {
+                    setChangedGradeIncrement((current) => current - 1);
+                  }}
+                >
+                  <MinusIcon size={10} />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip label="Increment current grade">
+                <ActionIcon
+                  size="lg"
+                  disabled={!selectedGrade}
+                  color="dark"
+                  variant="default"
+                  onClick={() => {
+                    setChangedGradeIncrement((current) => current + 1);
+                  }}
+                >
+                  <AddIcon size={10} />
+                </ActionIcon>
+              </Tooltip>
+              <Select
+                size="sm"
+                autoFocus
+                variant="filled"
+                placeholder="Pick grade"
+                value={String(selectedGrade)}
+                onChange={(value) => {
+                  const anyChangesMade = studentData?.filter(
+                    (data) => data.status === "Changed"
+                  );
+                  if (selectedGrade && anyChangesMade?.length) {
+                    setTempSelectedGrade(Number(value));
+                    saveChangesModalOpen();
+                  } else setSelectedGrade(Number(value));
+                }}
+                data={getStudentQuery.data?.data
+                  ?.map((record) => record.grade)
+                  .filter((grade, idx, array) => idx === array.indexOf(grade))
+                  .map((grade) => String(grade))}
+              />
+            </Group>
+            <NovellaDataTable<getAllStudentsTypeDef>
+              columns={tanstackCols}
+              isDataLoading={getStudentQuery.isLoading}
+              isDataRefetching={getStudentQuery.isRefetching}
+              data={studentData}
+            />
+            <Group justify="flex-end" align="start" mt={15}>
               <Button
                 color="red.9"
                 size="sm"
@@ -363,70 +418,47 @@ export default function Nextyear() {
               >
                 Delete grade
               </Button>
-              <div className="flex items-center mb-5 gap-3">
-                <Tooltip label="Decrement current grade">
-                  <ActionIcon
-                    size="lg"
-                    color="dark"
-                    disabled={!selectedGrade}
-                    variant="default"
-                    onClick={() => {
-                      setChangedGradeIncrement((current) => current - 1);
-                    }}
-                  >
-                    <MinusIcon size={10} />
-                  </ActionIcon>
-                </Tooltip>
-                <Tooltip label="Increment current grade">
-                  <ActionIcon
-                    size="lg"
-                    disabled={!selectedGrade}
-                    color="dark"
-                    variant="default"
-                    onClick={() => {
-                      setChangedGradeIncrement((current) => current + 1);
-                    }}
-                  >
-                    <AddIcon size={10} />
-                  </ActionIcon>
-                </Tooltip>
-                <Select
-                  size="sm"
-                  placeholder="Pick grade"
-                  value={String(selectedGrade)}
-                  onChange={(value) => {
-                    const anyChangesMade = studentData?.filter(
-                      (data) => data.status === "Changed"
+              <Button
+                size="sm"
+                variant="default"
+                disabled={!statusChanged}
+                onClick={() => {
+                  if (getStudentQuery.data?.data) {
+                    // Only update the status of the students in the current view of the table
+                    const currentStudentsInViewByID = studentData?.map(
+                      (student) => student.id
                     );
-                    if (selectedGrade && anyChangesMade?.length) {
-                      setTempSelectedGrade(Number(value));
-                      saveChangesModalOpen();
-                    } else setSelectedGrade(Number(value));
-                  }}
-                  data={getStudentQuery.data?.data
-                    ?.map((record) => record.grade)
-                    .filter((grade, idx, array) => idx === array.indexOf(grade))
-                    .map((grade) => String(grade))}
-                />
-                <Button
-                  size="sm"
-                  disabled={!statusChanged}
-                  leftSection={<CheckIcon size={10} />}
-                  onClick={() => {
-                    saveChangesModalOpen();
-                  }}
-                  loading={changeAcademicMutation.isLoading}
-                >
-                  Save changes
-                </Button>
-              </div>
+                    const studentQueryCurrentStudents =
+                      getStudentQuery.data.data.filter((student) =>
+                        currentStudentsInViewByID?.includes(student.id)
+                      );
+                    const newStudentData: getAllStudentsTypeDef[] =
+                      studentQueryCurrentStudents.map((student) => {
+                        return {
+                          ...student,
+                          new_grade: null,
+                          status: "No change",
+                        };
+                      });
+                    setStudentData([...newStudentData]);
+                  }
+                }}
+                leftSection={<CloseIcon size={10} />}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                disabled={!statusChanged}
+                leftSection={<CheckIcon size={10} />}
+                onClick={() => {
+                  saveChangesModalOpen();
+                }}
+                loading={changeAcademicMutation.isLoading}
+              >
+                Save changes
+              </Button>
             </Group>
-            <NovellaDataTable<getAllStudentsTypeDef>
-              columns={tanstackCols}
-              isDataLoading={getStudentQuery.isLoading}
-              isDataRefetching={getStudentQuery.isRefetching}
-              data={studentData}
-            />
           </div>
           <ConfirmChangesModal
             saveButtonLoading={

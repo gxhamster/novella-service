@@ -21,7 +21,6 @@ import {
 } from ".";
 import TrashIcon from "../icons/TrashIcon";
 import CloseIcon from "../icons/CloseIcon";
-import NButtonLink from "../NButtonLink";
 import BoxIcon from "../icons/BoxIcon";
 import {
   Table,
@@ -181,19 +180,20 @@ export default function NDataTableFixed<TableType>({
         </ActionIcon>
         {selectedData.length ? (
           <div className="flex items-center gap-2">
-            <ActionIcon
-              variant="default"
-              color="dark"
-              size="lg"
-              aria-label="Reset row selection"
-              onClick={() => table.resetRowSelection()}
-            >
-              <CloseIcon size={16} />
-            </ActionIcon>
             <Text
               c="dark.1"
-              size="xs"
+              size="sm"
             >{`${selectedData.length} rows selected`}</Text>
+            <Button
+              variant="default"
+              color="dark"
+              size="sm"
+              aria-label="Reset row selection"
+              onClick={() => table.resetRowSelection()}
+              leftSection={<CloseIcon size={16} />}
+            >
+              Cancel
+            </Button>
 
             <Button
               variant="filled"

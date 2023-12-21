@@ -2,7 +2,6 @@
 import {
   ColumnDef,
   PaginationState,
-  TableMeta,
   flexRender,
   getCoreRowModel,
   useReactTable,
@@ -10,8 +9,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import RightArrowIcon from "./icons/RightArrowIcon";
 import LeftArrowIcon from "./icons/LeftArrowIcon";
-import LoadingIcon from "./icons/LoadingIcon";
-import { Table, Select, Text, ActionIcon, Stack } from "@mantine/core";
+import { Table, Select, Text, ActionIcon, Stack, Loader } from "@mantine/core";
 
 type NovellaDataTableProps<T> = {
   data: T[] | undefined;
@@ -122,7 +120,8 @@ export default function NovellaDataTable<T>({
           {isDataLoading || isDataRefetching ? (
             <div className="flex gap-2 text-xs items-center">
               {" "}
-              <LoadingIcon size={18} /> <span>Loading data...</span>
+              <Loader color="rgba(237, 237, 237, 0.18)" size="xs" />{" "}
+              <span>Loading data...</span>
             </div>
           ) : null}
         </div>

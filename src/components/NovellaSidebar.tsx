@@ -98,7 +98,7 @@ const links = [
         icon: IssueBookIcon,
       },
       {
-        title: "Add book",
+        title: "Books",
         href: "/books",
         icon: BookIcon,
       },

@@ -5,14 +5,24 @@ import NDataTableFixed, {
 } from "@/components/NDataTableFixed";
 import { IIssuedBookV2 } from "./lib/types";
 import { createColumnHelper } from "@tanstack/react-table";
-import { IssuedBooksTableColumnDef } from "./lib/types";
-import Link from "next/link";
 import IssueBookDrawer from "./components/IssueBookDrawer";
 import NDeleteModal from "@/components/NDeleteModal";
 import { trpc } from "@/app/_trpc/client";
 import ReturnBookModal from "./components/ReturnBookModal";
 import { format } from "date-fns";
-import { Anchor, Button } from "@mantine/core";
+import { Anchor, Badge } from "@mantine/core";
+
+type DuedateStatusBadgeProps = {
+  days: number;
+};
+function DuedateStatusBadge({ days }: DuedateStatusBadgeProps) {
+  const absDays = Math.abs(days);
+  if (days < 0) return <Badge color="red.9">{`Overdue (${absDays})`}</Badge>;
+  else if (days < 1)
+    return <Badge color="yellow.9">{`To be due (${absDays})`}</Badge>;
+  else if (days > 1)
+    return <Badge color="green.9">{`Not due (${absDays})`}</Badge>;
+}
 
 export default function Issued() {
   const [isIssueBookDrawerOpen, setIsIssueBookDrawerOpen] = useState(false);
@@ -51,56 +61,88 @@ export default function Issued() {
     deleteIssuedBooksQuery.mutate(ids);
   };
 
-  const issuedBooksTableCols: Array<IssuedBooksTableColumnDef> = [
-    { id: "id", header: "ID" },
-    { id: "created_at", header: "Issued Date", isDate: true },
-    { id: "book_id", header: "Book ID", baseHref: "/books" },
-    { id: "title", header: "Title" },
-    { id: "student_id", header: "Student ID", baseHref: "/students" },
-    { id: "name", header: "Student Name" },
-    { id: "due_date", header: "Due Date", isDate: true },
-    { id: "action", header: "Recieve", isDisplayColumn: true },
+  type issueBooksTableDef = {
+    id: any;
+    header: string;
+    type: "string" | "date" | "link" | "return" | "status";
+    href?: string;
+  };
+
+  const issuedBooksTableCols: issueBooksTableDef[] = [
+    { id: "id", header: "ID", type: "string" },
+    { id: "created_at", header: "Issued Date", type: "date" },
+    { id: "book_id", header: "Book ID", type: "link", href: "/books" },
+    { id: "title", header: "Title", type: "string" },
+    { id: "student_id", header: "Student ID", type: "link", href: "/students" },
+    { id: "name", header: "Student Name", type: "string" },
+    { id: "due_date", header: "Due Date", type: "date" },
+    { id: "action", header: "Return", type: "return" },
+    { id: "due_status", header: "Status", type: "status" },
   ];
 
   const issuedBooksTableColsTanstack = issuedBooksTableCols.map((column) => {
-    if (column.isDisplayColumn)
-      return issuedBooksColHelper.display({
-        id: column.id,
-        cell: (cell) => (
-          <Button
-            variant="transparent"
-            size="xs"
-            onClick={() => {
-              setReturnBookID(cell.row.getAllCells()[1].getValue() as number);
-              setIsReturnBookModalOpen(true);
-            }}
-          >
-            Return
-          </Button>
-        ),
-        header: "Return",
-      });
-    else if (column.baseHref)
-      return issuedBooksColHelper.accessor(column.id, {
-        cell: (cell) => (
-          <Link href={`${column.baseHref}/${cell.getValue()}`}>
-            <Anchor c="dark.1" href={`${column.baseHref}/${cell.getValue()}`}>
+    switch (column.type) {
+      case "string":
+        return issuedBooksColHelper.accessor(column.id, {
+          cell: (cell) => cell.getValue(),
+          header: column.header,
+        });
+      case "date":
+        return issuedBooksColHelper.accessor(column.id, {
+          header: column.header,
+          cell: (cell) => format(new Date(cell.getValue()), "dd-MM-yyyy hh:mm"),
+        });
+      case "link":
+        return issuedBooksColHelper.accessor(column.id, {
+          cell: (cell) => (
+            <Anchor
+              size="sm"
+              underline="always"
+              c="dark.1"
+              href={`${column.href}/${cell.getValue()}`}
+            >
               {cell.getValue()}
             </Anchor>
-          </Link>
-        ),
-        header: column.header,
-      });
-    else if (column.isDate)
-      return issuedBooksColHelper.accessor(column.id, {
-        header: column.header,
-        cell: (cell) => format(new Date(cell.getValue()), "dd-MM-yyyy hh:mm"),
-      });
-    else
-      return issuedBooksColHelper.accessor(column.id, {
-        cell: (cell) => cell.getValue(),
-        header: column.header,
-      });
+          ),
+          header: column.header,
+        });
+      case "return":
+        return issuedBooksColHelper.display({
+          id: column.id,
+          cell: (cell) => (
+            <Anchor
+              c="blue"
+              size="sm"
+              onClick={() => {
+                setReturnBookID(cell.row.getAllCells()[1].getValue() as number);
+                setIsReturnBookModalOpen(true);
+              }}
+            >
+              Return
+            </Anchor>
+          ),
+          header: column.header,
+        });
+      case "status":
+        return issuedBooksColHelper.display({
+          id: column.id,
+          header: "Status",
+          cell: (cell) => {
+            const dueDate = cell.row.original.due_date;
+            if (dueDate) {
+              const diffDate =
+                new Date(dueDate).getTime() - new Date().getTime();
+              const inDays = Math.floor(diffDate / (1000 * 60 * 60 * 24));
+              return <DuedateStatusBadge days={inDays} />;
+            }
+          },
+        });
+      default:
+        return issuedBooksColHelper.accessor(column.id, {
+          cell: (cell) => cell.getValue(),
+          header: column.header,
+        });
+    }
   });
 
   return (

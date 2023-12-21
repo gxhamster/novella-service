@@ -74,6 +74,7 @@ export default function ReturnBookModal({
             Do you want to return the book from the student to the library?
           </Text>
           <TextInput
+            autoFocus
             type="datetime-local"
             size="md"
             label="Return date"

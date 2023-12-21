@@ -101,33 +101,9 @@ export default function IssueBookDrawer({
           onSubmit={handleSubmit(issueBookFormSubmitHandler)}
           className="h-full flex flex-col items-center overflow-y-auto"
         >
-          <section className="flex flex-col p-6 w-full gap-7 border-b-[1px] border-surface-300">
-            <TextInput
-              disabled
-              size="md"
-              placeholder="325"
-              label="Issue ID"
-              description="Issue ID will be assigned by the system"
-              {...register("id")}
-            />
-            <TextInput
-              type="datetime-local"
-              size="md"
-              label="Issued Date"
-              description="Issue ID will be assigned by the system"
-              {...register("created_at")}
-            />
-            <TextInput
-              type="datetime-local"
-              size="md"
-              label="Due Date"
-              description="The date 5 days from now will be used by default"
-              {...register("due_date")}
-            />
-          </section>
           <section className="flex flex-col p-6 w-full gap-4 border-b-[1px] border-surface-300">
             <Text size="lg" c="dark.1">
-              Book Fields
+              Issue details
             </Text>
             <TextInput
               size="md"
@@ -149,11 +125,6 @@ export default function IssueBookDrawer({
                 valueAsNumber: true,
               })}
             />
-          </section>
-          <section className="flex flex-col p-6 w-full gap-4 border-b-[1px] border-surface-300">
-            <Text size="lg" c="dark.1">
-              Student Fields
-            </Text>
             <TextInput
               size="md"
               label="Student ID"
@@ -173,6 +144,30 @@ export default function IssueBookDrawer({
               {...register("student_id", {
                 valueAsNumber: true,
               })}
+            />
+          </section>
+          <section className="flex flex-col p-6 w-full gap-7 border-b-[1px] border-surface-300">
+            <TextInput
+              type="datetime-local"
+              size="md"
+              label="Issued Date"
+              description="Issue ID will be assigned by the system"
+              {...register("created_at")}
+            />
+            <TextInput
+              type="datetime-local"
+              size="md"
+              label="Due Date"
+              description="The date 5 days from now will be used by default"
+              {...register("due_date")}
+            />
+            <TextInput
+              disabled
+              size="md"
+              placeholder="325"
+              label="Issue ID"
+              description="Issue ID will be assigned by the system"
+              {...register("id")}
             />
           </section>
           <section className="flex justify-end gap-3 p-3 w-full ">

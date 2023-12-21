@@ -6,30 +6,31 @@ import { trpc } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
 import { NDrawerCreateFormFieldsType } from "@/components/NDrawer";
 import { format } from "date-fns";
-import NToast from "@/components/NToast";
-import { ZBook } from "@/supabase/schema";
+import { Toast } from "@/components/Toast";
 
 const bookFieldCategories: NDrawerCreateFormFieldsType<IBook>[] = [
   {
-    title: "",
+    title: "Book Fields",
     fields: [
-      {
-        field: "id",
-        title: "ID",
-        help: "ID will be automatically set by the system",
-        fieldType: "number",
-        disabled: true,
-      },
-      {
-        field: "created_at",
-        title: "Created At",
-        fieldType: "date",
-        help: `Default value will be the time as of now ${new Date().toDateString()}`,
-      },
       {
         field: "title",
         fieldType: "string",
         title: "Title",
+      },
+      {
+        fieldType: "string",
+        field: "author",
+        title: "Author",
+      },
+      {
+        fieldType: "string",
+        field: "genre",
+        title: "Genre",
+      },
+      {
+        fieldType: "number",
+        field: "pages",
+        title: "Pages",
       },
     ],
   },
@@ -72,22 +73,20 @@ const bookFieldCategories: NDrawerCreateFormFieldsType<IBook>[] = [
     ],
   },
   {
-    title: "Misc Fields",
+    title: "",
     fields: [
       {
-        fieldType: "string",
-        field: "author",
-        title: "Author",
-      },
-      {
-        fieldType: "string",
-        field: "genre",
-        title: "Genre",
-      },
-      {
+        field: "id",
+        title: "ID",
+        help: "ID will be automatically set by the system",
         fieldType: "number",
-        field: "pages",
-        title: "Pages",
+        disabled: true,
+      },
+      {
+        field: "created_at",
+        title: "Created At",
+        fieldType: "date",
+        help: `Default value will be the time as of now ${new Date().toDateString()}`,
       },
     ],
   },
@@ -109,7 +108,10 @@ export default function BookAddDrawer({
 
   const bookAddMutation = trpc.books.createBook.useMutation({
     onError: (_error) => {
-      NToast.error("Could not create book", `${_error.message}`);
+      Toast.Error({
+        title: "Could not create book",
+        message: _error.message,
+      });
       throw new Error(_error.message, {
         cause: _error.shape?.data,
       });
@@ -119,7 +121,10 @@ export default function BookAddDrawer({
     },
     onSuccess: () => {
       router.refresh();
-      NToast.success("Successful", "Added a new book to library");
+      Toast.Successful({
+        title: "Successful",
+        message: "Added a new book to library",
+      });
       onBookAdded();
     },
   });

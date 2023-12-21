@@ -7,7 +7,7 @@ import {
   Drawer,
   TextInput,
   Text,
-  ActionIcon,
+  NumberInput,
   Title,
 } from "@mantine/core";
 
@@ -85,34 +85,45 @@ export default function NDrawerCreateForm<TableType extends FieldValues>({
                 </Text>
               </section>
             ) : null}
-            {category.fields.map((field) => (
-              <TextInput
-                type={selectInputType(field.fieldType)}
-                key={field.field}
-                size="md"
-                label={field.title}
-                description={field.help}
-                {...register(field.field, {
+            {category.fields.map((field) => {
+              if (field.fieldType === "number") {
+                const { onChange, ...rest } = register(field.field, {
                   required: field.required ? "This field is required" : false,
                   valueAsNumber: field.fieldType === "number" ? true : false,
                   disabled: saveButtonLoadingState ? true : field.disabled,
-                })}
-              />
-              // <NovellaInput<typeof field.field>
-              //   key={field.field}
-              //   type={selectInputType(field.fieldType)}
-              //   fontSize="xs"
-              //   helpText={field.help}
-              //   reactHookErrorMessage={errors[field.field] as FieldError}
-              //   reactHookRegister={register(field.field, {
-              //     required: field.required ? "This field is required" : false,
-              //     valueAsNumber: field.fieldType === "number" ? true : false,
-              //     disabled: saveButtonLoadingState ? true : field.disabled,
-              //   })}
-              //   labelDirection="horizontal"
-              //   title={field.title}
-              // />
-            ))}
+                });
+                return (
+                  <NumberInput
+                    {...rest}
+                    min={0}
+                    max={Infinity}
+                    key={field.field}
+                    size="md"
+                    label={field.title}
+                    onChange={(value) =>
+                      onChange({ target: { value }, type: "input" })
+                    }
+                    description={field.help}
+                  />
+                );
+              } else {
+                return (
+                  <TextInput
+                    type={selectInputType(field.fieldType)}
+                    key={field.field}
+                    size="md"
+                    label={field.title}
+                    description={field.help}
+                    {...register(field.field, {
+                      required: field.required
+                        ? "This field is required"
+                        : false,
+                      disabled: saveButtonLoadingState ? true : field.disabled,
+                    })}
+                  />
+                );
+              }
+            })}
           </div>
         ))}
         <div className="flex justify-end p-3 gap-2">
@@ -135,20 +146,6 @@ export default function NDrawerCreateForm<TableType extends FieldValues>({
           >
             Save
           </Button>
-          {/* <NButton
-            kind="ghost"
-            title="Cancel"
-            onClick={(e) => {
-              e.preventDefault();
-              reset();
-              closeDrawer();
-            }}
-          />
-          <NButton
-            disabled={saveButtonLoadingState}
-            isLoading={saveButtonLoadingState}
-            title="Save"
-          /> */}
         </div>
       </form>
     </Drawer>

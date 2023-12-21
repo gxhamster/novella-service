@@ -8,29 +8,21 @@ import { UseFormSetValue } from "react-hook-form";
 import { trpc } from "@/app/_trpc/client";
 import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
 import { getBooksByPageType } from "@/server/routes/books";
-import { Drawer } from "@mantine/core";
+import { Drawer, Text } from "@mantine/core";
 
 const booksColHelper = createColumnHelper<getBooksByPageType>();
 const booksTableCols: Array<BooksTableColumnDef> = [
   { id: "id", header: "ID" },
-  { id: "created_at", header: "Created At" },
   { id: "title", header: "Tilte" },
-  { id: "author", header: "Author" },
   { id: "isbn", header: "ISBN" },
-  { id: "genre", header: "Genre" },
-  { id: "publisher", header: "Publisher" },
-  { id: "edition", header: "Edition" },
   { id: "ddc", header: "DDC" },
-  { id: "language", header: "Language" },
-  { id: "year", header: "Year" },
-  { id: "pages", header: "Pages" },
-  { id: "times_issued", header: "Times Issued" },
-  { id: "times_returned", header: "Times Returned" },
+  { id: "genre", header: "Genre" },
+  { id: "edition", header: "Edition" },
 ];
 
 const booksTableColsTanstack = booksTableCols.map((column) =>
   booksColHelper.accessor(column.id, {
-    cell: (info) => info.getValue(),
+    cell: (info) => <Text truncate>{info.getValue()}</Text>,
     header: column.header,
   })
 );
@@ -68,7 +60,7 @@ export default function SelectBookDrawer({
         body: { padding: 0 },
       }}
       position="right"
-      size="xl"
+      size="80%"
       opened={isAddBookDrawerOpen}
       onClose={() => {
         setIsAddBookDrawerOpen(false);

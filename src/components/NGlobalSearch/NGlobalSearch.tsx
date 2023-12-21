@@ -11,6 +11,7 @@ import { UnstyledButton, Flex, Text, Badge, Group } from "@mantine/core";
 import classes from "./NGlobalSearch.module.css";
 import HomeIcon from "../icons/HomeIcon";
 import IssueBookIcon from "../icons/IssueBookIcon";
+import SchoolIcon from "../icons/SchoolIcon";
 
 type QueryResultItem = {
   id: number;
@@ -41,6 +42,27 @@ export default function NGlobalSearch() {
       description: "Issue a book",
       onClick: () => nextRouter.push("/issued"),
       leftSection: <IssueBookIcon size={20} />,
+    },
+    {
+      id: "books",
+      label: "Books",
+      description: "Books directory",
+      onClick: () => nextRouter.push("/books"),
+      leftSection: <BookIcon size={20} />,
+    },
+    {
+      id: "students",
+      label: "Students",
+      description: "Students directory",
+      onClick: () => nextRouter.push("/students"),
+      leftSection: <UserIcon size={20} />,
+    },
+    {
+      id: "nextyear",
+      label: "Academic year",
+      description: "Change academic year",
+      onClick: () => nextRouter.push("/students/nextyear"),
+      leftSection: <SchoolIcon size={20} />,
     },
   ];
 

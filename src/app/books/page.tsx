@@ -77,8 +77,6 @@ export default function Books() {
     { id: "language", header: "Language" },
     { id: "year", header: "Year" },
     { id: "pages", header: "Pages" },
-    { id: "times_issued", header: "Times Issued" },
-    { id: "times_returned", header: "Times Returned" },
   ];
   const tanstackColumns = columnsObj.map((column) =>
     columnHelper.accessor(column.id, {
