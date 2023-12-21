@@ -1,11 +1,12 @@
-import { serverClient } from "@/app/_trpc/serverClient";
 import DashboardCard from "../components/DashboardCard";
-import Link from "next/link";
 import LeftArrowIcon from "@/components/icons/LeftArrowIcon";
 import NButtonLink from "@/components/NButtonLink";
 import { Anchor } from "@mantine/core";
+import { appRouter } from "@/server";
+import { createContext } from "@/server/trpc";
 
 export default async function PopularBook() {
+  const serverClient = appRouter.createCaller(await createContext());
   const { data: book } = await serverClient.books.getMostPopular();
   const { data: student } = await serverClient.students.getMostPopular();
 

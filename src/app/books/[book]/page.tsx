@@ -1,8 +1,10 @@
 import BookSummary from "./components/BookSummary";
 import BookCreate from "./components/BookCreate";
-import { serverClient } from "@/app/_trpc/serverClient";
+import { appRouter } from "@/server";
+import { createContext } from "@/server/trpc";
 
 export default async function Book({ params }: { params: { book: string } }) {
+  const serverClient = appRouter.createCaller(await createContext());
   const { data } = await serverClient.books.getBookById(Number(params.book));
 
   const resultBook = data;

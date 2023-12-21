@@ -1,9 +1,11 @@
-import { serverClient } from "@/app/_trpc/serverClient";
 import DashboardCard from "../components/DashboardCard";
 import IssueStatChart from "./components/IssueStatChart";
 import ReturnStatChart from "./components/ReturnStatChart";
+import { appRouter } from "@/server";
+import { createContext } from "@/server/trpc";
 
 export default async function IssueTrend() {
+  const serverClient = appRouter.createCaller(await createContext());
   const issueHistoryResponse =
     await serverClient.history.getIssueHistoryCurrentMonth();
   const returnHistoryResponse =

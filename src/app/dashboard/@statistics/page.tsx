@@ -3,9 +3,11 @@ import IssueBookIcon from "@/components/icons/IssueBookIcon";
 import UnreturnedBookIcon from "@/components/icons/UnreturnedBookIcon";
 import UserIcon from "@/components/icons/UserIcon";
 import StatCard from "./components/StatCard";
-import { serverClient } from "@/app/_trpc/serverClient";
+import { appRouter } from "@/server";
+import { createContext } from "@/server/trpc";
 
 export default async function Statistics() {
+  const serverClient = appRouter.createCaller(await createContext());
   const { count: totalIssuedBooks } =
     await serverClient.history.getTotalHistoryCount();
   const { count: totalUnreturnedBooks } =
