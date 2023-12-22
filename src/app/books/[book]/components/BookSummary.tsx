@@ -227,7 +227,7 @@ export default function BookSummary({ data }: { data: getBookByIdType }) {
           <div className="flex justify-between items-center">
             <div>
               <Title order={2} fw="normal" c="dark.1">
-                Books / Ref: <Title order={3}> {data.id}</Title>
+                Books / Ref: {data.id}
               </Title>
             </div>
             <div className="flex gap-2">

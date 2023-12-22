@@ -301,13 +301,13 @@ export default function Nextyear() {
             case "Changed":
               return "green";
             case "Deleted":
-              return "red.9";
+              return "red";
             default:
-              return "dark.6";
+              return "gray";
           }
         };
         return (
-          <Badge color={getBadgeColor(props.getValue())}>
+          <Badge variant="light" color={getBadgeColor(props.getValue())}>
             {props.getValue()}
           </Badge>
         );

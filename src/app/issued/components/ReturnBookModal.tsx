@@ -7,7 +7,7 @@ import { Toast } from "@/components/Toast";
 
 type ReturnBookModalProps = {
   isReturnBookModalOpen: boolean;
-  returnBookID: number | null;
+  returnBookIDs: Array<number>;
   setIsReturnBookModalOpen: Dispatch<SetStateAction<boolean>>;
   onBookReturned: () => void;
 };
@@ -15,7 +15,7 @@ type ReturnBookModalProps = {
 export default function ReturnBookModal({
   isReturnBookModalOpen,
   setIsReturnBookModalOpen,
-  returnBookID,
+  returnBookIDs,
   onBookReturned,
 }: ReturnBookModalProps) {
   type ReturnBookForm = {
@@ -52,11 +52,12 @@ export default function ReturnBookModal({
   });
 
   const returnButtonHandler: SubmitHandler<ReturnBookForm> = (formData) => {
-    if (returnBookID) {
-      returnBookMutation.mutate({
-        id: returnBookID,
+    if (returnBookIDs && returnBookIDs.length) {
+      const booksToReturn = returnBookIDs.map((id) => ({
+        id,
         returned_date: formatISO(new Date(formData.returned_date)),
-      });
+      }));
+      returnBookMutation.mutate(booksToReturn);
     }
   };
 
@@ -101,42 +102,5 @@ export default function ReturnBookModal({
         </Stack>
       </form>
     </Modal>
-    // <NModal
-    //   title="Return the issued book"
-    //   isOpen={isReturnBookModalOpen}
-    //   onModalClose={() => setIsReturnBookModalOpen(false)}
-    // >
-    //   <form onSubmit={handleSubmit(returnButtonHandler)}>
-    //     <section className="text-surface-700 p-6 flex flex-col gap-3">
-    //       <p className="text-sm">
-    //         Do you want to return the book from the student to the library ?
-    //       </p>
-    //       <NovellaInput
-    //         type="datetime-local"
-    //         title="Return Date"
-    //         helpText="Returned date will default to today"
-    //         reactHookErrorMessage={errors.returned_date}
-    //         reactHookRegister={register("returned_date")}
-    //       />
-    //     </section>
-    //     <section className="flex gap-2 border-t-[1px] border-surface-300 p-2 justify-end">
-    //       <NButton
-    //         kind="secondary"
-    //         size="normal"
-    //         title="Cancel"
-    //         onClick={(e) => {
-    //           e.preventDefault();
-    //           setIsReturnBookModalOpen(false);
-    //         }}
-    //       />
-    //       <NButton
-    //         kind="primary"
-    //         size="normal"
-    //         title="Return"
-    //         isLoading={returnBookMutation.isLoading}
-    //       />
-    //     </section>
-    //   </form>
-    // </NModal>
   );
 }

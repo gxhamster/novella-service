@@ -2,6 +2,7 @@
 import {
   ColumnDef,
   PaginationState,
+  Table as TanstackTable,
   flexRender,
   getCoreRowModel,
   useReactTable,
@@ -32,6 +33,8 @@ import {
   Button,
   Flex,
   Stack,
+  Group,
+  Divider,
 } from "@mantine/core";
 
 type NovellaDataTableProps<TableType> = {
@@ -49,9 +52,13 @@ type NovellaDataTableProps<TableType> = {
   showCreateButton?: boolean;
   isDataLoading?: boolean;
   onCreateRowButtonPressed?: () => void;
-  onRowSelectionChanged?: (state: Array<any>) => void;
+  onRowSelectionChanged?: (
+    state: Array<TableType>,
+    table: TanstackTable<TableType>
+  ) => void;
   onRowDeleted?: (deletedRows: Array<TableType>) => void;
   primaryButtonTitle?: string;
+  selectedToobarActions?: React.ReactNode;
 };
 
 export default function NDataTableFixed<TableType>({
@@ -66,6 +73,7 @@ export default function NDataTableFixed<TableType>({
   onCreateRowButtonPressed,
   onRowSelectionChanged = () => null,
   showCreateButton = true,
+  selectedToobarActions,
   onRowDeleted,
 }: NovellaDataTableProps<TableType>) {
   // Fixme: Remove the any type and put proper typing :(
@@ -146,7 +154,7 @@ export default function NDataTableFixed<TableType>({
   }, [pageIndex, pageSize, filters, sorts, dataCount]);
 
   useEffect(() => {
-    onRowSelectionChanged(selectedData);
+    onRowSelectionChanged(selectedData, table);
   }, [selectedData]);
 
   useEffect(() => {
@@ -163,21 +171,24 @@ export default function NDataTableFixed<TableType>({
     <div className="m-0 flex flex-col h-full">
       {/* Table Functions */}
       <div className="flex max-h-[45px] justify-between bg-dark-7 border-b-[1px] border-surface-300 p-1">
-        <ActionIcon
-          variant="light"
-          color="dark"
-          w={100}
-          size="lg"
-          aria-label="Refresh"
-          onClick={onRefresh}
-        >
-          <Flex gap={10} align="center">
-            {refreshBtnIcon}
-            <Text size="sm" c="dark.1">
-              Refresh
-            </Text>
-          </Flex>
-        </ActionIcon>
+        <Group gap={10}>
+          <ActionIcon
+            variant="light"
+            color="dark"
+            w={100}
+            size="lg"
+            aria-label="Refresh"
+            onClick={onRefresh}
+          >
+            <Flex gap={10} align="center">
+              {refreshBtnIcon}
+              <Text size="sm" c="dark.1">
+                Refresh
+              </Text>
+            </Flex>
+          </ActionIcon>
+        </Group>
+        {/* Selected toolbar */}
         {selectedData.length ? (
           <div className="flex items-center gap-2">
             <Text
@@ -186,7 +197,7 @@ export default function NDataTableFixed<TableType>({
             >{`${selectedData.length} rows selected`}</Text>
             <Button
               variant="default"
-              color="dark"
+              color="gray"
               size="sm"
               aria-label="Reset row selection"
               onClick={() => table.resetRowSelection()}
@@ -194,10 +205,10 @@ export default function NDataTableFixed<TableType>({
             >
               Cancel
             </Button>
-
+            <Divider orientation="vertical" mx={10} />
             <Button
-              variant="filled"
-              color="red.8"
+              variant="light"
+              color="red.9"
               leftSection={<TrashIcon size={18} />}
               onClick={() => {
                 onRowDeleted && onRowDeleted(selectedData);
@@ -206,6 +217,7 @@ export default function NDataTableFixed<TableType>({
             >
               Delete
             </Button>
+            {selectedToobarActions}
           </div>
         ) : (
           <div className="flex gap-3">

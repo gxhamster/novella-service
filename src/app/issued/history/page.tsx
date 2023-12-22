@@ -8,7 +8,7 @@ import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed"
 import { trpc } from "@/app/_trpc/client";
 import { IHistory } from "@/supabase/types/supabase";
 import { format } from "date-fns";
-import NToast from "@/components/NToast";
+import { Toast } from "@/components/Toast";
 
 export default function Issued() {
   const issuedBooksColHelper = createColumnHelper<IHistory>();
@@ -29,12 +29,18 @@ export default function Issued() {
 
   const deleteHistoryMutation = trpc.history.deleteHistoryByIds.useMutation({
     onError: (_error) => {
-      NToast.error("Could not delete history", `${_error.message}`);
+      Toast.Error({
+        title: "Could not delete history",
+        message: _error.message,
+      });
       throw new Error(_error.message);
     },
     onSuccess: () => {
       getHistoryByPageQuery.refetch();
-      NToast.success("Successful", `Deleted the history`);
+      Toast.Successful({
+        title: "Successful",
+        message: "Deleted the history",
+      });
       setIsIssueBookDeleteModalOpen(false);
     },
   });
@@ -107,6 +113,7 @@ export default function Issued() {
       <NDeleteModal
         isOpen={isIssueBookDeleteModalOpen}
         closeModal={() => setIsIssueBookDeleteModalOpen(false)}
+        isDeleting={deleteHistoryMutation.isLoading}
         onDelete={async () => {
           const ids = deletedBooks?.map((rows) => rows.id);
           if (ids) deleteHistoryMutation.mutate(ids);

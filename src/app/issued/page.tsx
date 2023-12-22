@@ -4,32 +4,42 @@ import NDataTableFixed, {
   NDataTableFixedFetchFunctionProps,
 } from "@/components/NDataTableFixed";
 import { IIssuedBookV2 } from "./lib/types";
-import { createColumnHelper } from "@tanstack/react-table";
+import { Table, createColumnHelper } from "@tanstack/react-table";
 import IssueBookDrawer from "./components/IssueBookDrawer";
 import NDeleteModal from "@/components/NDeleteModal";
 import { trpc } from "@/app/_trpc/client";
 import ReturnBookModal from "./components/ReturnBookModal";
 import { format } from "date-fns";
-import { Anchor, Badge } from "@mantine/core";
+import { Anchor, Badge, Button } from "@mantine/core";
+import UnreturnedBookIcon from "@/components/icons/UnreturnedBookIcon";
+import { Toast } from "@/components/Toast";
 
 type DuedateStatusBadgeProps = {
   days: number;
 };
 function DuedateStatusBadge({ days }: DuedateStatusBadgeProps) {
   const absDays = Math.abs(days);
-  if (days < 0) return <Badge color="red.9">{`Overdue (${absDays})`}</Badge>;
+  if (days < 0)
+    return <Badge variant="light" color="red">{`Overdue (${absDays})`}</Badge>;
   else if (days < 1)
-    return <Badge color="yellow.9">{`To be due (${absDays})`}</Badge>;
+    return (
+      <Badge variant="light" color="yellow">{`To be due (${absDays})`}</Badge>
+    );
   else if (days > 1)
-    return <Badge color="green.9">{`Not due (${absDays})`}</Badge>;
+    return (
+      <Badge variant="light" color="green">{`Not due (${absDays})`}</Badge>
+    );
 }
 
 export default function Issued() {
   const [isIssueBookDrawerOpen, setIsIssueBookDrawerOpen] = useState(false);
   const [isReturnBookModalOpen, setIsReturnBookModalOpen] = useState(false);
-  const [returnBookID, setReturnBookID] = useState<number | null>(null);
+  const [returnBookIDs, setReturnBookIDs] = useState<Array<number>>([]);
+  const [selectedRows, setSelectedRows] = useState<IIssuedBookV2[]>();
   const issuedBooksColHelper = createColumnHelper<IIssuedBookV2>();
   const [deletedBooks, setDeletedBooks] = useState<IIssuedBookV2[]>([]);
+  const [tanstackTableRef, setTanstackTableRef] =
+    useState<Table<IIssuedBookV2> | null>(null);
   const [isIssueBookDeleteModalOpen, setIsIssueBookDeleteModalOpen] =
     useState(false);
   const [fetchFunctionOpts, setFetchFunctionOpts] = useState<
@@ -98,7 +108,7 @@ export default function Issued() {
             <Anchor
               size="sm"
               underline="always"
-              c="dark.1"
+              c="blue.1"
               href={`${column.href}/${cell.getValue()}`}
             >
               {cell.getValue()}
@@ -114,7 +124,9 @@ export default function Issued() {
               c="blue"
               size="sm"
               onClick={() => {
-                setReturnBookID(cell.row.getAllCells()[1].getValue() as number);
+                setReturnBookIDs([
+                  cell.row.getAllCells()[1].getValue() as number,
+                ]);
                 setIsReturnBookModalOpen(true);
               }}
             >
@@ -152,7 +164,32 @@ export default function Issued() {
         columns={issuedBooksTableCols}
         tanStackColumns={issuedBooksTableColsTanstack}
         onCreateRowButtonPressed={() => setIsIssueBookDrawerOpen(true)}
-        onRowSelectionChanged={(state) => console.log(state)}
+        onRowSelectionChanged={(selectedRows, table) => {
+          setSelectedRows(selectedRows);
+          setTanstackTableRef(table);
+        }}
+        selectedToobarActions={
+          <Button
+            variant="light"
+            onClick={() => {
+              if (selectedRows) {
+                const booksToReturn = selectedRows?.map((row) => row.id);
+                setReturnBookIDs(booksToReturn);
+                setIsReturnBookModalOpen(true);
+                tanstackTableRef?.resetRowSelection();
+              } else {
+                Toast.Error({
+                  title: "Coudld not return",
+                  message:
+                    "Make sure atleast one row is selected to be able to return",
+                });
+              }
+            }}
+            rightSection={<UnreturnedBookIcon size={16} />}
+          >
+            Return
+          </Button>
+        }
         isDataLoading={
           getIssuedBooksByPageQuery.isLoading ||
           getIssuedBooksByPageQuery.isRefetching
@@ -184,8 +221,10 @@ export default function Issued() {
       <ReturnBookModal
         isReturnBookModalOpen={isReturnBookModalOpen}
         setIsReturnBookModalOpen={setIsReturnBookModalOpen}
-        onBookReturned={() => getIssuedBooksByPageQuery.refetch()}
-        returnBookID={returnBookID}
+        onBookReturned={() => {
+          getIssuedBooksByPageQuery.refetch();
+        }}
+        returnBookIDs={returnBookIDs}
       />
       <IssueBookDrawer
         onBookIssued={() => getIssuedBooksByPageQuery.refetch()}

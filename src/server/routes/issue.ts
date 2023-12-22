@@ -148,15 +148,16 @@ export const IssueRouter = router({
   }),
 
   returnIssuedBook: publicProcedure
-    .input(z.object({ id: z.number(), returned_date: z.string() }))
+    .input(z.array(z.object({ id: z.number(), returned_date: z.string() })))
     .mutation(async (opts) => {
       const { input } = opts;
       const { supabase } = opts.ctx;
 
-      const { data: issuedBook, error: issuedBookError } = await supabase
+      const ids = input.map((returnObjs) => returnObjs.id);
+      const { data: issuedBooks, error: issuedBookError } = await supabase
         .from("issued")
-        .select("book_id, student_id, due_date, created_at")
-        .eq("id", input.id);
+        .select("id, book_id, student_id, due_date, created_at")
+        .in("id", ids);
 
       if (issuedBookError)
         throw new TRPCError({
@@ -165,12 +166,12 @@ export const IssueRouter = router({
           code: "INTERNAL_SERVER_ERROR",
         });
 
-      if (issuedBook) {
+      if (issuedBooks) {
         // Remove from issue table
         const { error: deleteError } = await supabase
           .from("issued")
           .delete()
-          .eq("id", input.id);
+          .in("id", ids);
 
         if (deleteError)
           throw new TRPCError({
@@ -179,18 +180,48 @@ export const IssueRouter = router({
             code: "INTERNAL_SERVER_ERROR",
           });
 
-        const returnedBook: IHistoryInsert = {
-          book_id: issuedBook[0].book_id,
-          student_id: issuedBook[0].student_id,
-          issued_date: issuedBook[0].created_at,
-          due_date: issuedBook[0].due_date,
-          returned_date: input.returned_date,
-        };
+        if (issuedBooks.length !== ids.length) {
+          throw new TRPCError({
+            message:
+              "Input returned books length is not equal to queried issued books",
+            code: "INTERNAL_SERVER_ERROR",
+          });
+        }
+
+        const returnedBookObjs = issuedBooks.map((issuedBook) => {
+          const matching_ids = input.filter((n) => n.id === issuedBook.id);
+
+          if (!matching_ids.length)
+            throw new TRPCError({
+              message:
+                "Input is missing returned_date for an expected issue id",
+              code: "INTERNAL_SERVER_ERROR",
+            });
+
+          if (matching_ids.length > 1) {
+            throw new TRPCError({
+              message: "Input contains duplicate ids",
+              code: "INTERNAL_SERVER_ERROR",
+            });
+          }
+
+          const returned_date = matching_ids[0].returned_date;
+
+          const historyEntry = {
+            book_id: issuedBook.book_id,
+            student_id: issuedBook.student_id,
+            issued_date: issuedBook.created_at,
+            due_date: issuedBook.due_date,
+            returned_date,
+          };
+
+          return historyEntry;
+        });
 
         // Add to history table
         const { data: historyData, error: historyError } = await supabase
           .from("history")
-          .insert(returnedBook);
+          .insert(returnedBookObjs);
 
         if (historyError) {
           throw new TRPCError({
@@ -203,4 +234,60 @@ export const IssueRouter = router({
         return { data: historyData };
       }
     }),
+  // returnIssuedBook: publicProcedure
+  //   .input(z.object({ id: z.number(), returned_date: z.string() }))
+  //   .mutation(async (opts) => {
+  //     const { input } = opts;
+  //     const { supabase } = opts.ctx;
+
+  //     const { data: issuedBook, error: issuedBookError } = await supabase
+  //       .from("issued")
+  //       .select("book_id, student_id, due_date, created_at")
+  //       .eq("id", input.id);
+
+  //     if (issuedBookError)
+  //       throw new TRPCError({
+  //         message: issuedBookError.message,
+  //         cause: issuedBookError.details,
+  //         code: "INTERNAL_SERVER_ERROR",
+  //       });
+
+  //     if (issuedBook) {
+  //       // Remove from issue table
+  //       const { error: deleteError } = await supabase
+  //         .from("issued")
+  //         .delete()
+  //         .eq("id", input.id);
+
+  //       if (deleteError)
+  //         throw new TRPCError({
+  //           message: deleteError.message,
+  //           cause: deleteError.details,
+  //           code: "INTERNAL_SERVER_ERROR",
+  //         });
+
+  //       const returnedBook: IHistoryInsert = {
+  //         book_id: issuedBook[0].book_id,
+  //         student_id: issuedBook[0].student_id,
+  //         issued_date: issuedBook[0].created_at,
+  //         due_date: issuedBook[0].due_date,
+  //         returned_date: input.returned_date,
+  //       };
+
+  //       // Add to history table
+  //       const { data: historyData, error: historyError } = await supabase
+  //         .from("history")
+  //         .insert(returnedBook);
+
+  //       if (historyError) {
+  //         throw new TRPCError({
+  //           message: historyError.message,
+  //           cause: historyError.details,
+  //           code: "INTERNAL_SERVER_ERROR",
+  //         });
+  //       }
+
+  //       return { data: historyData };
+  //     }
+  //   }),
 });

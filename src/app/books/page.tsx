@@ -99,6 +99,7 @@ export default function Books() {
     <div className="w-full h-full flex flex-col text-surface-900 gap-y-3 m-0">
       <NDataTableFixed<getBooksByPageType>
         columns={columnsObj}
+        primaryButtonTitle="Add book"
         tanStackColumns={tanstackColumns}
         onCreateRowButtonPressed={() => setIsAddBookDrawerOpen(true)}
         data={getBooksByPageQuery.data ? getBooksByPageQuery.data?.data : []}
