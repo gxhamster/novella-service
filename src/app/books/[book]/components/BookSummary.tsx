@@ -281,6 +281,7 @@ export default function BookSummary({ data }: { data: getBookByIdType }) {
           description="
               This will permanently delete the book from the database and cannot
               be recovered"
+          isDeleting={deleteBookByIdMutation.isLoading}
           isOpen={isDeleteModalOpen}
           closeModal={() => setIsDeleteModalOpen(false)}
           onDelete={deleteModalCloseHandler}

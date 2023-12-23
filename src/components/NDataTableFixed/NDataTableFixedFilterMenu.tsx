@@ -62,41 +62,6 @@ function FilterItem({
         }}
       />
       <CloseButton variant="default" size="xs" onClick={filterItemRemoved} />
-      {/* <Select
-        value={filter.prop}
-        className="flex-grow"
-        onChange={(e) => {
-          filterItemChanged({ ...filter, prop: e.target.value });
-        }}
-      >
-        {tableProps.map((prop: any) => (
-          <option key={prop}>{prop}</option>
-        ))}
-      </Select>
-      <Select
-        value={filter.operator}
-        onChange={(e) => {
-          filterItemChanged({ ...filter, operator: e.target.value });
-        }}
-      >
-        {["eq", "gt", "lt", "ilike"].map((v) => (
-          <option key={v}>{v}</option>
-        ))}
-      </Select>
-      <input
-        value={filter.value}
-        onChange={(e) => {
-          e.preventDefault();
-          filterItemChanged({ ...filter, value: e.target.value });
-        }}
-        className="py-1 px-2 block min-w-[5rem] bg-surface-200 appearance-none outline-none hover:bg-surface-300 border-[1px] border-surface-200 focus:border-surface-900 text-xs text-surface-900 placeholder:text-surface-500"
-        placeholder="Enter your value here"
-      ></input> */}
-      {/* <NButton
-        kind="ghost"
-        icon={<CloseIcon size={12} />}
-        onClick={filterItemRemoved}
-      /> */}
     </div>
   );
 }
@@ -142,24 +107,6 @@ type FilterControlsProps = {
 function FilterControls({ addFilter, applyFilters }: FilterControlsProps) {
   return (
     <div className="border-t-[1px] border-surface-300 pt-3 flex justify-between">
-      {/* <NButton
-        kind="ghost"
-        className="px-2 py-2"
-        size="xs"
-        title="Add Filter"
-        onClick={(e) => {
-          e.preventDefault();
-          addFilter();
-        }}
-        icon={<AddIcon size={16} />}
-      /> */}
-      {/* <NButton
-        kind="secondary"
-        className="px-2 py-2"
-        title="Apply filter"
-        size="xs"
-        onClick={applyFilters}
-      /> */}
       <Button
         variant="subtle"
         color="gray"
