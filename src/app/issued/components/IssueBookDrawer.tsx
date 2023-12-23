@@ -14,13 +14,13 @@ import { Toast } from "@/components/Toast";
 
 type IssueBookDrawerProps = {
   isIssueBookDrawerOpen: boolean;
-  setIsIssueBookDrawerOpen: Dispatch<SetStateAction<boolean>>;
+  closeIssueDrawer: () => void;
   onBookIssued: () => void;
 };
 
 export default function IssueBookDrawer({
   isIssueBookDrawerOpen,
-  setIsIssueBookDrawerOpen,
+  closeIssueDrawer,
   onBookIssued,
 }: IssueBookDrawerProps) {
   const [selectedBook, setSelectedBook] = useState<getBooksByPageType | null>(
@@ -43,6 +43,7 @@ export default function IssueBookDrawer({
         title: "Successful",
         message: "Issued a new book",
       });
+      closeIssueDrawer();
       onBookIssued();
     },
   });
@@ -92,9 +93,7 @@ export default function IssueBookDrawer({
         size="lg"
         opened={isIssueBookDrawerOpen}
         onClose={() => {
-          !isAddBookDrawerOpen &&
-            !isAddStudentDrawerOpen &&
-            setIsIssueBookDrawerOpen(false);
+          !isAddBookDrawerOpen && !isAddStudentDrawerOpen && closeIssueDrawer();
         }}
       >
         <form

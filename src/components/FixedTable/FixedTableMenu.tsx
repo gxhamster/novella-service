@@ -1,21 +1,19 @@
 import { useState } from "react";
-// import { Popover, Transition } from "@headlessui/react";
 import { Popover, Button } from "@mantine/core";
 
-type NDataTableFixedSortMenuProps = {
+type FixedTableMenuProps = {
   buttonContent: React.ReactNode;
   buttonIcon: React.ReactNode;
   children: React.ReactNode;
   width?: number;
   position?: "left" | "right";
 };
-export default function NDataTableFixedMenu({
+export default function FixedTableMenu({
   buttonContent,
   buttonIcon,
   width = 320,
-  position = "right",
   children,
-}: NDataTableFixedSortMenuProps) {
+}: FixedTableMenuProps) {
   const [opened, setOpened] = useState(false);
   return (
     <Popover
@@ -29,9 +27,9 @@ export default function NDataTableFixedMenu({
       <Popover.Target>
         <Button
           variant="default"
-          color="dark"
-          leftSection={buttonIcon}
           size="xs"
+          color="gray"
+          leftSection={buttonIcon}
           onClick={() => setOpened(true)}
         >
           {buttonContent}

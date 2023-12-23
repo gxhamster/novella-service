@@ -234,6 +234,46 @@ export const StudentRouter = router({
     return { count };
   }),
 
+  getStudentsByGrade: publicProcedure
+    .input(z.number().optional())
+    .query(async (opts) => {
+      const { supabase } = opts.ctx;
+      const { input } = opts;
+
+      if (!input) return { data: [] };
+
+      const { data, error } = await supabase
+        .from("students")
+        .select("id, name, index, grade")
+        .eq("grade", input)
+        .order("id");
+
+      if (error)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error.message,
+          cause: error.details,
+        });
+
+      return { data };
+    }),
+
+  getGradeValues: publicProcedure.query(async (opts) => {
+    const { supabase } = opts.ctx;
+    const { data, error } = await supabase
+      .from("get_grade_values")
+      .select("grade");
+
+    if (error)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error.message,
+        cause: error.details,
+      });
+
+    return { data };
+  }),
+
   getMostPopular: publicProcedure.query(async (opts) => {
     const { supabase } = opts.ctx;
 

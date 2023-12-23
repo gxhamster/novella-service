@@ -8,13 +8,13 @@ import { Toast } from "@/components/Toast";
 type ReturnBookModalProps = {
   isReturnBookModalOpen: boolean;
   returnBookIDs: Array<number>;
-  setIsReturnBookModalOpen: Dispatch<SetStateAction<boolean>>;
+  closeReturnModal: () => void;
   onBookReturned: () => void;
 };
 
 export default function ReturnBookModal({
   isReturnBookModalOpen,
-  setIsReturnBookModalOpen,
+  closeReturnModal,
   returnBookIDs,
   onBookReturned,
 }: ReturnBookModalProps) {
@@ -34,7 +34,7 @@ export default function ReturnBookModal({
 
   const returnBookMutation = trpc.issued.returnIssuedBook.useMutation({
     onSuccess: () => {
-      setIsReturnBookModalOpen(false);
+      closeReturnModal();
       Toast.Successful({
         title: "Succcessful",
         message: "Added book to history",
@@ -42,7 +42,7 @@ export default function ReturnBookModal({
       onBookReturned();
     },
     onError: (_error) => {
-      setIsReturnBookModalOpen(false);
+      closeReturnModal();
       Toast.Error({
         title: "Could not add book to history",
         message: _error.message,
@@ -65,7 +65,7 @@ export default function ReturnBookModal({
     <Modal
       size="lg"
       opened={isReturnBookModalOpen}
-      onClose={() => setIsReturnBookModalOpen(false)}
+      onClose={() => closeReturnModal()}
       title="Return the issued book"
       centered
     >
@@ -86,7 +86,7 @@ export default function ReturnBookModal({
             <Button
               variant="default"
               size="md"
-              onClick={() => setIsReturnBookModalOpen(false)}
+              onClick={() => closeReturnModal()}
             >
               Cancel
             </Button>

@@ -1,12 +1,16 @@
 "use client";
-import NovellaDataTable from "@/components/NovellaDataTable";
-import { IIssuedBook } from "@/supabase/types/supabase";
 import { createColumnHelper } from "@tanstack/react-table";
 import { trpc } from "../../../_trpc/client";
 import { format } from "date-fns";
+import {
+  DataTable,
+  DataTableContent,
+  DataTableControls,
+} from "@/components/DataTable";
+import { Tables } from "@/supabase/types/types";
 
 type TableCols = {
-  id: any;
+  id: string;
   header: string;
   isDate?: boolean;
 };
@@ -36,10 +40,27 @@ const tableColumnsObj: TableCols[] = [
   },
 ];
 
+const booksTableCols: TableCols[] = [
+  {
+    id: "id",
+    header: "ID",
+  },
+  {
+    id: "title",
+    header: "Title",
+  },
+  {
+    id: "author",
+    header: "Author",
+  },
+];
+
+type issuedTableDef = Tables<"issued">;
+
 export default function DashboardIssuedTable({ issuedBooks }: any) {
-  const columnHelper = createColumnHelper<IIssuedBook>();
+  const columnHelper = createColumnHelper<issuedTableDef>();
   const tanstackCols = tableColumnsObj.map((col) => {
-    return columnHelper.accessor(col.id as keyof IIssuedBook, {
+    return columnHelper.accessor(col.id as keyof issuedTableDef, {
       cell: (cell) =>
         col.isDate
           ? format(new Date(cell.getValue() as string), "dd/MM/yyyy hh:mm")
@@ -56,11 +77,15 @@ export default function DashboardIssuedTable({ issuedBooks }: any) {
   });
 
   return (
-    <NovellaDataTable<IIssuedBook>
-      columns={tanstackCols}
+    <DataTable<issuedTableDef>
       isDataLoading={getIssuedBookQuery.isLoading}
+      totalDataCount={getIssuedBookQuery.data?.count || 0}
       isDataRefetching={getIssuedBookQuery.isRefetching}
-      data={getIssuedBookQuery.data?.data}
-    />
+      columns={tanstackCols}
+      data={getIssuedBookQuery.data?.data || []}
+    >
+      <DataTableContent />
+      <DataTableControls />
+    </DataTable>
   );
 }

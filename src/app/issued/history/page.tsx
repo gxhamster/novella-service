@@ -1,22 +1,32 @@
 "use client";
 import { useState } from "react";
-import NDataTableFixed from "@/components/NDataTableFixed";
 import { createColumnHelper } from "@tanstack/react-table";
 import Link from "next/link";
-import NDeleteModal from "@/components/NDeleteModal";
-import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
 import { trpc } from "@/app/_trpc/client";
 import { IHistory } from "@/supabase/types/supabase";
 import { format } from "date-fns";
 import { Toast } from "@/components/Toast";
+import { Tables } from "@/supabase/types/types";
+import {
+  FixedTable,
+  FixedTableContent,
+  FixedTableControls,
+  FixedTableEmptyContent,
+  FixedTableFetchFunctionProps,
+  FixedTableToolbar,
+} from "@/components/FixedTable";
+import { useDisclosure } from "@mantine/hooks";
+import DeleteModal from "@/components/NDeleteModal";
+
+type historyTableDef = Tables<"history">;
 
 export default function Issued() {
   const issuedBooksColHelper = createColumnHelper<IHistory>();
   const [deletedBooks, setDeletedBooks] = useState<IHistory[] | null>(null);
-  const [isIssueBookDeleteModalOpen, setIsIssueBookDeleteModalOpen] =
-    useState(false);
+  const [issueBookDeleteModalOpen, issueBookDeleteModalHandler] =
+    useDisclosure(false);
   const [fetchFunctionOpts, setFetchFunctionOpts] = useState<
-    NDataTableFixedFetchFunctionProps<IHistory>
+    FixedTableFetchFunctionProps<IHistory>
   >({
     pageIndex: 0,
     pageSize: 10,
@@ -41,7 +51,7 @@ export default function Issued() {
         title: "Successful",
         message: "Deleted the history",
       });
-      setIsIssueBookDeleteModalOpen(false);
+      issueBookDeleteModalHandler.close();
     },
   });
 
@@ -90,29 +100,34 @@ export default function Issued() {
 
   return (
     <>
-      <NDataTableFixed<IHistory>
-        columns={historyBooksTableCols}
+      <FixedTable<historyTableDef>
         tanStackColumns={issuedBooksTableColsTanstack}
-        showCreateButton={false}
-        isDataLoading={
-          getHistoryByPageQuery.isLoading || getHistoryByPageQuery.isRefetching
-        }
-        onRowSelectionChanged={(state) => console.log(state)}
-        onRowDeleted={(deletedBooks) => {
-          setDeletedBooks(deletedBooks);
-          setIsIssueBookDeleteModalOpen(true);
-        }}
-        data={getHistoryByPageQuery.data ? getHistoryByPageQuery.data.data : []}
-        dataCount={
-          getHistoryByPageQuery.data ? getHistoryByPageQuery.data.count : 0
-        }
-        onRefresh={() => getHistoryByPageQuery.refetch()}
+        data={getHistoryByPageQuery.data?.data || []}
         onPaginationChanged={(opts) => setFetchFunctionOpts(opts)}
-      />
-      {/* Delete Issued book Modal */}
-      <NDeleteModal
-        isOpen={isIssueBookDeleteModalOpen}
-        closeModal={() => setIsIssueBookDeleteModalOpen(false)}
+        dataCount={getHistoryByPageQuery.data?.count || 0}
+      >
+        <FixedTableToolbar<historyTableDef>
+          onRefresh={getHistoryByPageQuery.refetch}
+          activePrimaryAction={false}
+          primaryAction={() => null}
+          columns={historyBooksTableCols}
+          isDataLoading={
+            getHistoryByPageQuery.isLoading ||
+            getHistoryByPageQuery.isRefetching
+          }
+          onRowDeleted={(deletedRows) => {
+            setDeletedBooks(deletedRows);
+            issueBookDeleteModalHandler.open();
+          }}
+        />
+        <FixedTableContent />
+        <FixedTableEmptyContent />
+        <FixedTableControls loading={getHistoryByPageQuery.isLoading} />
+      </FixedTable>
+
+      <DeleteModal
+        isOpen={issueBookDeleteModalOpen}
+        closeModal={issueBookDeleteModalHandler.close}
         isDeleting={deleteHistoryMutation.isLoading}
         onDelete={async () => {
           const ids = deletedBooks?.map((rows) => rows.id);

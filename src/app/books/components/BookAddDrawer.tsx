@@ -1,14 +1,14 @@
 "use client";
-import { NDrawerCreateForm } from "@/components/NDrawer";
+import { DrawerCreateForm } from "@/components/Drawer";
 import { IBook } from "@/supabase/types/supabase";
 import { useState } from "react";
 import { trpc } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
-import { NDrawerCreateFormFieldsType } from "@/components/NDrawer";
+import { DrawerCreateFormFieldsType } from "@/components/Drawer";
 import { format } from "date-fns";
 import { Toast } from "@/components/Toast";
 
-const bookFieldCategories: NDrawerCreateFormFieldsType<IBook>[] = [
+const bookFieldCategories: DrawerCreateFormFieldsType<IBook>[] = [
   {
     title: "Book Fields",
     fields: [
@@ -136,7 +136,7 @@ export default function BookAddDrawer({
   };
 
   return (
-    <NDrawerCreateForm<IBook>
+    <DrawerCreateForm<IBook>
       title="Add new book to library"
       saveButtonLoadingState={saveButtonLoading}
       isOpen={isAddBookDrawerOpen}

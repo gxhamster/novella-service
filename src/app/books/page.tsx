@@ -2,25 +2,32 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createColumnHelper } from "@tanstack/react-table";
-import Link from "next/link";
-import NDataTableFixed, {
-  NDataTableFixedFetchFunctionProps,
-} from "@/components/NDataTableFixed";
-import NDeleteModal from "@/components/NDeleteModal";
+import { useDisclosure } from "@mantine/hooks";
 import { IBook } from "@/supabase/types/supabase";
 import { trpc } from "@/app/_trpc/client";
-import BookAddDrawer from "./components/BookAddDrawer";
 import { Toast } from "@/components/Toast";
 import { getBooksByPageType } from "@/server/routes/books";
+import {
+  FixedTable,
+  FixedTableContent,
+  FixedTableControls,
+  FixedTableEmptyContent,
+  FixedTableFetchFunctionProps,
+  FixedTableToolbar,
+} from "@/components/FixedTable";
+import DeleteModal from "@/components/NDeleteModal";
+import BookAddDrawer from "./components/BookAddDrawer";
+import Link from "next/link";
 
 export default function Books() {
   const columnHelper = createColumnHelper<getBooksByPageType>();
   const router = useRouter();
-  const [isDeleteBookModalOpen, setIsDeleteBookModalOpen] = useState(false);
+  const [deleteBookModalOpen, deleteBookModalHandler] = useDisclosure(false);
+  const [addBookDrawerOpen, addBookDrawerHandler] = useDisclosure(false);
+
   const [deletedBooks, setDeletedBooks] = useState<getBooksByPageType[]>([]);
-  const [isAddBookDrawerOpen, setIsAddBookDrawerOpen] = useState(false);
   const [fetchFunctionOpts, setFetchFunctionOpts] = useState<
-    NDataTableFixedFetchFunctionProps<IBook>
+    FixedTableFetchFunctionProps<IBook>
   >({
     pageIndex: 0,
     pageSize: 10,
@@ -43,7 +50,7 @@ export default function Books() {
       });
     },
     onSettled: () => {
-      setIsDeleteBookModalOpen(false);
+      deleteBookModalHandler.close();
     },
     onSuccess: () => {
       Toast.Successful({
@@ -97,39 +104,39 @@ export default function Books() {
 
   return (
     <div className="w-full h-full flex flex-col text-surface-900 gap-y-3 m-0">
-      <NDataTableFixed<getBooksByPageType>
-        columns={columnsObj}
-        primaryButtonTitle="Add book"
+      <FixedTable<getBooksByPageType>
         tanStackColumns={tanstackColumns}
-        onCreateRowButtonPressed={() => setIsAddBookDrawerOpen(true)}
-        data={getBooksByPageQuery.data ? getBooksByPageQuery.data?.data : []}
-        isDataLoading={
-          getBooksByPageQuery.isLoading || getBooksByPageQuery.isRefetching
-        }
-        onRowDeleted={(deletedRows) => {
-          setDeletedBooks([...deletedRows]);
-          setIsDeleteBookModalOpen(true);
-        }}
-        dataCount={
-          getBooksByPageQuery.data ? getBooksByPageQuery.data?.count : 0
-        }
-        onRefresh={() => {
-          getBooksByPageQuery.refetch();
-        }}
-        onPaginationChanged={(opts) => {
-          setFetchFunctionOpts({ ...opts });
-        }}
-      />
-      <NDeleteModal
-        isOpen={isDeleteBookModalOpen}
-        closeModal={() => setIsDeleteBookModalOpen(false)}
+        data={getBooksByPageQuery.data?.data || []}
+        onPaginationChanged={(opts) => setFetchFunctionOpts(opts)}
+        dataCount={getBooksByPageQuery.data?.count || 0}
+      >
+        <FixedTableToolbar
+          primaryActionTitle="Add book"
+          columns={columnsObj}
+          onRefresh={getBooksByPageQuery.refetch}
+          primaryAction={addBookDrawerHandler.open}
+          onRowDeleted={(deletedRows) => {
+            setDeletedBooks(deletedRows);
+            deleteBookModalHandler.open();
+          }}
+          isDataLoading={
+            getBooksByPageQuery.isLoading || getBooksByPageQuery.isRefetching
+          }
+        />
+        <FixedTableContent />
+        <FixedTableEmptyContent />
+        <FixedTableControls loading={getBooksByPageQuery.isLoading} />
+      </FixedTable>
+      <DeleteModal
+        isOpen={deleteBookModalOpen}
+        closeModal={deleteBookModalHandler.close}
         onDelete={onBooksDeleted}
         isDeleting={booksDeleteMutation.isLoading}
       />
       <BookAddDrawer
-        isAddBookDrawerOpen={isAddBookDrawerOpen}
-        onBookAdded={() => getBooksByPageQuery.refetch()}
-        onAddBookDrawerClosed={() => setIsAddBookDrawerOpen(false)}
+        isAddBookDrawerOpen={addBookDrawerOpen}
+        onBookAdded={getBooksByPageQuery.refetch}
+        onAddBookDrawerClosed={addBookDrawerHandler.close}
       />
     </div>
   );

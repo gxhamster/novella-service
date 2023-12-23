@@ -1,4 +1,3 @@
-import NDrawer from "@/components/NDrawer";
 import NDataTableFixedSmall from "@/components/NDataTableFixed/NDataTableFixedSmall";
 import { Dispatch, SetStateAction, useState } from "react";
 import { BooksTableColumnDef } from "../lib/types";
@@ -66,11 +65,6 @@ export default function SelectBookDrawer({
         setIsAddBookDrawerOpen(false);
       }}
     >
-      {/* <NDrawer
-      title="Select a book to issue"
-      isOpen={isAddBookDrawerOpen}
-      closeDrawer={() => setIsAddBookDrawerOpen(false)}
-    > */}
       <NDataTableFixedSmall<getBooksByPageType>
         columns={booksTableCols}
         tanStackColumns={booksTableColsTanstack}

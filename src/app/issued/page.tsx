@@ -1,18 +1,25 @@
 "use client";
 import { useState } from "react";
-import NDataTableFixed, {
-  NDataTableFixedFetchFunctionProps,
-} from "@/components/NDataTableFixed";
-import { IIssuedBookV2 } from "./lib/types";
+import { useDisclosure } from "@mantine/hooks";
 import { Table, createColumnHelper } from "@tanstack/react-table";
-import IssueBookDrawer from "./components/IssueBookDrawer";
-import NDeleteModal from "@/components/NDeleteModal";
 import { trpc } from "@/app/_trpc/client";
-import ReturnBookModal from "./components/ReturnBookModal";
 import { format } from "date-fns";
 import { Anchor, Badge, Button } from "@mantine/core";
-import UnreturnedBookIcon from "@/components/icons/UnreturnedBookIcon";
 import { Toast } from "@/components/Toast";
+import {
+  FixedTable,
+  FixedTableToolbar,
+  FixedTableContent,
+  FixedTableEmptyContent,
+  FixedTableControls,
+  FixedTableFetchFunctionProps,
+} from "@/components/FixedTable";
+import { IssuedPageTableType } from "./lib/types";
+import IssueBookDrawer from "./components/IssueBookDrawer";
+import DeleteModal from "@/components/NDeleteModal";
+import ReturnBookModal from "./components/ReturnBookModal";
+import UnreturnedBookIcon from "@/components/icons/UnreturnedBookIcon";
+import UploadIcon from "@/components/icons/UploadIcon";
 
 type DuedateStatusBadgeProps = {
   days: number;
@@ -21,7 +28,7 @@ function DuedateStatusBadge({ days }: DuedateStatusBadgeProps) {
   const absDays = Math.abs(days);
   if (days < 0)
     return <Badge variant="light" color="red">{`Overdue (${absDays})`}</Badge>;
-  else if (days < 1)
+  else if (days <= 1)
     return (
       <Badge variant="light" color="yellow">{`To be due (${absDays})`}</Badge>
     );
@@ -32,18 +39,17 @@ function DuedateStatusBadge({ days }: DuedateStatusBadgeProps) {
 }
 
 export default function Issued() {
-  const [isIssueBookDrawerOpen, setIsIssueBookDrawerOpen] = useState(false);
-  const [isReturnBookModalOpen, setIsReturnBookModalOpen] = useState(false);
+  const [issueDrawerOpen, issueDrawerHandlers] = useDisclosure(false);
+  const [returnModalOpen, returnModalHandlers] = useDisclosure(false);
+  const [issueDeleteModalOpen, issueDeleteModalHandlers] = useDisclosure(false);
   const [returnBookIDs, setReturnBookIDs] = useState<Array<number>>([]);
-  const [selectedRows, setSelectedRows] = useState<IIssuedBookV2[]>();
-  const issuedBooksColHelper = createColumnHelper<IIssuedBookV2>();
-  const [deletedBooks, setDeletedBooks] = useState<IIssuedBookV2[]>([]);
+  const [selectedRows, setSelectedRows] = useState<IssuedPageTableType[]>();
+  const issuedBooksColHelper = createColumnHelper<IssuedPageTableType>();
+  const [deletedBooks, setDeletedBooks] = useState<IssuedPageTableType[]>([]);
   const [tanstackTableRef, setTanstackTableRef] =
-    useState<Table<IIssuedBookV2> | null>(null);
-  const [isIssueBookDeleteModalOpen, setIsIssueBookDeleteModalOpen] =
-    useState(false);
+    useState<Table<IssuedPageTableType> | null>(null);
   const [fetchFunctionOpts, setFetchFunctionOpts] = useState<
-    NDataTableFixedFetchFunctionProps<IIssuedBookV2>
+    FixedTableFetchFunctionProps<IssuedPageTableType>
   >({
     pageIndex: 0,
     pageSize: 10,
@@ -61,7 +67,7 @@ export default function Issued() {
       });
     },
     onSuccess: () => {
-      setIsIssueBookDeleteModalOpen(false);
+      issueDeleteModalHandlers.close();
       getIssuedBooksByPageQuery.refetch();
     },
   });
@@ -127,7 +133,7 @@ export default function Issued() {
                 setReturnBookIDs([
                   cell.row.getAllCells()[1].getValue() as number,
                 ]);
-                setIsReturnBookModalOpen(true);
+                returnModalHandlers.open();
               }}
             >
               Return
@@ -157,9 +163,35 @@ export default function Issued() {
     }
   });
 
+  function TableToolbarReturn() {
+    return (
+      <Button
+        size="xs"
+        variant="filled"
+        onClick={() => {
+          if (selectedRows) {
+            const booksToReturn = selectedRows?.map((row) => row.id);
+            setReturnBookIDs(booksToReturn);
+            returnModalHandlers.open();
+            tanstackTableRef?.resetRowSelection();
+          } else {
+            Toast.Error({
+              title: "Could not return",
+              message:
+                "Make sure atleast one row is selected to be able to return",
+            });
+          }
+        }}
+        rightSection={<UnreturnedBookIcon size={16} />}
+      >
+        Return
+      </Button>
+    );
+  }
+
   return (
     <>
-      <NDataTableFixed<IIssuedBookV2>
+      {/* <NDataTableFixed<IIssuedBookV2>
         primaryButtonTitle="Issue Book"
         columns={issuedBooksTableCols}
         tanStackColumns={issuedBooksTableColsTanstack}
@@ -210,26 +242,64 @@ export default function Issued() {
         }
         onRefresh={() => getIssuedBooksByPageQuery.refetch()}
         onPaginationChanged={(opts) => setFetchFunctionOpts(opts)}
-      />
+      /> */}
+
+      <FixedTable<IssuedPageTableType>
+        data={getIssuedBooksByPageQuery.data?.data || []}
+        onPaginationChanged={(options) => setFetchFunctionOpts(options)}
+        dataCount={getIssuedBooksByPageQuery.data?.count || 0}
+        tanStackColumns={issuedBooksTableColsTanstack}
+        onRowSelectionChanged={(selectedRows, table) => {
+          setSelectedRows(selectedRows);
+          setTanstackTableRef(table);
+        }}
+      >
+        <FixedTableToolbar<IssuedPageTableType>
+          primaryActionTitle="Issue book"
+          selectedToobarActions={<TableToolbarReturn />}
+          columns={issuedBooksTableCols}
+          primaryAction={issueDrawerHandlers.open}
+          onRefresh={getIssuedBooksByPageQuery.refetch}
+          onRowDeleted={(deletedBooks) => {
+            setDeletedBooks(deletedBooks);
+            issueDeleteModalHandlers.open();
+          }}
+          isDataLoading={
+            getIssuedBooksByPageQuery.isLoading ||
+            getIssuedBooksByPageQuery.isRefetching
+          }
+        >
+          <Button
+            color="gray"
+            variant="default"
+            size="xs"
+            leftSection={<UploadIcon size={16} />}
+          >
+            Import
+          </Button>
+        </FixedTableToolbar>
+        <FixedTableContent />
+        <FixedTableEmptyContent />
+        <FixedTableControls loading={getIssuedBooksByPageQuery.isLoading} />
+      </FixedTable>
+
       {/* Delete Issued book Modal */}
-      <NDeleteModal
-        isOpen={isIssueBookDeleteModalOpen}
-        closeModal={() => setIsIssueBookDeleteModalOpen(false)}
+      <DeleteModal
+        isOpen={issueDeleteModalOpen}
+        closeModal={issueDeleteModalHandlers.close}
         isDeleting={deleteIssuedBooksQuery.isLoading}
         onDelete={deleteIssuedBooks}
       />
       <ReturnBookModal
-        isReturnBookModalOpen={isReturnBookModalOpen}
-        setIsReturnBookModalOpen={setIsReturnBookModalOpen}
-        onBookReturned={() => {
-          getIssuedBooksByPageQuery.refetch();
-        }}
+        isReturnBookModalOpen={returnModalOpen}
+        closeReturnModal={returnModalHandlers.close}
+        onBookReturned={() => getIssuedBooksByPageQuery.refetch()}
         returnBookIDs={returnBookIDs}
       />
       <IssueBookDrawer
-        onBookIssued={() => getIssuedBooksByPageQuery.refetch()}
-        isIssueBookDrawerOpen={isIssueBookDrawerOpen}
-        setIsIssueBookDrawerOpen={setIsIssueBookDrawerOpen}
+        onBookIssued={getIssuedBooksByPageQuery.refetch}
+        isIssueBookDrawerOpen={issueDrawerOpen}
+        closeIssueDrawer={issueDrawerHandlers.close}
       />
     </>
   );

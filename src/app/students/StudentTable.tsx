@@ -1,26 +1,33 @@
 "use client";
 import { useState } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
-import Link from "next/link";
 import { IStudent } from "@/supabase/types/supabase";
-import {
-  NDrawerCreateForm,
-  NDrawerCreateFormFieldsType,
-} from "@/components/NDrawer";
-import NDataTableFixed from "@/components/NDataTableFixed";
-import NDeleteModal from "@/components/NDeleteModal";
 import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
 import { trpc } from "@/app/_trpc/client";
 import { getStudentsByPageType } from "@/server/routes/student";
 import { format } from "date-fns";
 import { ZStudentInsert } from "@/supabase/schema";
 import { Toast } from "@/components/Toast";
+import {
+  FixedTable,
+  FixedTableContent,
+  FixedTableControls,
+  FixedTableEmptyContent,
+  FixedTableToolbar,
+} from "@/components/FixedTable";
+import { useDisclosure } from "@mantine/hooks";
+import {
+  DrawerCreateForm,
+  DrawerCreateFormFieldsType,
+} from "@/components/Drawer";
+import DeleteModal from "@/components/NDeleteModal";
+import Link from "next/link";
 
 export default function StudentsTable() {
   const columnHelper = createColumnHelper<getStudentsByPageType>();
-  const [isAddBookDrawerOpen, setIsAddBookDrawerOpen] = useState(false);
-  const [isDeleteStudentModalOpen, setIsDeleteStudentModalOpen] =
-    useState(false);
+  const [addBookDrawerOpen, addBookDrawerHandler] = useDisclosure(false);
+  const [deleteStudentModalOpen, deleteStudentModalHandler] =
+    useDisclosure(false);
   const [deletedStudentsRows, setDeletedStudentRows] = useState<
     getStudentsByPageType[]
   >([]);
@@ -63,7 +70,7 @@ export default function StudentsTable() {
       });
     },
     onSettled: () => {
-      setIsDeleteStudentModalOpen(false);
+      deleteStudentModalHandler.close();
       getStudentsByPageQuery.refetch();
     },
   });
@@ -114,7 +121,7 @@ export default function StudentsTable() {
     })
   );
 
-  const studentCategories: NDrawerCreateFormFieldsType<IStudent>[] = [
+  const studentCategories: DrawerCreateFormFieldsType<IStudent>[] = [
     {
       title: "",
       fields: [
@@ -173,13 +180,13 @@ export default function StudentsTable() {
 
   return (
     <>
-      <NDrawerCreateForm<IStudent>
+      <DrawerCreateForm<IStudent>
         title="Add new student to library"
         schema={ZStudentInsert}
         saveButtonLoadingState={saveButtonLoading}
-        isOpen={isAddBookDrawerOpen}
+        isOpen={addBookDrawerOpen}
         onFormSubmit={addStudentToSupabase}
-        closeDrawer={() => setIsAddBookDrawerOpen(false)}
+        closeDrawer={addBookDrawerHandler.close}
         formFieldsCategories={studentCategories}
         defaultValues={{
           created_at: format(new Date(), "yyyy-MM-dd'T'hh:mm"),
@@ -188,34 +195,33 @@ export default function StudentsTable() {
         }}
       />
 
-      <NDataTableFixed<getStudentsByPageType>
-        columns={columnsObj}
+      <FixedTable<getStudentsByPageType>
         tanStackColumns={tanstackColumns}
-        onCreateRowButtonPressed={() => setIsAddBookDrawerOpen(true)}
-        isDataLoading={
-          getStudentsByPageQuery.isLoading ||
-          getStudentsByPageQuery.isRefetching
-        }
-        onRowDeleted={(deletedRows) => {
-          setDeletedStudentRows([...deletedRows]);
-          setIsDeleteStudentModalOpen(true);
-        }}
-        data={
-          getStudentsByPageQuery.data ? getStudentsByPageQuery.data.data : []
-        }
-        dataCount={
-          getStudentsByPageQuery.data ? getStudentsByPageQuery.data.count : 0
-        }
-        onRefresh={() => {
-          getStudentsByPageQuery.refetch();
-        }}
-        onPaginationChanged={(opts) => {
-          setFetchFunctionOpts(opts);
-        }}
-      />
-      <NDeleteModal
-        isOpen={isDeleteStudentModalOpen}
-        closeModal={() => setIsDeleteStudentModalOpen(false)}
+        data={getStudentsByPageQuery.data?.data || []}
+        onPaginationChanged={(opts) => setFetchFunctionOpts(opts)}
+        dataCount={getStudentsByPageQuery.data?.count || 0}
+      >
+        <FixedTableToolbar<getStudentsByPageType>
+          primaryActionTitle="Add student"
+          columns={columnsObj}
+          onRefresh={getStudentsByPageQuery.refetch}
+          primaryAction={addBookDrawerHandler.open}
+          onRowDeleted={(deletedRows) => {
+            setDeletedStudentRows([...deletedRows]);
+            deleteStudentModalHandler.open();
+          }}
+          isDataLoading={
+            getStudentsByPageQuery.isLoading ||
+            getStudentsByPageQuery.isRefetching
+          }
+        />
+        <FixedTableContent />
+        <FixedTableEmptyContent />
+        <FixedTableControls loading={getStudentsByPageQuery.isLoading} />
+      </FixedTable>
+      <DeleteModal
+        isOpen={deleteStudentModalOpen}
+        closeModal={deleteStudentModalHandler.close}
         onDelete={async () => {
           const ids = deletedStudentsRows?.map((rows) => rows.id);
           deleteStudentMutation.mutate(ids);

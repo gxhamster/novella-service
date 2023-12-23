@@ -1,6 +1,6 @@
 "use client";
 import { FieldValues, useForm, DefaultValues } from "react-hook-form";
-import { NDrawerCreateFormFieldsType } from ".";
+import { DrawerCreateFormFieldsType } from ".";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
@@ -23,11 +23,11 @@ type NDrawerCreateStudentProps<TableType> = {
   onFormSubmit: (formData: TableType) => void;
   schema?: any;
   saveButtonLoadingState: boolean;
-  formFieldsCategories: Array<NDrawerCreateFormFieldsType<TableType>>;
+  formFieldsCategories: Array<DrawerCreateFormFieldsType<TableType>>;
   defaultValues: DefaultValues<TableType> | AsyncDefaultValues<TableType>;
 };
 
-export default function NDrawerCreateForm<TableType extends FieldValues>({
+export default function DrawerCreateForm<TableType extends FieldValues>({
   isOpen,
   closeDrawer,
   title,

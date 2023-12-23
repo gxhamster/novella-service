@@ -1,9 +1,7 @@
 import { Path } from "react-hook-form";
-import NDrawer from "./NDrawer";
-import NDrawerCreateForm from "./NDrawerCreateForm";
+import DrawerCreateForm from "./DrawerCreateForm";
 
-export default NDrawer;
-export type NDrawerCreateFormFieldsType<TableType> = {
+export type DrawerCreateFormFieldsType<TableType> = {
   title: string;
   description?: string;
   fields: Array<{
@@ -16,4 +14,4 @@ export type NDrawerCreateFormFieldsType<TableType> = {
   }>;
 };
 
-export { NDrawerCreateForm };
+export { DrawerCreateForm };

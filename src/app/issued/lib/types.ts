@@ -4,7 +4,7 @@ import { IBook } from "@/supabase/types/supabase";
 import { IStudent } from "@/supabase/types/supabase";
 import { IIssuedBook } from "@/supabase/types/supabase";
 
-export type IIssuedBookV2 = Pick<IBook, "title"> &
+export type IssuedPageTableType = Pick<IBook, "title"> &
   Pick<IStudent, "name"> &
   IIssuedBook;
 

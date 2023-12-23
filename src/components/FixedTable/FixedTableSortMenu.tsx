@@ -1,12 +1,12 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import SortIcon from "../icons/SortIcon";
-import { NDataTableFixedSort } from ".";
-import NDataTableFixedMenu from "./NDataTableFixedMenu";
 import { Text, Switch, CloseButton, Select, Button } from "@mantine/core";
+import SortIcon from "../icons/SortIcon";
+import { FixedTableSort } from ".";
+import FixedTableMenu from "./FixedTableMenu";
 
-type NovellaDataTableFixedSortMenuProps<T> = {
+type FixedTableSortMenuProps<T> = {
   fields: Array<{ id: keyof T; header: string }>;
-  sortRulesChange: (rule: NDataTableFixedSort<T> | null) => void;
+  sortRulesChange: (rule: FixedTableSort<T> | null) => void;
   position?: "left" | "right";
 };
 
@@ -24,8 +24,8 @@ function DisplayEmptySorts() {
 }
 
 type DisplayEmptySortsProps<T> = {
-  sorts: NDataTableFixedSort<T> | null;
-  setSorts: Dispatch<SetStateAction<NDataTableFixedSort<T> | null>>;
+  sorts: FixedTableSort<T> | null;
+  setSorts: Dispatch<SetStateAction<FixedTableSort<T> | null>>;
 };
 function DisplaySortingRules<T>({
   sorts,
@@ -65,9 +65,9 @@ function DisplaySortingRules<T>({
 
 type SortControlProps<T> = {
   fields: Array<{ id: keyof T; header: string }>;
-  sorts: NDataTableFixedSort<T> | null;
-  setSorts: Dispatch<SetStateAction<NDataTableFixedSort<T> | null>>;
-  sortRulesChange: (rule: NDataTableFixedSort<T> | null) => void;
+  sorts: FixedTableSort<T> | null;
+  setSorts: Dispatch<SetStateAction<FixedTableSort<T> | null>>;
+  sortRulesChange: (rule: FixedTableSort<T> | null) => void;
 };
 function SortControls<T>({
   sorts,
@@ -100,20 +100,16 @@ function SortControls<T>({
   );
 }
 
-export default function NDataTableFixedSortMenu<T>({
+export default function FixedTableSortMenu<T>({
   fields,
   sortRulesChange,
-}: NovellaDataTableFixedSortMenuProps<T>) {
-  const [sorts, setSorts] = useState<NDataTableFixedSort<T> | null>(null);
+}: FixedTableSortMenuProps<T>) {
+  const [sorts, setSorts] = useState<FixedTableSort<T> | null>(null);
 
   return (
-    <NDataTableFixedMenu
-      buttonContent={
-        <Text size="sm" c="dark.1" fw={500}>
-          {sorts ? `Sorted by ${String(sorts.field)}` : "Sort"}
-        </Text>
-      }
-      buttonIcon={<SortIcon size={16} />}
+    <FixedTableMenu
+      buttonContent={sorts ? `Sorted by ${String(sorts.field)}` : "Sort"}
+      buttonIcon={<SortIcon size={18} />}
     >
       <>
         <div className="flex flex-col gap-2">
@@ -130,6 +126,6 @@ export default function NDataTableFixedSortMenu<T>({
           sortRulesChange={sortRulesChange}
         />
       </>
-    </NDataTableFixedMenu>
+    </FixedTableMenu>
   );
 }

@@ -2,9 +2,9 @@
 import { useState } from "react";
 import { IBook } from "@/supabase/types/supabase";
 import {
-  NDrawerCreateForm,
-  NDrawerCreateFormFieldsType,
-} from "@/components/NDrawer";
+  DrawerCreateForm,
+  DrawerCreateFormFieldsType,
+} from "@/components/Drawer";
 import { trpc } from "@/app/_trpc/client";
 import { ZBook } from "@/supabase/schema";
 import { Button } from "@mantine/core";
@@ -20,7 +20,7 @@ export default function BookCreate() {
     setSaveButtonLoading(false);
   };
 
-  const bookFieldCategories: NDrawerCreateFormFieldsType<IBook>[] = [
+  const bookFieldCategories: DrawerCreateFormFieldsType<IBook>[] = [
     {
       title: "",
       fields: [
@@ -108,7 +108,7 @@ export default function BookCreate() {
       <Button variant="filled" onClick={() => setIsAddBookDrawerOpen(true)}>
         Create a new book
       </Button>
-      <NDrawerCreateForm<IBook>
+      <DrawerCreateForm<IBook>
         schema={ZBook.partial()}
         title="Add new book to library"
         saveButtonLoadingState={saveButtonLoading}

@@ -26,8 +26,13 @@ import AddIcon from "@/components/icons/AddIcon";
 import MinusIcon from "@/components/icons/MinusIcon";
 import { Toast } from "@/components/Toast";
 import TrashIcon from "@/components/icons/TrashIcon";
-import NDeleteModal from "@/components/NDeleteModal";
+import DeleteModal from "@/components/NDeleteModal";
 import CloseIcon from "@/components/icons/CloseIcon";
+import {
+  DataTable,
+  DataTableContent,
+  DataTableControls,
+} from "@/components/DataTable";
 
 interface getAllStudentsTypeDef extends getAllStudentsType {
   new_grade: number | null;
@@ -127,9 +132,19 @@ export default function Nextyear() {
     }
     return false;
   }, [selectedGrade, studentData]);
-  const getStudentQuery = trpc.students.getAllStudents.useQuery(undefined, {
-    enabled: false,
+
+  // const getStudentQuery = trpc.students.getAllStudents.useQuery(undefined, {
+  //   enabled: false,
+  // });
+
+  const getStudentQuery =
+    trpc.students.getStudentsByGrade.useQuery(selectedGrade);
+
+  const getGradeValues = trpc.students.getGradeValues.useQuery(undefined, {
+    staleTime: Infinity,
+    cacheTime: Infinity,
   });
+
   const changeAcademicMutation = trpc.students.changeAcademic.useMutation({
     onError: (error) => {
       Toast.Error({
@@ -354,7 +369,7 @@ export default function Nextyear() {
             </Text>
           </div>
           <div className="flex flex-col">
-            <Group justify="flex-start" align="start" mb={15}>
+            <Group justify="flex-start" align="end" mb={15}>
               <Tooltip label="Decrement current grade">
                 <ActionIcon
                   size="lg"
@@ -396,18 +411,25 @@ export default function Nextyear() {
                     saveChangesModalOpen();
                   } else setSelectedGrade(Number(value));
                 }}
-                data={getStudentQuery.data?.data
-                  ?.map((record) => record.grade)
-                  .filter((grade, idx, array) => idx === array.indexOf(grade))
-                  .map((grade) => String(grade))}
+                // data={getStudentQuery.data?.data
+                //   ?.map((record) => record.grade)
+                //   .filter((grade, idx, array) => idx === array.indexOf(grade))
+                //   .map((grade) => String(grade))}
+                data={getGradeValues.data?.data
+                  .filter((grade) => grade.grade !== null)
+                  .map((grade) => String(grade.grade))}
               />
             </Group>
-            <NovellaDataTable<getAllStudentsTypeDef>
+            <DataTable<getAllStudentsTypeDef>
               columns={tanstackCols}
               isDataLoading={getStudentQuery.isLoading}
               isDataRefetching={getStudentQuery.isRefetching}
+              totalDataCount={studentData?.length || 0}
               data={studentData}
-            />
+            >
+              <DataTableContent />
+              <DataTableControls />
+            </DataTable>
             <Group justify="flex-end" align="start" mt={15}>
               <Button
                 color="red.9"
@@ -467,15 +489,13 @@ export default function Nextyear() {
             }
             opened={saveChangesModalOpened}
             onClose={saveChangesModalClose}
+            onSave={saveChangesToDB}
             onCancel={() => {
               setSelectedGrade(tempSelectedGrade);
               saveChangesModalClose();
             }}
-            onSave={() => {
-              saveChangesToDB();
-            }}
           />
-          <NDeleteModal
+          <DeleteModal
             isOpen={deleteModalOpened}
             closeModal={deleteModalClose}
             isDeleting={deleteStudentsInGrade.isLoading}

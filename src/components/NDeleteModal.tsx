@@ -9,7 +9,7 @@ type NDeleteModalProps = {
   description?: string;
 };
 
-export default function NDeleteModal({
+export default function DeleteModal({
   title = "Confirm to delete",
   description = "Are you sure you want to delete the selected rows? This action cannot be undone",
   isOpen,

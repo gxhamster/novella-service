@@ -7,7 +7,7 @@ import { getStudentByIdType } from "@/server/routes/student";
 import { Title, Button, TextInput, Alert, Stack, Text } from "@mantine/core";
 import AlertIcon from "@/components/icons/AlertIcon";
 import { Toast } from "@/components/Toast";
-import NDeleteModal from "@/components/NDeleteModal";
+import DeleteModal from "@/components/NDeleteModal";
 
 type StudentFieldsCategories<T> = {
   title: string;
@@ -304,7 +304,7 @@ export default function Student({ params }: StudentProps) {
             </Button>
           </Stack>
         </Alert>
-        <NDeleteModal
+        <DeleteModal
           title="Delete student from library"
           description="
               This will permanently delete the student from the database and cannot

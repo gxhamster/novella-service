@@ -9,7 +9,7 @@ import { trpc } from "@/app/_trpc/client";
 import { getBookByIdType } from "@/server/routes/books";
 import { TextInput, Button, Title } from "@mantine/core";
 import { Toast } from "@/components/Toast";
-import NDeleteModal from "@/components/NDeleteModal";
+import DeleteModal from "@/components/NDeleteModal";
 
 export default function BookSummary({ data }: { data: getBookByIdType }) {
   let defaultInputValues = {};
@@ -276,7 +276,7 @@ export default function BookSummary({ data }: { data: getBookByIdType }) {
           ))}
         </form>
         <BookDeleteCard onClick={() => setIsDeleteModalOpen(true)} />
-        <NDeleteModal
+        <DeleteModal
           title="Delete book from library"
           description="
               This will permanently delete the book from the database and cannot
