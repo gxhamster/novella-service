@@ -4,12 +4,12 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { IIssuedBook } from "@/supabase/types/supabase";
 import { UseFormSetValue } from "react-hook-form";
 import { trpc } from "@/app/_trpc/client";
-import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
 import { getBooksByPageType } from "@/server/routes/books";
 import { Drawer, Text } from "@mantine/core";
 import FixedTableSmall from "@/components/FixedTable/FixedTableSmall";
 import FixedTableSmallContent from "@/components/FixedTable/FixedTableSmallContent";
 import FixedTableSmallToolbar from "@/components/FixedTable/FixedTableSmallToolbar";
+import { FixedTableFetchFunctionProps } from "@/components/FixedTable";
 
 const booksColHelper = createColumnHelper<getBooksByPageType>();
 const booksTableCols: Array<BooksTableColumnDef> = [
@@ -42,7 +42,7 @@ export default function SelectBookDrawer({
   formSetValue,
 }: SelectBookDrawerProps) {
   const [fetchFunctionOpts, setFetchFunctionOpts] = useState<
-    NDataTableFixedFetchFunctionProps<getBooksByPageType>
+    FixedTableFetchFunctionProps<getBooksByPageType>
   >({
     pageIndex: 0,
     pageSize: 100,

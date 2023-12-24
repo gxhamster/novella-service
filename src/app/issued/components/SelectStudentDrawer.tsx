@@ -3,13 +3,13 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { IIssuedBook, IStudent } from "@/supabase/types/supabase";
 import { Dispatch, SetStateAction, useState } from "react";
 import { UseFormSetValue } from "react-hook-form";
-import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
 import { trpc } from "@/app/_trpc/client";
 import { getStudentsByPageType } from "@/server/routes/student";
 import { Drawer } from "@mantine/core";
 import FixedTableSmall from "@/components/FixedTable/FixedTableSmall";
 import FixedTableSmallToolbar from "@/components/FixedTable/FixedTableSmallToolbar";
 import FixedTableSmallContent from "@/components/FixedTable/FixedTableSmallContent";
+import { FixedTableFetchFunctionProps } from "@/components/FixedTable";
 
 const studentsColHelper = createColumnHelper<getStudentsByPageType>();
 const studentsTableCols: Array<StudentsTableColumnDef> = [
@@ -43,7 +43,7 @@ export default function SelectStudentDrawer({
   formSetValue,
 }: SelectStudentDrawerProps) {
   const [fetchFunctionOpts, setFetchFunctionOpts] = useState<
-    NDataTableFixedFetchFunctionProps<IStudent>
+    FixedTableFetchFunctionProps<IStudent>
   >({
     pageIndex: 0,
     pageSize: 10,

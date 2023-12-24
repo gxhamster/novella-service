@@ -1,9 +1,10 @@
+"use client";
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import FilterIcon from "../icons/FilterIcon";
 import AddIcon from "../icons/AddIcon";
 import { FixedTableFilter } from ".";
 import FixedTableMenu from "./FixedTableMenu";
-import { Text, Button, Select, TextInput, CloseButton } from "@mantine/core";
+import { Button, Select, TextInput, CloseButton } from "@mantine/core";
 
 function DisplayEmptyFilters() {
   return (

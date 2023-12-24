@@ -2,9 +2,9 @@ import { router, publicProcedure } from "../trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { ZBook, ZTableFetchFunctionOptions } from "@/supabase/schema";
-import { NDataTableFixedConvertToSupabaseFilters } from "@/components/NDataTableFixed";
 import { getShape } from "postgrest-js-tools";
 import { IBook } from "@/supabase/types/supabase";
+import { FixedTableFilterToSupabase } from "@/components/FixedTable";
 
 const getBookByIdShape = getShape<IBook>()({
   id: true,
@@ -66,7 +66,7 @@ export const BooksRouter = router({
     .query(async (opts) => {
       const { filters, sorts, pageIndex, pageSize } = opts.input;
       const { supabase } = opts.ctx;
-      const supabaseFilters = NDataTableFixedConvertToSupabaseFilters(filters);
+      const supabaseFilters = FixedTableFilterToSupabase(filters);
 
       let query = supabase
         .from("books")

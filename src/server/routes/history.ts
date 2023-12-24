@@ -2,10 +2,10 @@ import { z } from "zod";
 import { publicProcedure, router } from "../trpc";
 import { ZHistory, ZTableFetchFunctionOptions } from "@/supabase/schema";
 import { TRPCError } from "@trpc/server";
-import { NDataTableFixedConvertToSupabaseFilters } from "@/components/NDataTableFixed";
 import { getShape } from "postgrest-js-tools";
 import { IHistory } from "@/supabase/types/supabase";
 import { format, formatISO } from "date-fns";
+import { FixedTableFilterToSupabase } from "@/components/FixedTable";
 
 const getHistoryByDateShape = getShape<IHistory>()({
   id: true,
@@ -38,7 +38,7 @@ export const HistoryRouter = router({
     .query(async (opts) => {
       const { filters, sorts, pageIndex, pageSize } = opts.input;
       const { supabase } = opts.ctx;
-      const supabaseFilters = NDataTableFixedConvertToSupabaseFilters(filters);
+      const supabaseFilters = FixedTableFilterToSupabase(filters);
 
       let query = supabase
         .from("history")

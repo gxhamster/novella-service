@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import NGlobalSearch from "./NGlobalSearch/NGlobalSearch";
+import GlobalSearch from "./GlobalSearch/GlobalSearch";
 
 const NovellaHeader = () => (
   <nav className="bg-dark-7 px-6 items-center border-b-[1px] border-dark-4 flex justify-between m-0 h-14 max-h-[56px] text-surface-700">
@@ -8,7 +8,7 @@ const NovellaHeader = () => (
       <span className="text-2xl text-surface-950">novella</span>
     </Link>
     <section className="flex gap-10 items-center h-full">
-      <NGlobalSearch />
+      <GlobalSearch />
     </section>
   </nav>
 );

@@ -7,7 +7,7 @@ type NGlobalSearchModalProps = {
   children: React.ReactNode;
 };
 
-export default function NGlobalSearchModal({
+export default function GlobalSearchModal({
   isOpen,
   onModalClose,
   children,

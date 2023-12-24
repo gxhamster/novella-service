@@ -6,7 +6,7 @@ import {
   ZTableFetchFunctionOptions,
 } from "@/supabase/schema";
 import { TRPCError } from "@trpc/server";
-import { NDataTableFixedConvertToSupabaseFilters } from "@/components/NDataTableFixed";
+import { FixedTableFilterToSupabase } from "@/components/FixedTable";
 
 export const IssueRouter = router({
   getIssuedBookById: publicProcedure.input(z.number()).query(async (opts) => {
@@ -33,7 +33,7 @@ export const IssueRouter = router({
     .query(async (opts) => {
       const { filters, sorts, pageIndex, pageSize } = opts.input;
       const { supabase } = opts.ctx;
-      const supabaseFilters = NDataTableFixedConvertToSupabaseFilters(filters);
+      const supabaseFilters = FixedTableFilterToSupabase(filters);
 
       let query = supabase
         .from("issued")

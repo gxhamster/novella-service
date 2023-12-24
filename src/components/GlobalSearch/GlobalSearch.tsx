@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 import { useDebounce } from "usehooks-ts";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import SearchIcon from "../icons/SearchIcon";
 import { Database } from "@/supabase/types/types";
 import BookIcon from "../icons/BookIcon";
 import UserIcon from "../icons/UserIcon";
 import { useRouter } from "next/navigation";
 import { Spotlight, SpotlightActionData, spotlight } from "@mantine/spotlight";
-import { UnstyledButton, Flex, Text, Badge, Group } from "@mantine/core";
-import classes from "./NGlobalSearch.module.css";
+import { UnstyledButton, Text, Badge, Group } from "@mantine/core";
+import classes from "./GlobalSearch.module.css";
 import HomeIcon from "../icons/HomeIcon";
 import IssueBookIcon from "../icons/IssueBookIcon";
 import SchoolIcon from "../icons/SchoolIcon";
+import SearchIcon from "../icons/SearchIcon";
 
 type QueryResultItem = {
   id: number;
@@ -21,7 +21,7 @@ type QueryResultItem = {
   baseHref: string;
 };
 
-export default function NGlobalSearch() {
+export default function GlobalSearch() {
   const [searchValue, setSearchValue] = useState("");
   const [queryResults, setQueryResults] = useState<QueryResultItem[]>([]);
   const debouncedSearchValue = useDebounce(searchValue, 1000);

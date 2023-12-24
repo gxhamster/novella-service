@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
 import { IStudent } from "@/supabase/types/supabase";
-import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
 import { trpc } from "@/app/_trpc/client";
 import { getStudentsByPageType } from "@/server/routes/student";
 import { format } from "date-fns";
@@ -13,6 +12,7 @@ import {
   FixedTableContent,
   FixedTableControls,
   FixedTableEmptyContent,
+  FixedTableFetchFunctionProps,
   FixedTableToolbar,
 } from "@/components/FixedTable";
 import { useDisclosure } from "@mantine/hooks";
@@ -33,7 +33,7 @@ export default function StudentsTable() {
   >([]);
   const [saveButtonLoading, setSaveButtonLoading] = useState(false);
   const [fetchFunctionOpts, setFetchFunctionOpts] = useState<
-    NDataTableFixedFetchFunctionProps<getStudentsByPageType>
+    FixedTableFetchFunctionProps<getStudentsByPageType>
   >({
     pageIndex: 0,
     pageSize: 10,

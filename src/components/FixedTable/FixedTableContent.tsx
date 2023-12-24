@@ -1,3 +1,4 @@
+"use client";
 import { Table } from "@mantine/core";
 import { flexRender } from "@tanstack/react-table";
 import { useTable } from "./FixedTable";

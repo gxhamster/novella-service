@@ -6,9 +6,9 @@ import {
   ZTableFetchFunctionOptions,
 } from "@/supabase/schema";
 import { TRPCError } from "@trpc/server";
-import { NDataTableFixedConvertToSupabaseFilters } from "@/components/NDataTableFixed";
 import { getShape } from "postgrest-js-tools";
 import { IStudent } from "@/supabase/types/supabase";
+import { FixedTableFilterToSupabase } from "@/components/FixedTable";
 
 const getStudentByIdShape = getShape<IStudent>()({
   id: true,
@@ -85,7 +85,7 @@ export const StudentRouter = router({
     .query(async (opts) => {
       const { filters, sorts, pageIndex, pageSize } = opts.input;
       const { supabase } = opts.ctx;
-      const supabaseFilters = NDataTableFixedConvertToSupabaseFilters(filters);
+      const supabaseFilters = FixedTableFilterToSupabase(filters);
 
       let query = supabase.from("students").select("*", {
         count: "estimated",

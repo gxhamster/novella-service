@@ -16,18 +16,21 @@ import {
   useState,
 } from "react";
 import { Checkbox } from "@mantine/core";
-import { NDataTableFixedFilter, NDataTableFixedSort } from "../NDataTableFixed";
-import { FixedTableFetchFunctionProps } from ".";
+import {
+  FixedTableFetchFunctionProps,
+  FixedTableFilter,
+  FixedTableSort,
+} from ".";
 
 interface TableContextType<TableType> {
   table: TanstackTable<TableType>;
   selectedData: TableType[];
   data: TableType[];
   totalPageCount: number;
-  filters: NDataTableFixedFilter[];
-  setFilters: Dispatch<SetStateAction<NDataTableFixedFilter[]>>;
-  sorts: NDataTableFixedSort<TableType> | null;
-  setSorts: Dispatch<SetStateAction<NDataTableFixedSort<TableType> | null>>;
+  filters: FixedTableFilter[];
+  setFilters: Dispatch<SetStateAction<FixedTableFilter[]>>;
+  sorts: FixedTableSort<TableType> | null;
+  setSorts: Dispatch<SetStateAction<FixedTableSort<TableType> | null>>;
 }
 const TableContext = createContext<TableContextType<any> | null>(null);
 export const useTable = () => {
@@ -65,11 +68,9 @@ export default function FixedTable<TableType>({
   children,
   onRowSelectionChanged = () => null,
 }: FixedTable<TableType>) {
-  const [filters, setFilters] = useState<NDataTableFixedFilter[]>([]);
+  const [filters, setFilters] = useState<FixedTableFilter[]>([]);
   const [rowSelection, setRowSelection] = useState({});
-  const [sorts, setSorts] = useState<NDataTableFixedSort<TableType> | null>(
-    null
-  );
+  const [sorts, setSorts] = useState<FixedTableSort<TableType> | null>(null);
   const [totalPageCount, setTotalPageCount] = useState(0);
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,

@@ -12,9 +12,8 @@ import RefreshIcon from "../icons/RefreshIcon";
 import CloseIcon from "../icons/CloseIcon";
 import TrashIcon from "../icons/TrashIcon";
 import AddIcon from "../icons/AddIcon";
-import NDataTableFixedFilterMenu from "../NDataTableFixed/NDataTableFixedFilterMenu";
-import NDataTableFixedSortMenu from "../NDataTableFixed/NDataTableFixedSortMenu";
 import { useTable } from "./FixedTable";
+import { FixedTableFilterMenu, FixedTableSortMenu } from ".";
 
 type RefreshButtonProps = {
   onRefresh: () => void;
@@ -180,7 +179,7 @@ export default function FixedTableToolbar<TableType>({
       <PrimaryActions active={selectedData.length === 0}>
         {children}
         {/* Sort controls and filter controls go here */}
-        <NDataTableFixedSortMenu<TableType>
+        <FixedTableSortMenu<TableType>
           fields={columns}
           sortRulesChange={(_sorts) => {
             if (_sorts)
@@ -192,7 +191,7 @@ export default function FixedTableToolbar<TableType>({
           }}
         />
         {/* Filter Controls */}
-        <NDataTableFixedFilterMenu
+        <FixedTableFilterMenu
           filterRulesChanged={(filter) => {
             setFilters([...filter]);
           }}

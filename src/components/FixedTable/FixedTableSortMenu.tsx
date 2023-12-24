@@ -1,3 +1,4 @@
+"use client";
 import { Dispatch, SetStateAction, useState } from "react";
 import { Text, Switch, CloseButton, Select, Button } from "@mantine/core";
 import SortIcon from "../icons/SortIcon";
