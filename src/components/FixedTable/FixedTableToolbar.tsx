@@ -21,7 +21,7 @@ type RefreshButtonProps = {
   isRefreshing: boolean;
 };
 
-function RefreshButton({ onRefresh, isRefreshing }: RefreshButtonProps) {
+export function RefreshButton({ onRefresh, isRefreshing }: RefreshButtonProps) {
   const refreshBtnIcon = useMemo(() => {
     switch (isRefreshing) {
       case true:

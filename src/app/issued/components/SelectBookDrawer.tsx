@@ -1,4 +1,3 @@
-import NDataTableFixedSmall from "@/components/NDataTableFixed/NDataTableFixedSmall";
 import { Dispatch, SetStateAction, useState } from "react";
 import { BooksTableColumnDef } from "../lib/types";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -8,6 +7,9 @@ import { trpc } from "@/app/_trpc/client";
 import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed";
 import { getBooksByPageType } from "@/server/routes/books";
 import { Drawer, Text } from "@mantine/core";
+import FixedTableSmall from "@/components/FixedTable/FixedTableSmall";
+import FixedTableSmallContent from "@/components/FixedTable/FixedTableSmallContent";
+import FixedTableSmallToolbar from "@/components/FixedTable/FixedTableSmallToolbar";
 
 const booksColHelper = createColumnHelper<getBooksByPageType>();
 const booksTableCols: Array<BooksTableColumnDef> = [
@@ -56,7 +58,16 @@ export default function SelectBookDrawer({
     <Drawer
       title="Select a book to issue"
       styles={{
-        body: { padding: 0 },
+        content: {
+          display: "flex",
+          flexDirection: "column",
+        },
+        body: {
+          padding: 0,
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        },
       }}
       position="right"
       size="80%"
@@ -65,13 +76,11 @@ export default function SelectBookDrawer({
         setIsAddBookDrawerOpen(false);
       }}
     >
-      <NDataTableFixedSmall<getBooksByPageType>
-        columns={booksTableCols}
+      <FixedTableSmall<getBooksByPageType>
+        data={getBooksByPageQuery.data?.data || []}
+        dataCount={getBooksByPageQuery.data?.count || 0}
         tanStackColumns={booksTableColsTanstack}
-        isDataLoading={
-          getBooksByPageQuery.isLoading || getBooksByPageQuery.isRefetching
-        }
-        data={getBooksByPageQuery.data ? getBooksByPageQuery.data.data : []}
+        onPaginationChanged={(opts) => setFetchFunctionOpts(opts)}
         onRowSelectionChanged={(state) => {
           if (state) {
             setIsAddBookDrawerOpen(false);
@@ -79,14 +88,16 @@ export default function SelectBookDrawer({
             formSetValue("book_id", state.id);
           }
         }}
-        dataCount={
-          getBooksByPageQuery.data ? getBooksByPageQuery.data.count : 0
-        }
-        onPaginationChanged={(opts) => {
-          setFetchFunctionOpts({ ...opts });
-        }}
-        onRefresh={() => getBooksByPageQuery.refetch()}
-      />
+      >
+        <FixedTableSmallToolbar<getBooksByPageType>
+          onRefresh={getBooksByPageQuery.refetch}
+          columns={booksTableCols}
+          loading={
+            getBooksByPageQuery.isLoading || getBooksByPageQuery.isRefetching
+          }
+        />
+        <FixedTableSmallContent />
+      </FixedTableSmall>
     </Drawer>
   );
 }

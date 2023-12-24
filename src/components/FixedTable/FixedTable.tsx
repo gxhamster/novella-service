@@ -16,11 +16,8 @@ import {
   useState,
 } from "react";
 import { Checkbox } from "@mantine/core";
-import {
-  NDataTableFixedFetchFunctionProps,
-  NDataTableFixedFilter,
-  NDataTableFixedSort,
-} from "../NDataTableFixed";
+import { NDataTableFixedFilter, NDataTableFixedSort } from "../NDataTableFixed";
+import { FixedTableFetchFunctionProps } from ".";
 
 interface TableContextType<TableType> {
   table: TanstackTable<TableType>;
@@ -49,7 +46,7 @@ type FixedTable<TableType> = {
     sorts,
     pageIndex,
     pageSize,
-  }: NDataTableFixedFetchFunctionProps<TableType>) => void;
+  }: FixedTableFetchFunctionProps<TableType>) => void;
   data: Array<TableType>;
   dataCount: number;
   tanStackColumns: ColumnDef<TableType, any>[];

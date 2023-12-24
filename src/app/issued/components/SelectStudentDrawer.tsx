@@ -1,4 +1,3 @@
-import NDataTableFixedSmall from "@/components/NDataTableFixed/NDataTableFixedSmall";
 import { StudentsTableColumnDef } from "../lib/types";
 import { createColumnHelper } from "@tanstack/react-table";
 import { IIssuedBook, IStudent } from "@/supabase/types/supabase";
@@ -8,6 +7,9 @@ import { NDataTableFixedFetchFunctionProps } from "@/components/NDataTableFixed"
 import { trpc } from "@/app/_trpc/client";
 import { getStudentsByPageType } from "@/server/routes/student";
 import { Drawer } from "@mantine/core";
+import FixedTableSmall from "@/components/FixedTable/FixedTableSmall";
+import FixedTableSmallToolbar from "@/components/FixedTable/FixedTableSmallToolbar";
+import FixedTableSmallContent from "@/components/FixedTable/FixedTableSmallContent";
 
 const studentsColHelper = createColumnHelper<getStudentsByPageType>();
 const studentsTableCols: Array<StudentsTableColumnDef> = [
@@ -58,7 +60,17 @@ export default function SelectStudentDrawer({
     <Drawer
       title="Select a student to issue to"
       styles={{
-        body: { padding: 0 },
+        content: {
+          display: "flex",
+          flexDirection: "column",
+        },
+        body: {
+          padding: 0,
+          display: "flex",
+          flexDirection: "column",
+          flexGrow: "1",
+          overflow: "hidden",
+        },
       }}
       position="right"
       size="xl"
@@ -67,21 +79,11 @@ export default function SelectStudentDrawer({
         setIsAddStudentDrawerOpen(false);
       }}
     >
-      <NDataTableFixedSmall<getStudentsByPageType>
-        columns={studentsTableCols}
+      <FixedTableSmall<getStudentsByPageType>
+        data={getStudentsByPageQuery.data?.data || []}
+        dataCount={getStudentsByPageQuery.data?.count || 0}
         tanStackColumns={studentsTableColsTanstack}
-        isDataLoading={
-          getStudentsByPageQuery.isLoading ||
-          getStudentsByPageQuery.isRefetching
-        }
-        data={
-          getStudentsByPageQuery.data ? getStudentsByPageQuery.data.data : []
-        }
-        dataCount={
-          getStudentsByPageQuery.data ? getStudentsByPageQuery.data.count : 0
-        }
         onPaginationChanged={(opts) => setFetchFunctionOpts(opts)}
-        onRefresh={() => getStudentsByPageQuery.refetch()}
         onRowSelectionChanged={(state) => {
           if (state) {
             setIsAddStudentDrawerOpen(false);
@@ -89,7 +91,17 @@ export default function SelectStudentDrawer({
             formSetValue("student_id", state.id);
           }
         }}
-      />
+      >
+        <FixedTableSmallToolbar<getStudentsByPageType>
+          onRefresh={getStudentsByPageQuery.refetch}
+          columns={studentsTableCols}
+          loading={
+            getStudentsByPageQuery.isLoading ||
+            getStudentsByPageQuery.isRefetching
+          }
+        />
+        <FixedTableSmallContent />
+      </FixedTableSmall>
     </Drawer>
   );
 }

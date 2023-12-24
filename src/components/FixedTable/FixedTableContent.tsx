@@ -7,7 +7,7 @@ export default function FixedTableContent() {
 
   return (
     data.length > 0 && (
-      <div className="flex-grow overflow-scroll bg-dark-8 m-0 relative">
+      <div className=" h-[calc(100vh-43px-57px)] flex-grow overflow-scroll bg-dark-8 m-0 relative">
         <Table
           stickyHeader
           verticalSpacing="xs"
