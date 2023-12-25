@@ -19,7 +19,7 @@ export async function middleware(req: NextRequest) {
       "Auth Error: Error occcured when trying to access session",
       {
         cause: error,
-      }
+      },
     );
     console.error(errorFormatted);
     return NextResponse.redirect(new URL("/login", req.url));

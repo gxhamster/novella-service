@@ -16,13 +16,20 @@ function DataTableEmptyContent() {
   );
 }
 
-export default function DataTableContent() {
+type DataTableContentProps = {
+  spacing?: "xs" | "sm" | "md" | "lg" | "xl";
+};
+
+export default function DataTableContent({
+  spacing = "sm",
+}: DataTableContentProps) {
   const { table, data } = useDataTable();
 
   return (
     <Table
-      verticalSpacing="sm"
-      horizontalSpacing="sm"
+      verticalSpacing={spacing}
+      horizontalSpacing={spacing}
+      withColumnBorders
       highlightOnHover
       withTableBorder
     >

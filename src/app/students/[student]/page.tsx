@@ -114,6 +114,9 @@ type StudentProps = {
 };
 
 export default function Student({ params }: StudentProps) {
+  if (isNaN(Number(params.student)))
+    throw new Error("Book ID should be a number");
+
   const {
     register,
     handleSubmit,
@@ -238,22 +241,6 @@ export default function Student({ params }: StudentProps) {
               >
                 Update
               </Button>
-              {/* <NButton
-                kind="secondary"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (getStudentByIdQuery.data?.data)
-                    reset(getStudentByIdQuery.data?.data);
-                }}
-                disabled={!formValuesChanged}
-                title="Cancel"
-              />
-              <NButton
-                kind="primary"
-                disabled={!formValuesChanged}
-                title="Update"
-                isLoading={updateStudentByIdMutation.isLoading}
-              /> */}
             </div>
           </div>
           {categories.map((category) => (

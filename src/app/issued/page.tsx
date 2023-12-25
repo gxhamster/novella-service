@@ -19,7 +19,6 @@ import IssueBookDrawer from "./components/IssueBookDrawer";
 import DeleteModal from "@/components/NDeleteModal";
 import ReturnBookModal from "./components/ReturnBookModal";
 import UnreturnedBookIcon from "@/components/icons/UnreturnedBookIcon";
-import UploadIcon from "@/components/icons/UploadIcon";
 
 type DuedateStatusBadgeProps = {
   days: number;
@@ -191,59 +190,6 @@ export default function Issued() {
 
   return (
     <>
-      {/* <NDataTableFixed<IIssuedBookV2>
-        primaryButtonTitle="Issue Book"
-        columns={issuedBooksTableCols}
-        tanStackColumns={issuedBooksTableColsTanstack}
-        onCreateRowButtonPressed={() => setIsIssueBookDrawerOpen(true)}
-        onRowSelectionChanged={(selectedRows, table) => {
-          setSelectedRows(selectedRows);
-          setTanstackTableRef(table);
-        }}
-        selectedToobarActions={
-          <Button
-            variant="light"
-            onClick={() => {
-              if (selectedRows) {
-                const booksToReturn = selectedRows?.map((row) => row.id);
-                setReturnBookIDs(booksToReturn);
-                setIsReturnBookModalOpen(true);
-                tanstackTableRef?.resetRowSelection();
-              } else {
-                Toast.Error({
-                  title: "Coudld not return",
-                  message:
-                    "Make sure atleast one row is selected to be able to return",
-                });
-              }
-            }}
-            rightSection={<UnreturnedBookIcon size={16} />}
-          >
-            Return
-          </Button>
-        }
-        isDataLoading={
-          getIssuedBooksByPageQuery.isLoading ||
-          getIssuedBooksByPageQuery.isRefetching
-        }
-        onRowDeleted={(deletedBooks) => {
-          setDeletedBooks(deletedBooks);
-          setIsIssueBookDeleteModalOpen(true);
-        }}
-        data={
-          getIssuedBooksByPageQuery.data
-            ? getIssuedBooksByPageQuery.data.data
-            : []
-        }
-        dataCount={
-          getIssuedBooksByPageQuery.data
-            ? getIssuedBooksByPageQuery.data.count
-            : 0
-        }
-        onRefresh={() => getIssuedBooksByPageQuery.refetch()}
-        onPaginationChanged={(opts) => setFetchFunctionOpts(opts)}
-      /> */}
-
       <FixedTable<IssuedPageTableType>
         data={getIssuedBooksByPageQuery.data?.data || []}
         onPaginationChanged={(options) => setFetchFunctionOpts(options)}
@@ -268,16 +214,7 @@ export default function Issued() {
             getIssuedBooksByPageQuery.isLoading ||
             getIssuedBooksByPageQuery.isRefetching
           }
-        >
-          <Button
-            color="gray"
-            variant="default"
-            size="xs"
-            leftSection={<UploadIcon size={16} />}
-          >
-            Import
-          </Button>
-        </FixedTableToolbar>
+        />
         <FixedTableContent />
         <FixedTableEmptyContent />
         <FixedTableControls loading={getIssuedBooksByPageQuery.isLoading} />

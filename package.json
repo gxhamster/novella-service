@@ -13,12 +13,14 @@
     "@headlessui/react": "^1.7.17",
     "@hookform/resolvers": "^3.3.2",
     "@mantine/core": "^7.3.2",
+    "@mantine/dropzone": "^7.3.2",
     "@mantine/form": "^7.3.2",
     "@mantine/hooks": "^7.3.2",
     "@mantine/notifications": "^7.3.2",
     "@mantine/spotlight": "^7.3.2",
     "@supabase/auth-helpers-nextjs": "^0.7.4",
     "@supabase/supabase-js": "^2.33.1",
+    "@tabler/icons-react": "^2.44.0",
     "@tanstack/react-query": "^4.36.1",
     "@tanstack/react-table": "^8.9.7",
     "@trpc/client": "^10.40.0",
@@ -34,6 +36,7 @@
     "eslint": "8.48.0",
     "eslint-config-next": "13.4.19",
     "next": "13.4.19",
+    "papaparse": "^5.4.1",
     "postcss": "^8.4.32",
     "postgrest-js-tools": "^1.2.0",
     "react": "18.2.0",
@@ -48,6 +51,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/papaparse": "^5.3.14",
     "postcss-import": "^15.1.0",
     "postcss-preset-mantine": "^1.12.0",
     "postcss-simple-vars": "^7.0.1"

@@ -40,21 +40,6 @@ const tableColumnsObj: TableCols[] = [
   },
 ];
 
-const booksTableCols: TableCols[] = [
-  {
-    id: "id",
-    header: "ID",
-  },
-  {
-    id: "title",
-    header: "Title",
-  },
-  {
-    id: "author",
-    header: "Author",
-  },
-];
-
 type issuedTableDef = Tables<"issued">;
 
 export default function DashboardIssuedTable({ issuedBooks }: any) {

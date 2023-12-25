@@ -13,6 +13,7 @@ export default function FixedTableSmallContent() {
         verticalSpacing="xs"
         horizontalSpacing="xs"
         highlightOnHover
+        withRowBorders
         withColumnBorders
       >
         <Table.Thead>
