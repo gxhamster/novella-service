@@ -75,11 +75,19 @@ export default function Students({ searchParams }: SearchParamsProps) {
 
   const deleteStudentMutation = trpc.students.deleteStudentsById.useMutation({
     onError: (_error) => {
+      Toast.Error({
+        title: "Could not delete student",
+        message: _error.message,
+      });
       throw new Error(_error.message, {
         cause: _error.shape?.data,
       });
     },
-    onSettled: () => {
+    onSuccess: () => {
+      Toast.Successful({
+        title: "Successful",
+        message: "Student has been deleted successfully",
+      });
       deleteStudentModalHandler.close();
       getStudentsByPageQuery.refetch();
     },
@@ -241,6 +249,7 @@ export default function Students({ searchParams }: SearchParamsProps) {
       {showImportPreview && <ImportPreview />}
       <DeleteModal
         isOpen={deleteStudentModalOpen}
+        isDeleting={deleteStudentMutation.isLoading}
         closeModal={deleteStudentModalHandler.close}
         onDelete={async () => {
           const ids = deletedStudentsRows?.map((rows) => rows.id);

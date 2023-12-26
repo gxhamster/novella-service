@@ -25,6 +25,9 @@ import {
   IconDeviceFloppy,
   IconArrowLeft,
   IconArrowRight,
+  IconCircleCheck,
+  IconFileSpreadsheet,
+  IconCircleCheckFilled,
 } from "@tabler/icons-react";
 import { Dropzone, MIME_TYPES } from "@mantine/dropzone";
 import { useMemo, useState } from "react";
@@ -33,7 +36,9 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { ZStudentInsert } from "@/supabase/schema";
 import { SafeParseError } from "zod";
 import { useDisclosure } from "@mantine/hooks";
-import AlertIcon from "@/components/icons/AlertIcon";
+import { trpc } from "../_trpc/client";
+import { Toast } from "@/components/Toast";
+import { Tables, TablesInsert } from "@/supabase/types/types";
 
 type PreviewModalProps = {
   onFileSelected: (file: File) => void;
@@ -205,7 +210,7 @@ function ImportTable({ data, onIsTableErr }: ImportTableProps) {
             </Group>
           </>
         ),
-      })
+      }),
     ),
     columnHelper.accessor("status", {
       header: "Status",
@@ -244,7 +249,7 @@ function ImportTable({ data, onIsTableErr }: ImportTableProps) {
     console.log(errorStatusPerRow);
 
     const isAnyRowErr = errorStatusPerRow.filter(
-      (row) => row.status === "Invalid"
+      (row) => row.status === "Invalid",
     );
     if (isAnyRowErr.length) onIsTableErr(true);
     else onIsTableErr(false);
@@ -273,29 +278,86 @@ function ImportTable({ data, onIsTableErr }: ImportTableProps) {
 
 export default function ImportPreview() {
   const router = useRouter();
-  const [parsedFile, setParsedFile] = useState<Array<
-    Record<"string", any>
-  > | null>(null);
+  const [parsedFile, setParsedFile] = useState<Array<any> | null>(null);
   const [active, setActive] = useState(0);
   const nextStep = () =>
     setActive((current) => (current < 3 ? current + 1 : current));
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
   const [isTableError, setIsTableError] = useState(false);
+  const [uploadFinished, setIsUploadFinished] = useState(false);
 
   const allowNextStep = useMemo(() => {
-    if (parsedFile && !isTableError) return true;
-    return false;
-  }, [parsedFile, isTableError]);
+    switch (active) {
+      case 0:
+        return parsedFile ? true : false;
+      case 1:
+        return !isTableError;
+      case 2:
+        return uploadFinished;
+      default:
+        return false;
+    }
+  }, [parsedFile, isTableError, uploadFinished, active]);
 
-  const [isUploading, setIsUploading] = useState(false);
+  const allowPrevStep = useMemo(() => {
+    switch (active) {
+      case 0:
+      case 3:
+        return false;
+      case 2:
+        return !uploadFinished;
+      default:
+        return true;
+    }
+  }, [uploadFinished, active]);
+
+  const insertStudentMutation = trpc.students.createStudents.useMutation({
+    onError: (error) => {
+      Toast.Error({
+        title: "Cannot commit",
+        message: error.message,
+      });
+    },
+    onSuccess: () => {
+      setIsUploadFinished(true);
+      nextStep();
+      router.refresh();
+      Toast.Successful({
+        message: "Successfully imported students to the library",
+        title: "Successful",
+      });
+    },
+  });
 
   function upload() {
-    setIsUploading(true);
-    setTimeout(() => {
-      setIsUploading(false);
-      nextStep();
-    }, 10000);
+    const acceptedFields = [
+      "name",
+      "address",
+      "island",
+      "phone",
+      "grade",
+      "index",
+    ];
+    const recordsToUpload: Array<TablesInsert<"students">> = [];
+    // FIXME: Get rid of the any types. When assigning a key in newRecord it shows never.
+    if (!parsedFile) return;
+    for (const record of parsedFile) {
+      let newRecord: any = {
+        index: 0,
+      };
+
+      for (let field in record) {
+        if (acceptedFields.includes(field)) {
+          newRecord[field] = record[field];
+        }
+      }
+      recordsToUpload.push(newRecord);
+    }
+
+    // Upload to database
+    console.log(recordsToUpload);
+    insertStudentMutation.mutate(recordsToUpload);
   }
 
   return (
@@ -308,7 +370,7 @@ export default function ImportPreview() {
     >
       <Box pos="relative" p={20}>
         <LoadingOverlay
-          visible={isUploading}
+          visible={insertStudentMutation.isLoading}
           styles={{
             overlay: {
               backgroundColor: "rgba(36,36,36,0.2)",
@@ -319,11 +381,22 @@ export default function ImportPreview() {
         />
         <Stepper
           active={active}
-          color="green.5"
+          color="green.6"
           onStepClick={setActive}
+          completedIcon={
+            <IconCircleCheck style={{ width: rem(18), height: rem(18) }} />
+          }
           allowNextStepsSelect={allowNextStep}
         >
-          <Stepper.Step label="First step" description="Select file">
+          <Stepper.Step
+            icon={
+              <IconFileSpreadsheet
+                style={{ width: rem(18), height: rem(18) }}
+              />
+            }
+            label="First step"
+            description="Select file"
+          >
             <FileDropzone
               onFileSelected={(file) => {
                 Papa.parse(file, {
@@ -339,9 +412,12 @@ export default function ImportPreview() {
             />
           </Stepper.Step>
           <Stepper.Step
+            icon={
+              <IconAlertCircle style={{ width: rem(18), height: rem(18) }} />
+            }
             label="Second step"
             description="Check for errors"
-            color={isTableError ? "red" : "green.5"}
+            color={isTableError ? "red" : "green.6"}
           >
             <ImportTable
               onIsTableErr={(isError) => setIsTableError(isError)}
@@ -349,13 +425,17 @@ export default function ImportPreview() {
             />
           </Stepper.Step>
 
-          <Stepper.Step label="Third step" description="Commit records">
+          <Stepper.Step
+            icon={<IconUpload style={{ width: rem(20), height: rem(20) }} />}
+            label="Third step"
+            description="Commit records"
+          >
             <Stack justify="center" align="center" p={20} gap={40}>
               <IconDatabaseImport size={120} stroke={0.5} color="#9e9e9e" />
               <Button
                 variant="filled"
-                size="md"
-                loading={isUploading}
+                size="sm"
+                loading={insertStudentMutation.isLoading}
                 onClick={upload}
                 leftSection={<IconDeviceFloppy size={20} />}
               >
@@ -363,12 +443,31 @@ export default function ImportPreview() {
               </Button>
             </Stack>
           </Stepper.Step>
+          <Stepper.Completed>
+            <Group justify="center" p={20}>
+              <IconCircleCheckFilled
+                size={50}
+                stroke={0.5}
+                style={{ color: "#40bf56" }}
+              />
+              <Stack gap={5}>
+                <Text size="xl" inline>
+                  Import successful
+                </Text>
+                <Text size="sm" c="dimmed" mt={7}>
+                  The imported records have been commited to the library and
+                  will now be visible.
+                </Text>
+              </Stack>
+            </Group>
+          </Stepper.Completed>
         </Stepper>
         <Group justify="center" mt="xl">
           <Button
             size="xs"
             leftSection={<IconArrowLeft />}
             variant="default"
+            disabled={!allowPrevStep}
             onClick={() => {
               setIsTableError(false);
               prevStep();

@@ -223,6 +223,22 @@ export const StudentRouter = router({
           cause: error.details,
         });
     }),
+  createStudents: publicProcedure
+    .input(z.array(ZStudentInsert))
+    .mutation(async (opts) => {
+      const { input } = opts;
+      const { supabase } = opts.ctx;
+      const { error } = await supabase.from("students").insert(input, {
+        defaultToNull: false,
+      });
+
+      if (error)
+        throw new TRPCError({
+          message: error.message,
+          code: "BAD_REQUEST",
+          cause: error.details,
+        });
+    }),
 
   getTotalStudents: publicProcedure.query(async (opts) => {
     const { supabase } = opts.ctx;
