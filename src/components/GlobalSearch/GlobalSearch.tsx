@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDebounce } from "usehooks-ts";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "@/supabase/types/types";
@@ -12,6 +12,7 @@ import HomeIcon from "../icons/HomeIcon";
 import IssueBookIcon from "../icons/IssueBookIcon";
 import SchoolIcon from "../icons/SchoolIcon";
 import SearchIcon from "../icons/SearchIcon";
+import { IconSearch } from "@tabler/icons-react";
 
 type QueryResultItem = {
   id: number;
@@ -28,7 +29,7 @@ export default function GlobalSearch() {
   const supabase = createClientComponentClient<Database>();
   const nextRouter = useRouter();
 
-  const actions: SpotlightActionData[] = [
+  const [actions] = useState<SpotlightActionData[]>([
     {
       id: "home",
       label: "Home",
@@ -64,23 +65,26 @@ export default function GlobalSearch() {
       onClick: () => nextRouter.push("/students/nextyear"),
       leftSection: <SchoolIcon size={20} />,
     },
-  ];
+  ]);
 
-  const actionsWithQueryResults = [
-    ...actions,
-    ...queryResults.map((result) => ({
-      id: String(result.id),
-      label: result.title,
-      description: result.subtitle,
-      leftSection:
-        result.type === "book" ? (
-          <BookIcon size={20} />
-        ) : (
-          <UserIcon size={20} />
-        ),
-      onClick: () => nextRouter.push(`${result.baseHref}/${result.id}`),
-    })),
-  ];
+  const actionsWithQueryResults = useMemo(() => {
+    if (queryResults.length > 0)
+      return [
+        ...queryResults.map((result) => ({
+          id: String(result.id),
+          label: result.title,
+          description: result.subtitle,
+          leftSection:
+            result.type === "book" ? (
+              <BookIcon size={20} />
+            ) : (
+              <UserIcon size={20} />
+            ),
+          onClick: () => nextRouter.push(`${result.baseHref}/${result.id}`),
+        })),
+      ];
+    else return actions;
+  }, [queryResults, actions, nextRouter]);
 
   useEffect(() => {
     async function doTextSearch() {
@@ -90,7 +94,7 @@ export default function GlobalSearch() {
         .select()
         .textSearch(
           "searchcol",
-          `${debouncedSearchValue.split(" ").join("|")}`
+          `${debouncedSearchValue.split(" ").join("|")}`,
         );
 
       if (booksSearchResult !== null) {
@@ -101,7 +105,7 @@ export default function GlobalSearch() {
             title: book.title ? book.title : "",
             subtitle: book.author ? book.author : "",
             baseHref: "/books/",
-          })
+          }),
         );
         setQueryResults([...newBookSearchResult]);
       }
@@ -111,7 +115,7 @@ export default function GlobalSearch() {
         .select()
         .textSearch(
           "searchcol",
-          `${debouncedSearchValue.split(" ").join("|")}`
+          `${debouncedSearchValue.split(" ").join("|")}`,
         );
 
       if (studentsSearchResults !== null) {
@@ -150,16 +154,29 @@ export default function GlobalSearch() {
           </Badge>
         </Group>
       </UnstyledButton>
-      <Spotlight
-        actions={actionsWithQueryResults}
-        onChange={(event: any) => setSearchValue(event.target.value)}
-        nothingFound="Nothing found..."
-        highlightQuery
-        searchProps={{
-          leftSection: <SearchIcon size={20} className="" />,
-          placeholder: "Search...",
-        }}
-      />
+      <Spotlight.Root query={searchValue} onQueryChange={setSearchValue}>
+        <Spotlight.Search
+          placeholder="Search..."
+          leftSection={<IconSearch stroke={1.5} />}
+        />
+        <Spotlight.ActionsList>
+          {actionsWithQueryResults.length > 0 ? (
+            actionsWithQueryResults.map((result) => {
+              return (
+                <Spotlight.Action
+                  key={result.id}
+                  label={result.label}
+                  description={result.description}
+                  onClick={result.onClick}
+                  leftSection={result.leftSection}
+                />
+              );
+            })
+          ) : (
+            <Spotlight.Empty>Nothing found...</Spotlight.Empty>
+          )}
+        </Spotlight.ActionsList>
+      </Spotlight.Root>
     </>
   );
 }
