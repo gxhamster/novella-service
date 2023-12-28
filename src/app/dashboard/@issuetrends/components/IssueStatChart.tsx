@@ -15,8 +15,6 @@ type IssueStatChartProps = {
 export default function IssueStatChart({ data }: IssueStatChartProps) {
   Chart.register(CategoryScale);
 
-  console.log(data);
-
   const [chartData, setChartData] = useState({
     labels: data.dates,
     datasets: [

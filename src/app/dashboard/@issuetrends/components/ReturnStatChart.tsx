@@ -15,8 +15,6 @@ type ReturnStatChartProps = {
 export default function ReturnStatChart({ data }: ReturnStatChartProps) {
   Chart.register(CategoryScale);
 
-  console.log(data);
-
   const [chartData, setChartData] = useState({
     labels: data.dates,
     datasets: [
