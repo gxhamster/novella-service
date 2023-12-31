@@ -211,7 +211,7 @@ function ImportTable({ data, onIsTableErr }: ImportTableProps) {
             </Group>
           </>
         ),
-      }),
+      })
     ),
     columnHelper.accessor("status", {
       header: "Status",
@@ -249,7 +249,7 @@ function ImportTable({ data, onIsTableErr }: ImportTableProps) {
     const endIdx = pageSettings.pageSize * (pageSettings.pageIndex + 1);
 
     const isAnyRowErr = errorStatusPerRow.filter(
-      (row) => row.status === "Invalid",
+      (row) => row.status === "Invalid"
     );
     if (isAnyRowErr.length) onIsTableErr(true);
     else onIsTableErr(false);
@@ -288,16 +288,16 @@ function SampleTable() {
   ];
 
   const tanstackCols = sampleHeaders.map((col) =>
-    sampleColHelper.accessor(col.id, {
+    sampleColHelper.accessor(col.id as keyof TablesInsert<"students">, {
       header: col.id,
       cell: (props) => props.getValue(),
-    }),
+    })
   );
 
-  const sampleData: Array<Tables<"students">> = [
+  const sampleData: Array<TablesInsert<"students">> = [
     {
       name: "Student 1",
-      islands: "Island 1",
+      island: "Island 1",
       address: "Address 1",
       phone: "7567525",
       grade: 6,

@@ -107,6 +107,7 @@ export default function Issued() {
         dataCount={getHistoryByPageQuery.data?.count || 0}
       >
         <FixedTableToolbar<historyTableDef>
+          onFilterButtonPressed={() => null}
           onRefresh={getHistoryByPageQuery.refetch}
           activePrimaryAction={false}
           primaryAction={() => null}

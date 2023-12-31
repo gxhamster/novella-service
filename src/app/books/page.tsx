@@ -111,6 +111,7 @@ export default function Books() {
         dataCount={getBooksByPageQuery.data?.count || 0}
       >
         <FixedTableToolbar
+          onFilterButtonPressed={() => null}
           primaryActionTitle="Add book"
           columns={columnsObj}
           onRefresh={getBooksByPageQuery.refetch}

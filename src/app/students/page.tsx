@@ -136,7 +136,7 @@ export default function Students({ searchParams }: SearchParamsProps) {
       },
 
       header: column.header,
-    }),
+    })
   );
 
   const studentCategories: DrawerCreateFormFieldsType<IStudent>[] = [
@@ -219,6 +219,7 @@ export default function Students({ searchParams }: SearchParamsProps) {
         dataCount={getStudentsByPageQuery.data?.count || 0}
       >
         <FixedTableToolbar<getStudentsByPageType>
+          onFilterButtonPressed={() => null}
           primaryActionTitle="Add student"
           columns={columnsObj}
           onRefresh={getStudentsByPageQuery.refetch}
