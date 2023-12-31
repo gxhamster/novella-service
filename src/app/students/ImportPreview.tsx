@@ -8,6 +8,7 @@ import {
   ActionIcon,
   Box,
   Button,
+  Flex,
   LoadingOverlay,
   Modal,
   Popover,
@@ -246,7 +247,6 @@ function ImportTable({ data, onIsTableErr }: ImportTableProps) {
 
     const startIdx = pageSettings.pageIndex * pageSettings.pageSize;
     const endIdx = pageSettings.pageSize * (pageSettings.pageIndex + 1);
-    console.log(errorStatusPerRow);
 
     const isAnyRowErr = errorStatusPerRow.filter(
       (row) => row.status === "Invalid",
@@ -273,6 +273,51 @@ function ImportTable({ data, onIsTableErr }: ImportTableProps) {
         <DataTableControls />
       </DataTable>
     </>
+  );
+}
+
+function SampleTable() {
+  const sampleColHelper = createColumnHelper<TablesInsert<"students">>();
+  const sampleHeaders = [
+    { id: "name" },
+    { id: "island" },
+    { id: "address" },
+    { id: "phone" },
+    { id: "grade" },
+    { id: "index" },
+  ];
+
+  const tanstackCols = sampleHeaders.map((col) =>
+    sampleColHelper.accessor(col.id, {
+      header: col.id,
+      cell: (props) => props.getValue(),
+    }),
+  );
+
+  const sampleData: Array<Tables<"students">> = [
+    {
+      name: "Student 1",
+      islands: "Island 1",
+      address: "Address 1",
+      phone: "7567525",
+      grade: 6,
+      index: 5675,
+    },
+  ];
+
+  return (
+    <Stack gap={10} mt={15}>
+      <Text c="gray">Sample table</Text>
+      <DataTable
+        totalDataCount={sampleData.length}
+        isDataLoading={false}
+        isDataRefetching={false}
+        data={sampleData}
+        columns={tanstackCols}
+      >
+        <DataTableContent spacing="xs" />
+      </DataTable>
+    </Stack>
   );
 }
 
@@ -364,8 +409,13 @@ export default function ImportPreview() {
     <Modal
       opened
       onClose={router.back}
-      size="95%"
-      title="Import preview"
+      fullScreen
+      title={
+        <Group gap={5}>
+          <IconUpload color="gray" stroke={1.5} />
+          <Text c="gray">Import student records</Text>
+        </Group>
+      }
       radius="md"
     >
       <Box pos="relative" p={20}>
@@ -410,6 +460,7 @@ export default function ImportPreview() {
                 });
               }}
             />
+            <SampleTable />
           </Stepper.Step>
           <Stepper.Step
             icon={

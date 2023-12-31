@@ -15,7 +15,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <NovellaSidebar />
         <section className="flex flex-col flex-1 w-full overflow-x-hidden">
           <NovellaHeader />
-          <main className="overflow-y-auto flex-1 max-h-screen">
+          <main className="overflow-y-auto flex-1 max-h-screen max-w-full">
             {children}
           </main>
         </section>

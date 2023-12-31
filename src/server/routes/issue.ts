@@ -1,12 +1,9 @@
 import { z } from "zod";
 import { publicProcedure, router } from "../trpc";
-import {
-  ZIssued,
-  ZIssuedInsert,
-  ZTableFetchFunctionOptions,
-} from "@/supabase/schema";
+import { ZIssued, ZIssuedInsert } from "@/supabase/schema";
 import { TRPCError } from "@trpc/server";
-import { FixedTableFilterToSupabase } from "@/components/FixedTable";
+import { FilterNumber, filterSchema } from "@/components/Filter/filter";
+import { IssuedPageTableFilter } from "@/app/issued/page";
 
 export const IssueRouter = router({
   getIssuedBookById: publicProcedure.input(z.number()).query(async (opts) => {
@@ -29,38 +26,64 @@ export const IssueRouter = router({
   }),
 
   getIssuedBooksByPage: publicProcedure
-    .input(ZTableFetchFunctionOptions)
+    .input(filterSchema)
     .query(async (opts) => {
-      const { filters, sorts, pageIndex, pageSize } = opts.input;
+      const { filters, pageIndex, pageSize } = opts.input;
       const { supabase } = opts.ctx;
-      const supabaseFilters = FixedTableFilterToSupabase(filters);
 
-      let query = supabase
-        .from("issued")
-        .select("*, book_id, books (title), student_id, students (name)", {
-          count: "estimated",
-        });
-      if (filters.length > 0) query = query.or(supabaseFilters);
-      if (sorts)
-        query = query.order(sorts.field, { ascending: sorts.ascending });
-      query = query.range(pageIndex * pageSize, pageSize * (pageIndex + 1));
-      const { data, count, error } = await query;
-      const flatData = data?.map((v) => {
-        return {
-          book_id: v.book_id,
-          created_at: v.created_at,
-          id: v.id,
-          student_id: v.student_id,
-          name: v.students?.name || "",
-          title: v.books?.title || "",
-          due_date: v.due_date,
-          user_id: v.user_id,
-        };
+      console.log(filters);
+      let query = supabase.from("issued_table_view").select("*", {
+        count: "estimated",
       });
 
-      if (error) throw new Error(error.message);
+      function createRangeQuery(
+        columnName: keyof IssuedPageTableFilter,
+        params: FilterNumber
+      ) {
+        if (params.end) {
+          query = query.gt(columnName, params.start);
+          query = query.lt(columnName, params.end);
+        } else {
+          switch (params.operator) {
+            case "eq":
+              query = query.eq(columnName, params.start);
+              break;
+            case "lt":
+              query = query.lt(columnName, params.start);
+              break;
+            case "gt":
+              query = query.gt(columnName, params.start);
+              break;
+            default:
+              throw new Error("Unrecognized filter operator");
+          }
+        }
+      }
 
-      return { data: flatData ? flatData : [], count: count ? count : 0 };
+      if (filters.id) createRangeQuery("id", filters.id);
+
+      if (filters.book_id) createRangeQuery("book_id", filters.book_id);
+
+      if (filters.student_id)
+        createRangeQuery("student_id", filters.student_id);
+
+      if (filters.title) query = query.eq("title", filters.title);
+
+      if (filters.name) query = query.eq("name", filters.name);
+
+      if (filters.issued_date)
+        createRangeQuery("issued_date", filters.issued_date);
+
+      if (filters.due_date) createRangeQuery("due_date", filters.due_date);
+
+      if (filters.status) query = query.eq("status", filters.status);
+
+      const { data, count } = await query.range(
+        pageIndex * pageSize,
+        pageSize * (pageIndex + 1)
+      );
+
+      return { data: data || [], count: count || 0 };
     }),
 
   updateIssuedBookById: publicProcedure

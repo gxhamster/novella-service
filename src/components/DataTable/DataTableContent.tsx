@@ -30,8 +30,8 @@ export default function DataTableContent({
       verticalSpacing={spacing}
       horizontalSpacing={spacing}
       withColumnBorders
-      highlightOnHover
       withTableBorder
+      highlightOnHover
     >
       <Table.Thead>
         {table.getHeaderGroups().map((headerGroup) => (
@@ -45,7 +45,7 @@ export default function DataTableContent({
                   ? null
                   : flexRender(
                       header.column.columnDef.header,
-                      header.getContext()
+                      header.getContext(),
                     )}
               </Table.Th>
             ))}

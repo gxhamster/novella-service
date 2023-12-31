@@ -8,11 +8,11 @@ export default function FixedTableContent() {
 
   return (
     data.length > 0 && (
-      <div className=" h-[calc(100vh-43px-57px)] flex-grow overflow-scroll bg-dark-8 m-0 relative">
+      <div className="max-w-full h-full flex-grow overflow-scroll bg-dark-8 m-0 relative">
         <Table
           stickyHeader
           verticalSpacing="xs"
-          horizontalSpacing="sm"
+          horizontalSpacing="lg"
           withColumnBorders
           className="w-full table-auto"
         >
@@ -22,13 +22,13 @@ export default function FixedTableContent() {
                 {headerGroup.headers.map((header, idx) => (
                   <Table.Th
                     key={header.id}
-                    className={`text-start p-2 px-4 font-semibold text-sm border-x-[0.7px] border-surface-400 whitespace-nowrap`}
+                    className={`text-sm text-start truncate font-semibold border-x-[0.7px] border-surface-400 whitespace-nowrap`}
                   >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </Table.Th>
                 ))}
@@ -44,7 +44,7 @@ export default function FixedTableContent() {
                 {row.getVisibleCells().map((cell, idx) => (
                   <Table.Td
                     key={cell.id}
-                    className={`p-2 px-4 truncate border-[0.7px] border-surface-400/70 text-sm font-normal`}
+                    className={`text-sm truncate border-[0.7px] border-surface-400/70 font-normal`}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </Table.Td>

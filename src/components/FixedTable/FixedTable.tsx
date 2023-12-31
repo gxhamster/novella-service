@@ -58,6 +58,7 @@ type FixedTable<TableType> = {
     state: Array<TableType>,
     table: TanstackTable<TableType>
   ) => void;
+  fullWidth?: boolean;
 };
 
 export default function FixedTable<TableType>({
@@ -67,6 +68,7 @@ export default function FixedTable<TableType>({
   tanStackColumns,
   children,
   onRowSelectionChanged = () => null,
+  fullWidth = true,
 }: FixedTable<TableType>) {
   const [filters, setFilters] = useState<FixedTableFilter[]>([]);
   const [rowSelection, setRowSelection] = useState({});
@@ -144,7 +146,11 @@ export default function FixedTable<TableType>({
   }, [selectedData]);
 
   return (
-    <div className="m-0 flex flex-col h-full">
+    <div
+      className={`m-0 flex flex-col justify-between ${
+        fullWidth ? "col-span-2" : "col-span-1"
+      }`}
+    >
       <TableContext.Provider
         value={{
           table,

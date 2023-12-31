@@ -33,7 +33,7 @@ function DashboardHeader() {
           color="blue"
           size="md"
           rightSection={<AddIcon size={20} />}
-          onClick={() => nextRouter.push("/issued")}
+          onClick={() => nextRouter.push("/issued?drawer=true")}
         >
           Issue Book
         </Button>

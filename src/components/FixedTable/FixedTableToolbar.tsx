@@ -14,6 +14,7 @@ import TrashIcon from "../icons/TrashIcon";
 import AddIcon from "../icons/AddIcon";
 import { useTable } from "./FixedTable";
 import { FixedTableFilterMenu, FixedTableSortMenu } from ".";
+import FilterIcon from "../icons/FilterIcon";
 
 type RefreshButtonProps = {
   onRefresh: () => void;
@@ -136,6 +137,7 @@ function PrimaryAction({
 type FixedTableToolbarProps<TableType> = {
   onRefresh: () => void;
   onRowDeleted: (deletedRows: Array<TableType>) => void;
+  onFilterButtonPressed: () => void;
   isDataLoading: boolean;
   primaryAction: () => void;
   columns: Array<{ id: keyof TableType; header: string }>;
@@ -149,6 +151,7 @@ export default function FixedTableToolbar<TableType>({
   isDataLoading,
   onRefresh,
   columns,
+  onFilterButtonPressed,
   primaryAction,
   primaryActionTitle = "Create",
   activePrimaryAction = true,
@@ -191,12 +194,21 @@ export default function FixedTableToolbar<TableType>({
           }}
         />
         {/* Filter Controls */}
-        <FixedTableFilterMenu
+        {/* <FixedTableFilterMenu
           filterRulesChanged={(filter) => {
             setFilters([...filter]);
           }}
           tableProps={columns.map((col) => col.id)}
-        />
+        /> */}
+        <Button
+          variant="default"
+          size="xs"
+          color="gray"
+          leftSection={<FilterIcon size={16} />}
+          onClick={onFilterButtonPressed}
+        >
+          Filter
+        </Button>
         <PrimaryAction
           title={primaryActionTitle}
           active={activePrimaryAction}

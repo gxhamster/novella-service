@@ -1,7 +1,6 @@
 "use client";
 import { createColumnHelper } from "@tanstack/react-table";
 import { trpc } from "../../../_trpc/client";
-import { format } from "date-fns";
 import {
   DataTable,
   DataTableContent,
@@ -29,7 +28,7 @@ const tableColumnsObj: TableCols[] = [
     header: "Title",
   },
   {
-    id: "created_at",
+    id: "issued_date",
     header: "Issued Date",
     isDate: true,
   },
@@ -40,16 +39,13 @@ const tableColumnsObj: TableCols[] = [
   },
 ];
 
-type issuedTableDef = Tables<"issued">;
+type issuedTableDef = Tables<"issued_table_view">;
 
 export default function DashboardIssuedTable({ issuedBooks }: any) {
   const columnHelper = createColumnHelper<issuedTableDef>();
   const tanstackCols = tableColumnsObj.map((col) => {
     return columnHelper.accessor(col.id as keyof issuedTableDef, {
-      cell: (cell) =>
-        col.isDate
-          ? format(new Date(cell.getValue() as string), "dd/MM/yyyy hh:mm")
-          : cell.getValue(),
+      cell: (cell) => cell.getValue(),
       header: col.header,
     });
   });
@@ -57,8 +53,7 @@ export default function DashboardIssuedTable({ issuedBooks }: any) {
   const getIssuedBookQuery = trpc.issued.getIssuedBooksByPage.useQuery({
     pageIndex: 0,
     pageSize: 10,
-    filters: [],
-    sorts: { field: "id", ascending: true },
+    filters: {},
   });
 
   return (

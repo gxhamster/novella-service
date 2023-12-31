@@ -82,11 +82,6 @@ const categories: StudentFieldsCategories<getStudentByIdType>[] = [
   },
 ];
 
-const categoryLinks = categories.map((category) => ({
-  href: category.title,
-  title: category.title,
-}));
-
 type useFormValuesChangedProps<T> = {
   srcData: T;
   currentFormValues: T;
